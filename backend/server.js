@@ -5,6 +5,12 @@ const path = require("path");
 const usuariosRoutes = require("./routes/usuarios");
 const docentesRoutes = require("./routes/docentes");
 const estudiantesRoutes = require("./routes/estudiantes");
+const cargosRoutes = require("./routes/cargos");
+const materiasRoutes = require("./routes/materias");
+const tramitacionesRoutes = require("./routes/tramitaciones");
+const codigosRoutes = require("./routes/codigos_tramite");
+const cursosRoutes = require("./routes/cursos");
+const licenciasRoutes = require("./routes/licencias");
 
 const app = express();
 
@@ -37,6 +43,12 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 app.use("/usuarios", usuariosRoutes);
 app.use("/docentes", docentesRoutes);
 app.use("/estudiantes", estudiantesRoutes);
+app.use("/cargos", cargosRoutes);
+app.use("/materias", materiasRoutes);
+app.use("/tramitaciones", tramitacionesRoutes);
+app.use("/codigos-tramite", codigosRoutes);
+app.use("/cursos", cursosRoutes);
+app.use("/licencias", licenciasRoutes);
 
 // ==================
 // RUTA PRINCIPAL

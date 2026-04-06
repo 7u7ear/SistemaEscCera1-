@@ -1,0 +1,10 @@
+node_modules/
+logs/
+coverage/
+dist/
+.env
+*.log
+frontend/
+src/web/
+debug_*.js
+test_*.js
