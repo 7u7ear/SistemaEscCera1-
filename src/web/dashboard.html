@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Escolar Cera 1 - Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-saas: #5E72E4;
+            --accent-saas: #11CDEF;
+            --dark-saas: #172B4D;
+            --bg-saas: #F8F9FE;
+            --text-saas: #32325D;
+            --muted-saas: #8898AA;
+            
+            /* Overriding old variables for compatibility */
+            --primary-color: #172B4D;
+            --accent-color: #5E72E4;
+            --bg-body: #F8F9FE;
+        }
+        body {
+            background-color: var(--bg-saas);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-saas);
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: linear-gradient(135deg, var(--dark-saas) 0%, #2b3a54 100%);
+            color: white;
+            padding-top: 2rem;
+            z-index: 1050;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar-brand {
+            padding: 0 1.5rem 2rem;
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 1px;
+        }
+        .sidebar-link {
+            padding: 0.9rem 1.5rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            font-size: 0.95rem;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.08);
+            border-left: 4px solid var(--accent-saas);
+        }
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            background: #fff;
+        }
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .view-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* SaaS Specific Components */
+        .btn-primary {
+            background-color: var(--primary-saas);
+            border-color: var(--primary-saas);
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: #495bd6;
+            border-color: #495bd6;
+            transform: translateY(-1px);
+        }
+        
+        .active-chain-node {
+            border-left: 3px solid var(--accent-saas);
+            background: #fff;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+        }
+        .node-highlight {
+            background: linear-gradient(90deg, #f0f3ff 0%, #ffffff 100%);
+            border-left: 4px solid var(--primary-saas);
+        }
+        .node-actual {
+            background: linear-gradient(135deg, var(--primary-saas) 0%, var(--accent-saas) 100%);
+            color: white;
+            border-left: none;
+        }
+        .node-actual .text-muted { color: rgba(255,255,255,0.7) !important; }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--muted-saas);
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--primary-saas);
+            background: transparent;
+            border-bottom: 3px solid var(--primary-saas);
+        }
+        
+        .badge-saas {
+            border-radius: 30px;
+            padding: 0.4em 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-mortarboard-fill"></i> EscCera1
+    </div>
+    <nav>
+        <a class="sidebar-link active" onclick="mostrarSeccion('dashboard')">
+            <i class="bi bi-house-door"></i> Dashboard
+        </a>
+        <a class="sidebar-link" onclick="mostrarSeccion('docentes')">
+            <i class="bi bi-people"></i> Docentes
+        </a>
+        <a class="sidebar-link" onclick="mostrarSeccion('cargos')">
+            <i class="bi bi-briefcase"></i> Puestos
+        </a>
+        <a class="sidebar-link" onclick="mostrarSeccion('tramitaciones')">
+            <i class="bi bi-file-earmark-text"></i> Tramitaciones
+        </a>
+        <a class="sidebar-link" onclick="mostrarSeccion('licencias')">
+            <i class="bi bi-calendar-check text-primary"></i> Licencias
+        </a>
+        <a class="sidebar-link" onclick="mostrarSeccion('planilla')">
+            <i class="bi bi-pen text-info"></i> Planilla de Firmas
+        </a>
+        <hr class="mx-3 opacity-25">
+        <a class="sidebar-link text-danger" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i> Salir
+        </a>
+    </nav>
+</div>
+
+<div class="main-content">
+    <header class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 id="titulo" class="fw-bold mb-0">Bienvenido</h2>
+            <p id="userInfo" class="text-muted mb-0 small"></p>
+        </div>
+        <div class="d-flex gap-2">
+            <!-- Botones de acción rápida opcionales -->
+        </div>
+    </header>
+
+    <!-- SECCION DASHBOARD -->
+    <div id="seccion-dashboard" class="view-section active">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card p-4 bg-primary text-white h-100">
+                    <h5 class="fw-bold"><i class="bi bi-graph-up-arrow"></i> Resumen</h5>
+                    <p class="mb-0 mt-3 opacity-75">Sistema de administración escolar sincronizado.</p>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card p-4 h-100">
+                    <h5 class="fw-bold">Próximos Pasos</h5>
+                    <p class="text-muted">Utilice el menú lateral para gestionar el personal docente y los cargos institucionales.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCION DOCENTES -->
+    <div id="seccion-docentes" class="view-section">
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Docentes</h3>
+                <button class="btn btn-success px-4" onclick="abrirModal()">
+                    <i class="bi bi-person-plus"></i> Nuevo Docente
+                </button>
+            </div>
+            <div class="mb-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="buscador" class="form-control border-start-0" placeholder="Buscar por apellido, nombre o DNI..." onkeyup="filtrar()">
+                </div>
+            </div>
+            <div class="table-responsive" id="tablaDocentes">
+                <div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCION PUESTOS -->
+    <div id="seccion-cargos" class="view-section">
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Puestos Institucionales</h3>
+                <button class="btn btn-primary px-4" onclick="abrirModalCargo()">
+                    <i class="bi bi-plus-circle"></i> Nuevo Puesto
+                </button>
+            </div>
+            <div class="mb-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="buscadorCargos" class="form-control border-start-0" placeholder="Buscar por número de puesto..." onkeyup="filtrarCargos()">
+                </div>
+            </div>
+            <div class="table-responsive" id="tablaCargos">
+                <div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCION TRAMITACIONES -->
+    <div id="seccion-tramitaciones" class="view-section">
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Tramitaciones</h3>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary px-4" onclick="verGestionCodigos()">
+                        <i class="bi bi-gear"></i> Gestionar Códigos
+                    </button>
+                    <button class="btn btn-primary px-4" onclick="abrirModalTramitacion()">
+                        <i class="bi bi-plus-circle"></i> Nueva Tramitación
+                    </button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="buscadorTramitaciones" class="form-control border-start-0" placeholder="Buscar por docente, tipo o expediente..." onkeyup="filtrarTramitaciones()">
+                </div>
+            </div>
+            <div class="table-responsive" id="tablaTramitaciones">
+                <div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCION LICENCIAS -->
+    <div id="seccion-licencias" class="view-section">
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-0">Licencias y Ausentismo</h3>
+                    <p class="mb-0 text-muted small">Control de inasistencias y estados administrativos</p>
+                </div>
+                <button class="btn btn-primary px-4 fw-bold shadow-sm" onclick="abrirModalLicencia()">
+                    <i class="bi bi-plus-circle"></i> Registrar Licencia
+                </button>
+            </div>
+            <div class="mb-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="buscadorLicencias" class="form-control border-start-0" placeholder="Buscar por docente, tipo o expediente..." onkeyup="filtrarLicencias()">
+                </div>
+            </div>
+            <div class="table-responsive" id="tablaLicencias">
+                <div class="text-center p-5"><div class="spinner-border text-warning" role="status"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCION PLANILLA -->
+    <div id="seccion-planilla" class="view-section">
+        <!-- Renderizado dinámico desde planillaFirmasComponent.js -->
+    </div>
+</div>
+
+<!-- MODAL DETALLE PUESTO (NODAL) -->
+<div class="modal fade" id="modalDetallePuesto" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-dark text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-info-circle me-2"></i>Detalle del Puesto</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="bodyDetallePuesto">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALES (Reutilizados del diseño anterior) -->
+
+<!-- MODAL DOCENTE -->
+<div class="modal fade" id="modalDocente" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 bg-light">
+        <h5 class="modal-title fw-bold" id="modalTitulo">Datos del Docente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 row g-3">
+        <input type="hidden" id="docenteId">
+        <div class="col-md-4"><label class="small text-muted">RRHH ID</label><input type="text" id="rrhh_id" class="form-control"></div>
+        <div class="col-md-4"><label class="small text-muted">Apellido</label><input type="text" id="apellido" class="form-control"></div>
+        <div class="col-md-4"><label class="small text-muted">Nombre</label><input type="text" id="nombre" class="form-control"></div>
+        <div class="col-md-4"><label class="small text-muted">Fecha Nac.</label><input type="date" id="fechaNac" class="form-control"></div>
+        <div class="col-md-4"><label class="small text-muted">DNI</label><input type="text" id="dni" class="form-control"></div>
+        <div class="col-md-4"><label class="small text-muted">CUIL</label><input type="text" id="cuil" class="form-control"></div>
+        <div class="col-md-4"><label class="small text-muted">Ficha Censal</label><input type="text" id="fichaCensal" class="form-control"></div>
+        <div class="col-md-4"><label class="small text-muted">Email</label><input type="email" id="email" class="form-control"></div>
+        <div class="col-md-4"><label class="small text-muted">Teléfono</label><input type="text" id="telefono" class="form-control"></div>
+        <div class="col-md-12"><label class="small text-muted">Dirección</label><input type="text" id="direccion" class="form-control"></div>
+        <div class="col-md-6"><label class="small text-muted">Fecha Ingreso</label><input type="date" id="fecha_ingreso" class="form-control"></div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-primary px-4" onclick="guardarDocente()">Guardar Cambios</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CARGO -->
+<div class="modal fade" id="modalCargo" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 bg-light">
+        <h5 class="modal-title fw-bold" id="modalTituloCargo">Datos del Puesto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 row g-3">
+        <input type="hidden" id="cargoId">
+        <div class="col-md-12"><label class="small text-muted">Número de Puesto</label><input type="text" id="numero_puesto" class="form-control"></div>
+        <div class="col-md-12"><label class="small text-muted">Tipo de Puesto</label><input type="text" id="tipo_cargo" class="form-control" placeholder="Ej: TP3, Preceptor"></div>
+        <div class="col-md-12"><label class="small text-muted">Total de Horas</label><input type="number" id="total_horas" class="form-control"></div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-primary px-4" onclick="guardarCargo()">Guardar</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GESTIÓN DE CARGO (Docente y Horarios) -->
+<div class="modal fade" id="modalGestionCargo" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 bg-primary text-white">
+        <h5 class="modal-title fw-bold" id="gestionCargoTitulo">Gestión de Cargo</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="gestionCargoId">
+        
+        <!-- NAV TABS -->
+        <ul class="nav nav-tabs mb-4" id="gestionCargoTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-asignaciones" data-bs-toggle="tab" data-bs-target="#panel-asignaciones" type="button" role="tab"><i class="bi bi-diagram-3 me-2"></i>Asignación y Horarios</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-historial" data-bs-toggle="tab" data-bs-target="#panel-historial" type="button" role="tab"><i class="bi bi-clock-history me-2"></i>Historial del Puesto</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-alta" data-bs-toggle="tab" data-bs-target="#panel-alta" type="button" role="tab"><i class="bi bi-person-plus-fill me-2"></i>Asignar Docente</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="gestionCargoTabsContent">
+            <!-- PANEL 1: ASIGNACIÓN ACTIVA Y HORARIOS -->
+            <div class="tab-pane fade show active" id="panel-asignaciones" role="tabpanel">
+                
+                <div class="row">
+                    <!-- CADENA DE DOCENTES (JERARQUÍA) -->
+                    <div class="col-md-5">
+                        <div class="card p-3 border-0 shadow-sm bg-light-subtle h-100">
+                            <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-people-fill"></i> Cadena de Docentes Activos</h6>
+                            <div id="contenedorCadenaAsignacion" class="overflow-auto" style="max-height: 450px;">
+                                <!-- Se renderiza jerárquicamente: Titular -> Suplente 1 -> Suplente 2 -->
+                                <div class="text-center p-4 text-muted small">Cargando cadena...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COMPOSICIÓN HORARIA -->
+                    <div class="col-md-7">
+                        <div class="card p-3 border-0 shadow-sm h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-calendar3"></i> Composición Horaria y Materias</h6>
+                                <button class="btn btn-sm btn-outline-primary" onclick="mostrarFormMateria()">+ Materia</button>
+                            </div>
+                            
+                            <!-- Formulario rápido de materia (oculto por defecto) -->
+                            <div id="formRapidoMateria" class="mb-3 p-3 bg-light rounded" style="display:none;">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-md-7"><select id="selectMateria" class="form-select form-select-sm"></select></div>
+                                    <div class="col-md-5"><select id="selectCurso" class="form-select form-select-sm"></select></div>
+                                </div>
+                                <div class="row g-2 mb-2">
+                                    <div class="col-md-4"><select id="selectDia" class="form-select form-select-sm">
+                                        <option value="lunes">Lunes</option><option value="martes">Martes</option><option value="miércoles">Miércoles</option><option value="jueves">Jueves</option><option value="viernes">Viernes</option>
+                                    </select></div>
+                                    <div class="col-md-4 d-flex gap-1">
+                                        <input type="time" id="inputHoraIngreso" class="form-control form-control-sm">
+                                        <input type="time" id="inputHoraEgreso" class="form-control form-control-sm">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="number" id="inputHoras" class="form-control form-control-sm" placeholder="Cant. Horas">
+                                    </div>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-md-8">
+                                        <div class="input-group input-group-sm">
+                                            <select id="selectTipoHora" class="form-select form-select-sm"></select>
+                                            <button class="btn btn-outline-secondary" onclick="abrirGestionTiposHora()"><i class="bi bi-gear"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-primary btn-sm px-3" onclick="agregarMateria()">Guardar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="tablaDistribucion" class="table-responsive">
+                                <!-- Tabla de materias asignadas -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL 2: HISTORIAL -->
+            <div class="tab-pane fade" id="panel-historial" role="tabpanel">
+                <div class="card p-3 border-0 shadow-sm">
+                    <h6 class="fw-bold mb-3">Docentes que han pasado por este puesto</h6>
+                    <div id="tablaHistorial" class="table-responsive">
+                        <div class="text-center p-3 text-muted">Cargando historial...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL 3: ASIGNAR DOCENTE (ALTA) -->
+            <div class="tab-pane fade" id="panel-alta" role="tabpanel">
+                <div class="card p-4 border-0 shadow-sm bg-light-subtle">
+                    <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-person-fill-add"></i> Registro de Asignación / Reemplazo</h5>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted">Docente a Asignar</label>
+                            <select id="selectDocente" class="form-select form-select-lg shadow-sm border-0"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small fw-bold text-muted">Situación de Revista</label>
+                            <select id="situacionRevista" class="form-select shadow-sm" onchange="toggleReemplazoDrop()">
+                                <option value="titular">Titular</option>
+                                <option value="interino">Interino</option>
+                                <option value="suplente">Suplente</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small fw-bold text-muted">ROL Institucional</label>
+                            <input type="number" id="inputRolAsignacion" class="form-control shadow-sm" placeholder="Ej: 101">
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="small fw-bold text-muted">Fecha de Inicio</label>
+                            <input type="date" id="fechaAsignacion" class="form-control shadow-sm">
+                        </div>
+                        <div class="col-md-5" id="divReemplazaA" style="display:none;">
+                            <label class="small fw-bold text-muted text-danger">¿A quién reemplaza?</label>
+                            <select id="selectReemplazaA" class="form-select shadow-sm border-danger">
+                                <option value="">-- Seleccionar Docente Licenciado --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small fw-bold text-muted">N° Expediente de Alta</label>
+                            <input type="text" id="inputExpedienteAlta" class="form-control shadow-sm" placeholder="Ej: EX-2024-...">
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button class="btn btn-primary btn-lg px-5 shadow" onclick="asignarDocente()">Confirmar Asignación</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VER CARGOS -->
+<div class="modal fade" id="modalVerCargos" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 bg-light">
+        <h5 class="modal-title fw-bold">Puestos del Docente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="bodyCargosDocente"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TRAMITACIÓN -->
+<div class="modal fade" id="modalTramitacion" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 bg-light">
+        <h5 class="modal-title fw-bold" id="modalTramiteTitulo">Nueva Tramitación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 row g-3">
+        <input type="hidden" id="tramiteId">
+        <div class="col-md-6">
+            <label class="small text-muted">Fecha ABM</label>
+            <input type="date" id="tramiteFecha" class="form-control">
+        </div>
+        <div class="col-md-6">
+            <label class="small text-muted">Puesto (Cargo)</label>
+            <input type="text" id="tramiteCargoSearch" class="form-control" list="listaPuestosTramite" placeholder="Escriba puesto..." oninput="seleccionarPuestoTramite(this.value)">
+            <datalist id="listaPuestosTramite"></datalist>
+            <input type="hidden" id="tramiteCargo">
+        </div>
+        <div class="col-md-6">
+            <label class="small text-muted">Docente</label>
+            <input type="text" id="tramiteDocenteSearch" class="form-control" list="listaDocentesTramite" placeholder="Escriba apellido, DNI..." oninput="seleccionarDocenteTramite(this.value)">
+            <datalist id="listaDocentesTramite"></datalist>
+            <input type="hidden" id="tramiteDocente">
+        </div>
+        <div class="col-md-6">
+            <label class="small text-muted">Tipo de Trámite (Código)</label>
+            <input type="text" id="tramiteCodigoSearch" class="form-control" list="listaCodigosTramite" placeholder="Escriba código o descripción..." oninput="seleccionarCodigoTramite(this.value)">
+            <datalist id="listaCodigosTramite"></datalist>
+            <input type="hidden" id="tramiteCodigoId">
+        </div>
+        <div class="col-md-6">
+            <label class="small text-muted">ROL (GCBA)</label>
+            <input type="number" id="tramiteRol" class="form-control" placeholder="Ej: 12345">
+        </div>
+        <div class="col-md-6">
+            <label class="small text-muted">Expediente</label>
+            <input type="text" id="tramiteExpediente" class="form-control" placeholder="Ej: EX-2024-...">
+        </div>
+        <div class="col-md-12">
+            <label class="small text-muted">Estado</label>
+            <select id="tramiteEstado" class="form-select">
+                <option value="caratulado">Caratulado</option>
+                <option value="en_tramitacion">En tramitación</option>
+                <option value="espera_documentacion">A la espera de documentación</option>
+                <option value="urgente">Urgente</option>
+                <option value="realizado">Realizado</option>
+            </select>
+        </div>
+        <div class="col-md-12">
+            <textarea id="tramiteObs" class="form-control" rows="2" placeholder="Observaciones"></textarea>
+        </div>
+        
+        <!-- INTEGRACION ABM PUESTOS -->
+        <hr class="my-3">
+        <div class="col-md-12 mt-0">
+            <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="checkAplicarABMPuesto" onchange="toggleTramiteABM()">
+                <label class="form-check-label fw-bold text-primary" for="checkAplicarABMPuesto">Impactar movimiento en Gestión de Puestos</label>
+            </div>
+            <div id="divTramiteABM" class="p-3 bg-light border rounded shadow-sm" style="display:none;">
+                <h6 class="fw-bold small mb-2"><i class="bi bi-person-lines-fill"></i> Si es un Alta o Designación:</h6>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <select id="tramiteABMSituacion" class="form-select small">
+                            <option value="">-- No aplicar Alta --</option>
+                            <option value="titular">Titular</option>
+                            <option value="interino">Interino</option>
+                            <option value="suplente">Suplente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <select id="tramiteABMReemplaza" class="form-select small">
+                            <option value="">-- Seleccionar a quién reemplaza --</option>
+                        </select>
+                    </div>
+                </div>
+                <h6 class="fw-bold small mb-2 text-danger"><i class="bi bi-box-arrow-right"></i> Si es una Baja o Cese:</h6>
+                <div class="col-md-12 mb-2">
+                    <select id="tramiteABMAsignacionBaja" class="form-select small shadow-sm border-danger">
+                        <option value="">-- Seleccionar designación a dar de baja --</option>
+                    </select>
+                </div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="tramiteABMRegresaTitular" checked>
+                    <label class="form-check-label small" for="tramiteABMRegresaTitular">El docente reemplazado por esta baja vuelve a estar Activo (Fin de licencia).</label>
+                </div>
+                <small class="text-muted d-block" style="font-size:11px;">Al guardar, el sistema asignará al Docente en el Puesto (Alta) o aplicará la baja a la designación seleccionada (Baja).</small>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-primary px-4" onclick="guardarTramitacion()">Guardar Trámite</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BAJA SUPLENTE/TITULAR -->
+<div class="modal fade" id="modalBajaSuplente" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-danger text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-box-arrow-right me-2"></i>Registrar Baja / Renuncia</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="bajaCargoId">
+        <input type="hidden" id="bajaCargoDocenteId">
+        <div class="mb-3">
+            <label class="form-label text-muted small">Fecha de Baja (Cese)</label>
+            <input type="date" id="bajaFecha" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label class="form-label text-muted small">N° Expediente (Baja)</label>
+            <input type="text" id="bajaExpediente" class="form-control" placeholder="Ej: EX-2024-123456">
+        </div>
+        <div class="form-check form-switch mt-4">
+            <input class="form-check-input" type="checkbox" id="bajaRetornaTitular" checked>
+            <label class="form-check-label fw-bold small" for="bajaRetornaTitular">El docente reemplazado (Titular) vuelve a estado Activo automáticamente, terminando su licencia.</label>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-danger px-4" onclick="confirmarBaja()">Confirmar Baja</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- MODAL GESTIÓN CÓDIGOS DE TRÁMITE -->
+<div class="modal fade" id="modalGestionCodigos" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 bg-dark text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-gear-fill me-2"></i>Gestión de Códigos de Trámite</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Formulario de carga rápida -->
+        <div class="card p-3 mb-4 bg-light border-0 shadow-sm">
+            <h6 class="fw-bold mb-3">Agregar / Editar Código</h6>
+            <input type="hidden" id="codigoTramiteId">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <input type="text" id="inputCodigoHex" class="form-control" placeholder="Código (Ej: 101)">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" id="inputDescripcionHex" class="form-control" placeholder="Descripción (Ej: Alta por Licencia)">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-success w-100" onclick="guardarCodigoTramite()">Guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr><th>Código</th><th>Descripción</th><th class="text-end">Acciones</th></tr>
+                </thead>
+                <tbody id="tablaCuerpoCodigos"></tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVA LICENCIA -->
+<div class="modal fade" id="modalLicencia" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-calendar-check-fill me-2"></i>Registrar Licencia / Ausentismo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="formLicencia">
+            <input type="hidden" id="licenciaId">
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label class="form-label fw-bold small text-muted">Docente</label>
+                    <input type="text" id="licenciaDocenteSearch" class="form-control" placeholder="Buscar por nombre o DNI..." list="listaDocentesLicencia" onchange="seleccionarDocenteLicencia(this.value)">
+                    <input type="hidden" id="licenciaDocenteId">
+                    <datalist id="listaDocentesLicencia"></datalist>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label fw-bold small text-muted">Puestos afectados por la licencia</label>
+                    <div id="contenedorCargosLicencia" class="border rounded p-3 bg-light" style="max-height: 180px; overflow-y: auto;">
+                        <span class="text-muted small">Seleccione un docente para ver sus cargos activos...</span>
+                    </div>
+                    <div class="form-check mt-2" id="divSeleccionarTodoLicencia" style="display:none;">
+                        <input class="form-check-input" type="checkbox" id="checkTodosLosCargos" onchange="seleccionarTodosLosCargosLicencia(this.checked)">
+                        <label class="form-check-label small fw-bold" for="checkTodosLosCargos">Seleccionar todos los cargos</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-muted">Fecha Inicio</label>
+                    <input type="date" id="licenciaFechaInicio" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small text-muted">Fecha Fin (Opcional)</label>
+                    <input type="date" id="licenciaFechaFin" class="form-control">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label fw-bold small text-muted">Tipo de Licencia / Artículo</label>
+                    <div class="input-group">
+                        <input type="text" id="licenciaTipo" class="form-control" placeholder="Ej: 70.j, Licencia Médica..." list="listaTiposLicencia" required>
+                        <button class="btn btn-outline-primary fw-bold border-primary text-dark" type="button" onclick="abrirModalNuevoTipoLicencia()">+ AGREGAR LIC</button>
+                    </div>
+                    <datalist id="listaTiposLicencia"></datalist>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" id="checkCorrespondeExpediente" onchange="toggleLicenciaExpediente()">
+                        <label class="form-check-label fw-bold" for="checkCorrespondeExpediente">Corresponde Expediente</label>
+                    </div>
+                    <div id="divLicenciaExpediente" style="display: none;">
+                        <input type="text" id="licenciaExpediente" class="form-control" placeholder="Número de expediente...">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label fw-bold small text-muted">Observaciones</label>
+                    <textarea id="licenciaObs" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-md-12 mt-2">
+                    <div class="card p-3 bg-light border-info border-opacity-50 shadow-sm">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="checkGenerarTramite" onchange="toggleGenerarTramite()">
+                            <label class="form-check-label fw-bold text-info" for="checkGenerarTramite">
+                                <i class="bi bi-file-earmark-plus"></i> Generar Trámite Administrativo
+                            </label>
+                        </div>
+                        <div id="divSelectCodigoTramite" style="display:none;" class="mt-2">
+                            <label class="small text-muted fw-bold">Seleccionar Código de Trámite</label>
+                            <input type="text" id="licenciaCodigoTramiteSearch" class="form-control form-control-sm" list="listaCodigosTramite" placeholder="Ej: LIC-MED, Licencia Médica..." oninput="seleccionarCodigoTramiteLicencia(this.value)">
+                            <input type="hidden" id="licenciaCodigoTramiteId">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 mt-2" id="divSyncPuestoLicencia" style="display:none;">
+                    <div class="card p-3 bg-light border-primary border-opacity-50">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="checkActualizarEstadoPuesto" checked>
+                            <label class="form-check-label small" for="checkActualizarEstadoPuesto">
+                                <strong>Cambiar estado a "Licencia"</strong> en los puestos seleccionados (permite cargar suplentes).
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0 p-4 pt-0">
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" id="btnGuardarLicencia" class="btn btn-primary px-4 fw-bold shadow-sm" onclick="guardarLicencia(event)">Guardar Licencia</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO TIPO DE LICENCIA -->
+<div class="modal fade" id="modalNuevoTipoLicencia" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-body p-4 text-center">
+        <h6 class="fw-bold mb-3"><i class="bi bi-plus-square-fill text-primary me-2"></i>Nuevo Tipo de Licencia</h6>
+        <input type="text" id="nuevoTipoCod" class="form-control mb-2" placeholder="Código (Ej: 70.x)">
+        <input type="text" id="nuevoTipoDesc" class="form-control mb-3" placeholder="Descripción (Ej: Licencia por Matrimonio)">
+        <div class="d-flex gap-2 justify-content-center">
+            <button class="btn btn-sm btn-light px-3" data-bs-dismiss="modal">Cancelar</button>
+            <button class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" onclick="guardarNuevoTipoLicencia()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="dashboard_script.js?v=final_fix_v5"></script>
+<script src="components/docentesComponent.js?v=final_fix_v5"></script>
+<script src="components/cargosComponent.js?v=final_fix_v5"></script>
+<script src="components/tramitacionesComponent.js?v=final_fix_v5"></script>
+<script src="components/licenciasComponent.js?v=final_fix_v5"></script>
+<script src="components/planillaFirmasComponent.js?v=final_fix_v5"></script>
+
+</body>
+</html>
