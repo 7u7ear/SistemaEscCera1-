@@ -3,7 +3,7 @@
 // ============================
 
 async function verTramitaciones() {
-    const res = await fetch("/api/v1/tramitaciones", { credentials: "include" });
+    const res = await api.get("/api/v1/tramitaciones");
     if (res.status === 401) { window.location.href = "login.html"; return; }
     if (res.status === 403) return alert("No tiene permisos para ver este módulo.");
     if (!res.ok) return alert("Error al cargar tramitaciones");
@@ -139,7 +139,7 @@ async function abrirModalEditarTramitacion(id) {
 }
 
 async function cargarCodigosTramite() {
-    const res = await fetch("/api/v1/codigos-tramite", { credentials: "include" });
+    const res = await api.get("/api/v1/codigos-tramite");
     if (res.ok) codigosTramiteGlobal = await res.json();
 }
 
@@ -202,12 +202,8 @@ async function guardarCodigoTramite() {
 
     if (!codigo || !descripcion) return alert("Código y descripción son obligatorios");
 
-    const res = await fetch(id ? `/codigos-tramite/${id}` : "/codigos-tramite", {
-        method: id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ codigo, descripcion_tramite: descripcion })
-    });
+    const url = id ? `/api/v1/codigos-tramite/${id}` : "/api/v1/codigos-tramite";
+    const res = await (id ? api.put(url, { codigo, descripcion_tramite: descripcion }) : api.post(url, { codigo, descripcion_tramite: descripcion }));
 
     if (res.ok) {
         document.getElementById("codigoTramiteId").value = "";
@@ -231,7 +227,7 @@ function editarCodigoTramite(id) {
 
 async function eliminarCodigoTramite(id) {
     if (!confirm("¿Desea desactivar este código de trámite?")) return;
-    const res = await fetch(`/codigos-tramite/${id}`, { method: "DELETE", credentials: "include" });
+    const res = await api.delete(`/api/v1/codigos-tramite/${id}`);
     if (res.ok) {
         await verGestionCodigos();
         poblarSelectCodigosTramite();
@@ -282,7 +278,7 @@ function seleccionarPuestoTramite(valor) {
 
 async function cargarReemplazosTramite(cargoId) {
     if (!cargoId) return;
-    const res = await fetch(`/api/v1/cargos/${cargoId}/historial`, { credentials: "include" });
+    const res = await api.get(`/api/v1/cargos/${cargoId}/historial`);
     if (res.ok) {
         historialTemporalTramite = await res.json();
         const selectR = document.getElementById("tramiteABMReemplaza");
@@ -308,15 +304,8 @@ function toggleTramiteABM() {
 }
 
 async function cargarDocentesDelCargo(cargoId, selectedDocenteId = null) {
-    const select = document.getElementById("tramiteDocente");
-    select.innerHTML = '<option value="">Cargando docentes...</option>';
-
-    if (!cargoId) {
-        select.innerHTML = '<option value="">-- Primero elija un Puesto --</option>';
-        return;
-    }
-
-    const res = await fetch(`/api/v1/cargos/${cargoId}/historial`, { credentials: "include" });
+    // ...
+    const res = await api.get(`/api/v1/cargos/${cargoId}/historial`);
     if (res.ok) {
         const historial = await res.json();
         select.innerHTML = '<option value="">-- Seleccionar Docente --</option>';
@@ -379,12 +368,8 @@ async function guardarTramitacion() {
     if (!data.fecha || !data.codigo_tramite_id) return alert("Fecha y Código de Trámite son obligatorios");
 
     const id = document.getElementById("tramiteId").value;
-    const res = await fetch(id ? `/tramitaciones/${id}` : "/tramitaciones", {
-        method: id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data)
-    });
+    const url = id ? `/api/v1/tramitaciones/${id}` : "/api/v1/tramitaciones";
+    const res = await (id ? api.put(url, data) : api.post(url, data));
 
     if (res.ok) {
         // Logica de ABM unificado
@@ -400,10 +385,7 @@ async function guardarTramitacion() {
                     rol: data.rol ? parseInt(data.rol, 10) : 0,
                     expediente_alta: data.expediente
                 };
-                await fetch(`/cargos/${data.cargo_id}/asignar`, {
-                    method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-                    body: JSON.stringify(payloadAlta)
-                });
+                await api.post(`/api/v1/cargos/${data.cargo_id}/asignar`, payloadAlta);
             } else {
                 // Es una BAJA
                 const bajaId = document.getElementById("tramiteABMAsignacionBaja").value;
@@ -413,12 +395,7 @@ async function guardarTramitacion() {
                         expediente_baja: data.expediente,
                         titular_regresa: document.getElementById("tramiteABMRegresaTitular").checked
                     };
-                    await fetch(`/cargos/${data.cargo_id}/baja/${bajaId}`, {
-                        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-                        body: JSON.stringify(payloadBaja)
-                    });
-                } else {
-                    console.log("No se seleccionó designación para dar de baja, omitiendo ABM de Puestos.");
+                    await api.post(`/api/v1/cargos/${data.cargo_id}/baja/${bajaId}`, payloadBaja);
                 }
             }
         }

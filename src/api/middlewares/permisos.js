@@ -4,7 +4,7 @@ const AppError = require('../../shared/errors/AppError');
 module.exports = (nombreModulo, tipo) => {
     return async (req, res, next) => {
         try {
-            const user = req.session.user;
+            const user = req.user;
             if (!user) {
                 return res.status(401).json({ error: "No autorizado" });
             }

@@ -14,7 +14,7 @@ class LicenciaController {
     async create(req, res, next) {
         try {
             const validatedData = createLicenciaSchema.parse(req.body);
-            const userId = req.session.user.id;
+            const userId = req.user.id;
             const result = await LicenciaService.createLicencia(validatedData, userId);
             res.status(201).json({ 
                 message: 'Licencia(s) registrada(s) con éxito', 

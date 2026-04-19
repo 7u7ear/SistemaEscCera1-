@@ -136,7 +136,7 @@ class CargoRepository {
                    cur.turno AS curso_turno
             FROM distribucion_horas dh
             JOIN materias m ON dh.materia_id = m.id
-            JOIN cursos cur ON dh.curso_id = cur.id
+            LEFT JOIN cursos cur ON dh.curso_id = cur.id
             LEFT JOIN tipos_hora th ON dh.tipo_hora_id = th.id
             WHERE dh.cargo_id = ? AND dh.deleted_at IS NULL
             ORDER BY FIELD(dh.dia, 'lunes', 'martes', 'miércoles', 'jueves', 'viernes'), dh.hora_ingreso
@@ -152,6 +152,23 @@ class CargoRepository {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'materia')
         `, [cargo_id, materia_id, curso_id, cantidad_horas, dia, hora_ingreso, hora_egreso, tipo_hora_id || null]);
         return result.insertId;
+    }
+
+    async updateDistribucion(id, data) {
+        const { materia_id, curso_id, cantidad_horas, dia, hora_ingreso, hora_egreso, tipo_hora_id } = data;
+        await db.query(`
+            UPDATE distribucion_horas 
+            SET materia_id=?, curso_id=?, cantidad_horas=?, dia=?, 
+                hora_ingreso=?, hora_egreso=?, tipo_hora_id=?, updated_at=NOW()
+            WHERE id=? AND deleted_at IS NULL
+        `, [materia_id, curso_id, cantidad_horas, dia, hora_ingreso, hora_egreso, tipo_hora_id || null, id]);
+    }
+
+    async deleteDistribucion(id) {
+        await db.query(
+            "UPDATE distribucion_horas SET deleted_at=NOW() WHERE id=?",
+            [id]
+        );
     }
 
     // --- Tipos de Hora ---

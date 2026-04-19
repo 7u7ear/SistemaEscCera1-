@@ -3,10 +3,10 @@
 // ============================
 
 async function cargarDocentesData() {
-    const res = await fetch("/api/v1/docentes", { credentials: "include" });
+    const res = await api.get("/api/v1/docentes");
     if (res.ok) docentesGlobal = await res.json();
-    else return false; // Indicate failure
-    return true; // Indicate success
+    else return false;
+    return true;
 }
 
 async function verDocentes() {
@@ -96,12 +96,8 @@ async function guardarDocente() {
         fecha_ingreso: document.getElementById("fecha_ingreso").value
     };
     const id = document.getElementById("docenteId").value;
-    const res = await fetch(id ? `/api/v1/docentes/${id}` : "/api/v1/docentes", {
-        method: id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data)
-    });
+    const url = id ? `/api/v1/docentes/${id}` : "/api/v1/docentes";
+    const res = await (id ? api.put(url, data) : api.post(url, data));
     if (!res.ok) { const msg = await res.json(); alert("Error: " + msg); return; }
     modal.hide();
     verDocentes();
@@ -109,7 +105,7 @@ async function guardarDocente() {
 
 async function eliminarDocente(id) {
     if (!confirm("¿Desea eliminar este docente?")) return;
-    await fetch(`/api/v1/docentes/${id}`, { method: "DELETE", credentials: "include" });
+    await api.delete(`/api/v1/docentes/${id}`);
     verDocentes();
 }
 

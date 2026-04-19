@@ -73,6 +73,14 @@ class CargoService {
         return await CargoRepository.addDistribucion(distributionData);
     }
 
+    async updateDistribucion(id, data) {
+        return await CargoRepository.updateDistribucion(id, data);
+    }
+
+    async deleteDistribucion(id) {
+        return await CargoRepository.deleteDistribucion(id);
+    }
+
     // --- Tipos de Hora ---
     async getTiposHora() {
         return await CargoRepository.findTiposHora();

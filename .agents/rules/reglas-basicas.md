@@ -2,283 +2,209 @@
 trigger: always_on
 ---
 
-# 📘 REGLAS BÁSICAS DE DESARROLLO – ESTÁNDAR PROFESIONAL
+# ⚙️ REGLAS OPERATIVAS IA (OBLIGATORIAS)
 
-## 1. Estructura del Proyecto
+## 1. CONTEXTO FIJO
 
-* Mantener una estructura clara y minimalista:
+- Proyecto real en desarrollo (NO ejemplo)
+- Backend: Node.js + Express
+- Base de datos: MySQL
+- Frontend: HTML + Bootstrap
+- Arquitectura: MVC + Service Layer
+- Autenticación: JWT
 
-  * `/src` → código fuente principal
-  * `/tests` → pruebas automatizadas
-  * `/docs` → documentación técnica y de usuario
-  * `/config` → configuraciones y variables de entorno
-* Usar `.gitignore` para excluir:
-
-  * dependencias
-  * logs
-  * archivos temporales
-* Nombrar archivos y carpetas de forma consistente y descriptiva.
+NO cambiar stack ni arquitectura.
 
 ---
 
-## 2. Código Limpio y Escalable
+## 2. FORMA DE RESPUESTA
 
-* Seguir estándares de estilo (PEP8, ESLint, etc.).
-* Evitar duplicación de código (DRY).
-* Modularizar funciones y clases.
-* Documentar con comentarios claros y concisos.
-* Aplicar patrones de diseño:
-
-  * MVC
-  * Repository
-  * Service Layer
-* Priorizar legibilidad sobre complejidad.
+- Responder SOLO lo pedido
+- Sin introducciones ni conclusiones
+- Priorizar código sobre explicación
+- Explicaciones máximo 5 líneas
+- No repetir información
 
 ---
 
-## 3. Arquitectura del Sistema
+## 3. CÓDIGO
 
-* Usar separación por capas:
-
-  * Dominio
-  * Aplicación
-  * Infraestructura
-* Favorecer arquitecturas escalables:
-
-  * Clean Architecture
-  * Hexagonal
-* Diseñar módulos desacoplados.
+- Código listo para producción
+- No código de ejemplo ni tutorial
+- No simplificar lógica real
+- Mantener consistencia con el proyecto existente
 
 ---
 
-## 4. Seguridad
+## 4. ESTRUCTURA
 
-* Validar todas las entradas del usuario.
-* Usar hashing seguro para contraseñas.
-* Implementar:
+Respetar siempre:
 
-  * Protección contra XSS
-  * Protección contra CSRF
-  * Prevención de SQL Injection
-* No exponer errores sensibles en producción.
-* Implementar roles y permisos.
-* Registrar auditoría de acciones (logs de usuario).
-* Usar HTTPS obligatorio.
+/controllers  
+/services  
+/routes  
+/models  
+/middlewares  
+/config  
 
----
-
-## 5. Diseño y Experiencia de Usuario (UX)
-
-* Interfaz clara, simple y consistente.
-* Feedback inmediato:
-
-  * mensajes de éxito
-  * errores claros
-* Cumplir estándares de accesibilidad (WCAG).
-* Mantener coherencia visual (colores, tipografías, iconos).
+- No mezclar responsabilidades
 
 ---
 
-## 6. Gestión de Datos
+## 5. BASE DE DATOS
 
-* Base de datos normalizada.
-* Uso de migraciones versionadas.
-* Implementar:
+- NO inventar tablas ni campos
+- Respetar estructura existente
+- No asumir relaciones
 
-  * backups automáticos
-  * políticas de recuperación
-* Minimizar recolección de datos sensibles.
-* Documentar el modelo de datos (ERD).
+Si falta información → preguntar
 
 ---
 
-## 7. APIs y Comunicación
+## 6. LÓGICA
 
-* Diseñar APIs consistentes:
-
-  * REST o GraphQL
-* Versionado (`/api/v1`)
-* Uso de códigos HTTP correctos.
-* Validación con schemas (Joi, Zod, etc.).
-* Manejo uniforme de errores.
-* Implementar rate limiting.
+- Toda lógica en services
+- Controllers solo request/response
+- No duplicar lógica
 
 ---
 
-## 8. Manejo de Errores
+## 7. DRY
 
-* Centralizar manejo de errores.
-* Diferenciar:
-
-  * errores de usuario
-  * errores internos
-* Loggear errores críticos.
-* No exponer stack traces en producción.
+- No repetir código
+- Reutilizar funciones existentes
 
 ---
 
-## 9. Observabilidad
+## 8. ASYNC
 
-* Implementar:
-
-  * logging estructurado (JSON)
-  * métricas (tiempos de respuesta, uso de recursos)
-  * trazabilidad de requests
-* Integrar herramientas como:
-
-  * Prometheus
-  * Grafana
-  * OpenTelemetry
+- Usar async/await
+- NO usar .then()
 
 ---
 
-## 10. Testing y Control de Calidad
+## 9. VALIDACIÓN
 
-* Implementar:
-
-  * pruebas unitarias
-  * pruebas de integración
-  * pruebas end-to-end
-* Mantener alta cobertura de tests.
-* Realizar:
-
-  * pruebas de rendimiento
-  * pruebas de seguridad
-* Usar análisis estático de código.
+- Validar todos los inputs
+- No confiar en frontend
 
 ---
 
-## 11. Entornos y Configuración
+## 10. ERRORES
 
-* Separar entornos:
-
-  * desarrollo
-  * testing
-  * producción
-* Usar variables de entorno (`.env`).
-* No hardcodear credenciales.
-* Usar gestores de secretos si es necesario.
+- try/catch obligatorio
+- Respuestas HTTP correctas
+- No console.log en producción
+- No exponer errores internos
 
 ---
 
-## 12. Contenerización y Entornos Reproducibles
+## 11. AUTENTICACIÓN
 
-* Usar Docker para:
-
-  * backend
-  * base de datos
-* Implementar `docker-compose`.
-* Incluir datos de prueba (seeds).
-* Facilitar levantamiento del entorno completo.
+- Usar JWT
+- No usar sesiones
+- Proteger rutas con middleware
 
 ---
 
-## 13. Performance
+## 12. SEGURIDAD
 
-* Implementar:
-
-  * caching (Redis u otros)
-  * paginación
-* Optimizar consultas a base de datos (índices).
-* Evitar cargas innecesarias.
-* Aplicar lazy loading cuando corresponda.
+- Sanitizar inputs (SQL Injection, XSS)
+- Hash de contraseñas (bcrypt)
+- Rate limit en endpoints críticos
+- No hardcodear datos sensibles
+- Usar variables de entorno
 
 ---
 
-## 14. Mantenimiento y Escalabilidad
+## 13. CONSISTENCIA
 
-* Mantener dependencias actualizadas.
-* Preparar el sistema para crecer sin romper compatibilidad.
-* Modularizar funcionalidades.
-* Documentar cambios importantes.
-
----
-
-## 15. Gestión de Versiones y Deploy
-
-* Usar versionado semántico (SemVer).
-* Implementar CI/CD.
-* Tener entorno de staging.
-* Documentar procesos de:
-
-  * deploy
-  * rollback
+- Naming en inglés
+- camelCase
+- Mismo estilo en todo el proyecto
 
 ---
 
-## 16. Automatización
+## 14. PERFORMANCE
 
-* Usar herramientas:
-
-  * ESLint / Prettier
-* Hooks de Git (Husky).
-* Ejecutar tests automáticamente en cada push.
+- Evitar queries innecesarias
+- Usar joins correctamente
+- Preparar paginación
 
 ---
 
-## 17. Normas de Equipo
+## 15. FRONTEND
 
-* Code reviews obligatorias.
-* Commits claros:
-
-  * `feat:`
-  * `fix:`
-  * `refactor:`
-* Comunicación clara en issues.
-* Uso de ramas (feature, develop, main).
+- HTML + Bootstrap simple
+- Sin lógica compleja
+- Consumir API backend
 
 ---
 
-## 18. Gestión de Dependencias
+## 16. REGLAS DE NEGOCIO
 
-* Usar lockfiles.
-* Auditar vulnerabilidades.
-* Evitar dependencias innecesarias.
-
----
-
-## 19. Documentación Profesional
-
-* Mantener documentación actualizada.
-* Incluir:
-
-  * guía de instalación
-  * guía de uso
-  * guía de contribución
-* Documentar APIs (Swagger/OpenAPI).
-* Incluir diagramas:
-
-  * arquitectura
-  * base de datos
-  * flujos
+- Validar consistencia antes de guardar
+- No permitir estados inválidos
+- Centralizar reglas en services
 
 ---
 
-## 20. Pensamiento de Producto
+## 17. AUDITORÍA
 
-* Entender el problema antes de programar.
-* Diseñar soluciones centradas en el usuario.
-* Evaluar impacto real del sistema.
-* Medir resultados con métricas.
-* Iterar y mejorar continuamente.
+Registrar:
+- creación
+- edición
+- eliminación
 
----
-
-## 21. Principios Profesionales
-
-* Planificar antes de codificar.
-* Escribir código mantenible y claro.
-* Manejar errores de forma robusta.
-* Optimizar solo cuando sea necesario.
-* Mantenerse actualizado.
-* Trabajar con metodologías ágiles.
+Campos:
+- user_id
+- acción
+- entidad
+- fecha
 
 ---
 
-## 22. programar como un ingeniero en sistemas con muchos años de experiencia. 
+## 18. CONTROL DE ERRORES PREVIOS
 
-# 📌 PRINCIPIO FINAL
-
-> “El software no solo debe funcionar, debe ser mantenible, seguro, escalable y comprensible.”
+- No repetir soluciones que fallaron
+- Adaptarse al estado actual del sistema
 
 ---
+
+## 19. MODO PROFESIONAL
+
+- No explicar conceptos básicos
+- No usar lenguaje de tutorial
+- Actuar como desarrollador senior
+
+---
+
+## 20. OPTIMIZACIÓN DE TOKENS
+
+- Respuestas cortas
+- Sin relleno
+- Sin redundancias
+
+---
+
+## 21. REGLA FINAL
+
+Si falta información:
+→ NO asumir
+→ NO inventar
+→ PREGUNTAR
+
+---
+
+## 22. NIVEL PRODUCTO (OBLIGATORIO)
+
+Este sistema está destinado a ser vendido.
+
+Debe ser:
+- Seguro
+- Mantenible
+- Escalable
+- Instalable fácilmente
+- Comprensible por otro desarrollador
+
+Evitar soluciones rápidas que comprometan el producto.

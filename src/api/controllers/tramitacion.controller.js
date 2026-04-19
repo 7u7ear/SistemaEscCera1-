@@ -12,7 +12,7 @@ class TramitacionController {
 
     async create(req, res, next) {
         try {
-            const userId = req.session.user.id;
+            const userId = req.user.id;
             const id = await TramitacionService.create(req.body, userId);
             res.status(201).json({ message: 'Tramitación registrada', id });
         } catch (err) {

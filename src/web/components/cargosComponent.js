@@ -3,7 +3,7 @@
 // ============================
 
 async function verCargos() {
-    const res = await fetch("/api/v1/cargos", { credentials: "include" });
+    const res = await api.get("/api/v1/cargos");
     if (!res.ok) return alert("No tiene permiso para ver cargos");
     cargosGlobal = await res.json();
     renderTablaCargos(cargosGlobal);
@@ -71,12 +71,8 @@ async function guardarCargo() {
         total_horas: document.getElementById("total_horas").value
     };
     const id = document.getElementById("cargoId").value;
-    const res = await fetch(id ? `/api/v1/cargos/${id}` : "/api/v1/cargos", {
-        method: id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data)
-    });
+    const url = id ? `/api/v1/cargos/${id}` : "/api/v1/cargos";
+    const res = await (id ? api.put(url, data) : api.post(url, data));
     if (!res.ok) { const msg = await res.json(); alert("Error: " + msg); return; }
     modalCargo.hide();
     verCargos();
@@ -84,7 +80,7 @@ async function guardarCargo() {
 
 async function eliminarCargo(id) {
     if (!confirm("¿Desea eliminar este cargo?")) return;
-    await fetch(`/api/v1/cargos/${id}`, { method: "DELETE", credentials: "include" });
+    await api.delete(`/api/v1/cargos/${id}`);
     verCargos();
 }
 
@@ -128,7 +124,8 @@ async function abrirModalGestion(cargoId, defaultTab = 'asignaciones') {
 
     // Poblar Select Cursos
     const selectCursos = document.getElementById("selectCurso");
-    selectCursos.innerHTML = '<option value="">-- Curso --</option>';
+    selectCursos.innerHTML = '<option value="">-- Seleccionar Curso --</option>';
+    selectCursos.innerHTML += '<option value="null">-- No aplica (Extraclase) --</option>';
     cursosGlobal.forEach(c => {
         let nombreCurso = `${c.anio} ${c.division || ''} ${c.modalidad || ''}`;
         if (c.especialidad && c.especialidad.trim() !== '') {
@@ -158,7 +155,7 @@ async function renderCadenaAsignaciones(cargoId) {
     container.innerHTML = '<div class="text-center p-3 text-muted small"><div class="spinner-border spinner-border-sm" role="status"></div> Cargando cadena...</div>';
 
     try {
-        const res = await fetch(`/api/v1/cargos/${cargoId}/cadena-activa`, { credentials: "include" });
+        const res = await api.get(`/api/v1/cargos/${cargoId}/cadena-activa`);
         if (!res.ok) throw new Error("Error API");
         const chain = await res.json();
 
@@ -218,11 +215,29 @@ async function renderCadenaAsignaciones(cargoId) {
 
 function mostrarFormMateria() {
     const div = document.getElementById("formRapidoMateria");
+    
+    // Si se está abriendo (estaba en none), reseteamos para que sea una NUEVA materia
+    if (div.style.display === "none") {
+        document.getElementById("editDistribucionId").value = "";
+        document.querySelector("#formRapidoMateria button.btn-primary").innerText = "Guardar";
+        limpiarFormMateria();
+    }
+    
     div.style.display = (div.style.display === "none") ? "block" : "none";
 }
 
+function limpiarFormMateria() {
+    document.getElementById("inputHoras").value = "";
+    document.getElementById("inputHoraIngreso").value = "";
+    document.getElementById("inputHoraEgreso").value = "";
+    document.getElementById("selectMateria").value = "";
+    document.getElementById("selectCurso").value = "";
+    document.getElementById("selectDia").value = "lunes";
+    document.getElementById("selectTipoHora").value = "";
+}
+
 async function cargarTiposHora() {
-    const res = await fetch("/api/v1/cargos/config/tipos-hora", { credentials: "include" });
+    const res = await api.get("/api/v1/cargos/config/tipos-hora");
     const select = document.getElementById("selectTipoHora");
     select.innerHTML = '<option value="">-- Tipo de Hora --</option>';
     if (res.ok) {
@@ -234,12 +249,12 @@ async function cargarTiposHora() {
 }
 
 async function cargarMaterias() {
-    const res = await fetch("/api/v1/materias", { credentials: "include" });
+    const res = await api.get("/api/v1/materias");
     if (res.ok) materiasGlobal = await res.json();
 }
 
 async function cargarCursos() {
-    const res = await fetch("/api/v1/cursos", { credentials: "include" });
+    const res = await api.get("/api/v1/cursos");
     if (res.ok) cursosGlobal = await res.json();
 }
 
@@ -255,7 +270,7 @@ function toggleReemplazoDrop() {
 }
 
 async function cargarHistorialCargo(cargoId) {
-    const res = await fetch(`/api/v1/cargos/${cargoId}/historial`, { credentials: "include" });
+    const res = await api.get(`/api/v1/cargos/${cargoId}/historial`);
     const container = document.getElementById("tablaHistorial");
     if (!res.ok) {
         container.innerHTML = "<div class='alert alert-danger'>Error al cargar historial</div>";
@@ -322,11 +337,10 @@ async function confirmarBaja() {
     const expBaja = document.getElementById("bajaExpediente").value;
     const retornaTitular = document.getElementById("bajaRetornaTitular").checked;
 
-    const res = await fetch(`/api/v1/cargos/${cargoId}/baja/${cargoDocenteId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ fecha_fin: fechaFin, expediente_baja: expBaja, titular_regresa: retornaTitular })
+    const res = await api.post(`/api/v1/cargos/${cargoId}/baja/${cargoDocenteId}`, { 
+        fecha_fin: fechaFin, 
+        expediente_baja: expBaja, 
+        titular_regresa: retornaTitular 
     });
 
     if (res.ok) {
@@ -361,12 +375,7 @@ async function asignarDocente() {
         expediente_alta: expAlta
     };
 
-    const res = await fetch(`/api/v1/cargos/${cargoId}/asignar`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(bodyData)
-    });
+    const res = await api.post(`/api/v1/cargos/${cargoId}/asignar`, bodyData);
 
     if (res.ok) {
         alert("Docente asignado correctamente.");
@@ -381,8 +390,11 @@ async function asignarDocente() {
     }
 }
 
+let distribucionActual = [];
+
 async function agregarMateria() {
     const cargoId = document.getElementById("gestionCargoId").value;
+    const editId = document.getElementById("editDistribucionId").value;
     const materiaId = document.getElementById("selectMateria").value;
     const cursoId = document.getElementById("selectCurso").value;
     const horas = document.getElementById("inputHoras").value;
@@ -391,11 +403,11 @@ async function agregarMateria() {
     const horaEgreso = document.getElementById("inputHoraEgreso").value;
     const tipoHoraId = document.getElementById("selectTipoHora").value;
 
-    if (!materiaId || !horas || !cursoId) return alert("Materia, Curso y Horas son obligatorios");
+    if (!materiaId || !horas) return alert("Materia y Horas son obligatorios");
 
     const bodyData = {
         materia_id: parseInt(materiaId),
-        curso_id: parseInt(cursoId),
+        curso_id: (cursoId && cursoId !== "null") ? parseInt(cursoId) : null,
         cantidad_horas: parseInt(horas),
         dia: dia,
         hora_ingreso: horaIngreso || null,
@@ -403,37 +415,32 @@ async function agregarMateria() {
         tipo_hora_id: tipoHoraId ? parseInt(tipoHoraId) : null
     };
 
-    const res = await fetch(`/api/v1/cargos/${cargoId}/distribucion`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(bodyData)
-    });
+    const url = editId ? `/api/v1/cargos/distribucion/${editId}` : `/api/v1/cargos/${cargoId}/distribucion`;
+    const res = await (editId ? api.put(url, bodyData) : api.post(url, bodyData));
 
     if (res.ok) {
         cargarDistribucion(cargoId);
-        // Limpiar
-        document.getElementById("inputHoras").value = "";
-        document.getElementById("inputHoraIngreso").value = "";
-        document.getElementById("inputHoraEgreso").value = "";
+        // Limpiar y Resetear
+        document.getElementById("editDistribucionId").value = "";
+        limpiarFormMateria();
         document.getElementById("formRapidoMateria").style.display = "none";
     } else {
         const msg = await res.json();
-        alert("Error al agregar materia: " + JSON.stringify(msg));
+        alert("Error al guardar materia: " + JSON.stringify(msg));
     }
 }
 
 async function cargarDistribucion(cargoId) {
-    const res = await fetch(`/api/v1/cargos/${cargoId}/distribucion`, { credentials: "include" });
+    const res = await api.get(`/api/v1/cargos/${cargoId}/distribucion`);
     if (!res.ok) return;
-    const data = await res.json();
+    distribucionActual = await res.json();
 
     let html = `<table class="table table-sm table-hover mt-0">
         <thead class="text-muted small border-bottom bg-light">
-            <tr><th>Materia</th><th>Tipo Hora</th><th>Curso</th><th>Día</th><th>Horario</th><th>Horas</th></tr>
+            <tr><th>Materia</th><th>Tipo Hora</th><th>Curso</th><th>Día</th><th>Horario</th><th>Horas</th><th class="text-end">Acciones</th></tr>
         </thead>
         <tbody>`;
-    data.forEach(d => {
+    distribucionActual.forEach(d => {
         const horario = (d.hora_ingreso && d.hora_egreso) ? `${d.hora_ingreso.substring(0, 5)} a ${d.hora_egreso.substring(0, 5)}` : 'A definir';
         let cursoTxt = 'N/A';
         if (d.curso_anio) {
@@ -447,21 +454,49 @@ async function cargarDistribucion(cargoId) {
             <td class="small text-capitalize">${d.dia}</td>
             <td class="small text-muted">${horario}</td>
             <td><span class="badge bg-primary-subtle text-primary">${d.cantidad_horas} hs</span></td>
+            <td class="text-end">
+                <button class="btn btn-link btn-sm p-0 text-primary me-2" onclick="editarMateria(${d.id})" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-link btn-sm p-0 text-danger" onclick="eliminarMateria(${d.id})" title="Eliminar"><i class="bi bi-trash"></i></button>
+            </td>
         </tr>`;
     });
     html += "</tbody></table>";
     document.getElementById("tablaDistribucion").innerHTML = html;
 }
 
+function editarMateria(id) {
+    const d = distribucionActual.find(x => x.id == id);
+    if (!d) return;
+
+    document.getElementById("editDistribucionId").value = d.id;
+    document.getElementById("selectMateria").value = d.materia_id;
+    document.getElementById("selectCurso").value = d.curso_id;
+    document.getElementById("selectDia").value = d.dia;
+    document.getElementById("inputHoraIngreso").value = d.hora_ingreso ? d.hora_ingreso.substring(0, 5) : "";
+    document.getElementById("inputHoraEgreso").value = d.hora_egreso ? d.hora_egreso.substring(0, 5) : "";
+    document.getElementById("inputHoras").value = d.cantidad_horas;
+    document.getElementById("selectTipoHora").value = d.tipo_hora_id || "";
+
+    document.getElementById("formRapidoMateria").style.display = "block";
+    document.querySelector("#formRapidoMateria button.btn-primary").innerText = "Actualizar";
+}
+
+async function eliminarMateria(id) {
+    if (!confirm("¿Desea eliminar este horario/materia de la composición?")) return;
+    const res = await api.delete(`/api/v1/cargos/distribucion/${id}`);
+    if (res.ok) {
+        const cargoId = document.getElementById("gestionCargoId").value;
+        cargarDistribucion(cargoId);
+    } else {
+        alert("Error al eliminar");
+    }
+}
+
 // Gestión simple de tipos de hora
 async function abrirGestionTiposHora() {
     const nombre = prompt("Ingrese el nombre del nuevo tipo de hora (ej: Extraclase):");
     if (!nombre) return;
-    const res = await fetch("/api/v1/cargos/config/tipos-hora", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre })
-    });
+    const res = await api.post("/api/v1/cargos/config/tipos-hora", { nombre });
     if (res.ok) {
         cargarTiposHora();
     }

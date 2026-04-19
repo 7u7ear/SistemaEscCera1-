@@ -35,9 +35,10 @@ console.log("Status:", res.status);
 const data = await res.json();
 
     if(res.ok){
+        if (data.token) localStorage.setItem('token', data.token);
         window.location.href = "dashboard.html";
     }else{
-        msg.innerText = data;
+        msg.innerText = typeof data === 'string' ? data : (data.error || 'Error al ingresar');
     }
 }
 </script>

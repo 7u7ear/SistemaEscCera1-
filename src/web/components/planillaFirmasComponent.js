@@ -107,7 +107,7 @@ async function cargarDatosPlanilla() {
     `;
 
     try {
-        const res = await fetch(`/api/v1/planilla-firmas?fecha=${fecha}&turno=${turno}`, { credentials: "include" });
+        const res = await api.get(`/api/v1/planilla-firmas?fecha=${fecha}&turno=${turno}`);
         if (!res.ok) throw new Error("Error al obtener datos");
         
         const data = await res.json();

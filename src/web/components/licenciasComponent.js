@@ -3,7 +3,7 @@
 // ============================
 
 async function verLicencias() {
-    const res = await fetch("/api/v1/licencias", { credentials: "include" });
+    const res = await api.get("/api/v1/licencias");
     if (res.status === 401) { window.location.href = "login.html"; return; }
     if (res.status === 403) return alert("No tiene permisos para ver este módulo.");
     if (!res.ok) return alert("Error al cargar licencias");
@@ -84,7 +84,7 @@ function filtrarLicencias() {
 }
 
 async function cargarTiposLicencia() {
-    const res = await fetch("/api/v1/licencias/tipos", { credentials: "include" });
+    const res = await api.get("/api/v1/licencias/tipos");
     if (res.ok) tiposLicenciaGlobal = await res.json();
 }
 
@@ -175,12 +175,7 @@ async function guardarNuevoTipoLicencia() {
 
     if (!cod_licencia || !descripcion) return alert("Código y descripción requeridos");
 
-    const res = await fetch("/api/v1/licencias/tipos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ cod_licencia, descripcion })
-    });
+    const res = await api.post("/api/v1/licencias/tipos", { cod_licencia, descripcion });
 
     if (res.ok) {
         modalNuevoTipoLicencia.hide();
@@ -248,7 +243,7 @@ async function seleccionarDocenteLicencia(valor) {
         return;
     }
 
-    const res = await fetch(`/api/v1/docentes/${docenteId}/cargos`, { credentials: "include" });
+    const res = await api.get(`/api/v1/docentes/${docenteId}/cargos`);
     if (!res.ok) {
         container.innerHTML = '<span class="text-danger small">Error al cargar cargos.</span>';
         return;
@@ -331,10 +326,9 @@ async function guardarLicencia(evt) {
     const url = id ? `/api/v1/licencias/${id}` : "/api/v1/licencias";
 
     try {
-        const res = await fetch(url, {
+        const res = await api.fetch(url, {
             method: method,
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
             body: JSON.stringify(data)
         });
 
@@ -402,6 +396,6 @@ async function editarLicencia(id) {
 
 async function eliminarLicencia(id) {
     if (!confirm("¿Desea eliminar este registro de licencia?")) return;
-    const res = await fetch(`/api/v1/licencias/${id}`, { method: "DELETE", credentials: "include" });
+    const res = await api.delete(`/api/v1/licencias/${id}`);
     if (res.ok) verLicencias();
 }

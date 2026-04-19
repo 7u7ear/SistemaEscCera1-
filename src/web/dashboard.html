@@ -426,6 +426,7 @@
                                 <button class="btn btn-sm btn-outline-primary" onclick="mostrarFormMateria()">+ Materia</button>
                             </div>
                             
+                            <input type="hidden" id="editDistribucionId">
                             <!-- Formulario rápido de materia (oculto por defecto) -->
                             <div id="formRapidoMateria" class="mb-3 p-3 bg-light rounded" style="display:none;">
                                 <div class="row g-2 mb-2">
@@ -453,6 +454,7 @@
                                     </div>
                                     <div class="col-md-4 text-end">
                                         <button class="btn btn-primary btn-sm px-3" onclick="agregarMateria()">Guardar</button>
+                                        <button class="btn btn-light btn-sm" onclick="mostrarFormMateria()">Cancelar</button>
                                     </div>
                                 </div>
                             </div>
@@ -822,6 +824,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="utils/api.js"></script>
 <script src="dashboard_script.js?v=final_fix_v5"></script>
 <script src="components/docentesComponent.js?v=final_fix_v5"></script>
 <script src="components/cargosComponent.js?v=final_fix_v5"></script>

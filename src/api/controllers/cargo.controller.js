@@ -36,7 +36,7 @@ class CargoController {
     async delete(req, res, next) {
         try {
             const { id } = req.params;
-            const userId = req.session.user.id;
+            const userId = req.user.id;
             await CargoService.deleteCargo(id, userId);
             res.json({ message: 'Cargo eliminado con éxito' });
         } catch (err) {
@@ -81,6 +81,27 @@ class CargoController {
             const validatedData = addDistribucionSchema.parse(req.body);
             await CargoService.addDistribucion(id, validatedData);
             res.status(201).json({ message: 'Distribución agregada con éxito' });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async updateDistribucion(req, res, next) {
+        try {
+            const { id } = req.params; // ID de la distribución
+            const validatedData = addDistribucionSchema.parse(req.body);
+            await CargoService.updateDistribucion(id, validatedData);
+            res.json({ message: 'Distribución actualizada con éxito' });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async deleteDistribucion(req, res, next) {
+        try {
+            const { id } = req.params; // ID de la distribución
+            await CargoService.deleteDistribucion(id);
+            res.json({ message: 'Distribución eliminada con éxito' });
         } catch (err) {
             next(err);
         }

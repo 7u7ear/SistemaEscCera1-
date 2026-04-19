@@ -35,7 +35,7 @@ class DocenteController {
     async delete(req, res, next) {
         try {
             const { id } = req.params;
-            const userId = req.session.user.id;
+            const userId = req.user.id;
             await DocenteService.deleteDocente(id, userId);
             res.json({ message: 'Docente eliminado con éxito' });
         } catch (err) {

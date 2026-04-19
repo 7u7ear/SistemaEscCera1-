@@ -69,7 +69,7 @@ function mostrarSeccion(seccion) {
 // ============================
 
 async function cargarUsuario() {
-    const res = await fetch("/api/v1/usuarios/me", { credentials: "include" });
+    const res = await api.get("/api/v1/usuarios/me");
     if (!res.ok) { window.location.href = "login.html"; return; }
     usuarioActual = await res.json();
     document.getElementById("titulo").innerText = "Bienvenido/a " + usuarioActual.nombre;
@@ -81,7 +81,7 @@ async function cargarUsuario() {
 // ============================
 
 async function verCargosDocente(id) {
-    const res = await fetch(`/api/v1/docentes/${id}/cargos`, { credentials: "include" });
+    const res = await api.get(`/api/v1/docentes/${id}/cargos`);
     if (!res.ok) return alert("Error");
     const data = await res.json();
 
@@ -98,7 +98,8 @@ async function verCargosDocente(id) {
 }
 
 async function logout() {
-    await fetch("/api/v1/usuarios/logout", { method: "POST", credentials: "include" });
+    await api.post("/api/v1/usuarios/logout");
+    localStorage.removeItem('token');
     window.location.href = "login.html";
 }
 

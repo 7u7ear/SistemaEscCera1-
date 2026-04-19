@@ -1,6 +1,7 @@
 const UsuarioService = require('../services/usuario.service');
 const { loginSchema } = require('../validations/usuario.validation');
 const logger = require('../services/logger.service');
+const { generarToken } = require('../utils/jwt.util');
 
 class UsuarioController {
     async login(req, res, next) {
@@ -9,8 +10,10 @@ class UsuarioController {
             const user = await UsuarioService.authenticate(validatedData.username, validatedData.password);
             
             req.session.user = user;
+            const token = generarToken(user);
+            
             logger.info(`User ${user.username} logged in successfully`);
-            res.json({ message: 'Login correcto', user });
+            res.json({ message: 'Login correcto', user, token });
         } catch (err) {
             next(err);
         }
@@ -18,10 +21,11 @@ class UsuarioController {
 
     async getMe(req, res, next) {
         try {
-            if (!req.session.user) {
+            const user = req.user || req.session.user;
+            if (!user) {
                 return res.status(401).json({ error: 'No autorizado' });
             }
-            res.json(req.session.user);
+            res.json(user);
         } catch (err) {
             next(err);
         }

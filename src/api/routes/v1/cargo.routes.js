@@ -47,6 +47,16 @@ router.post('/:id/distribucion',
     CargoController.addDistribucion
 );
 
+router.put('/distribucion/:id',
+    permisoModulo('docentes', 'edicion'),
+    CargoController.updateDistribucion
+);
+
+router.delete('/distribucion/:id',
+    permisoModulo('docentes', 'edicion'),
+    CargoController.deleteDistribucion
+);
+
 // --- Tipos de Hora ---
 router.get('/config/tipos-hora',
     permisoModulo('docentes', 'lectura'),
