@@ -1,5 +1,5 @@
 const UsuarioService = require('../services/usuario.service');
-const { loginSchema } = require('../validations/usuario.validation');
+const { loginSchema, registerSchema } = require('../validations/usuario.validation');
 const logger = require('../services/logger.service');
 const { generarToken } = require('../utils/jwt.util');
 
@@ -12,6 +12,17 @@ class UsuarioController {
             
             logger.info(`User ${user.username} logged in successfully`);
             res.json({ message: 'Login correcto', user, token });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async register(req, res, next) {
+        try {
+            const validatedData = registerSchema.parse(req.body);
+            const insertId = await UsuarioService.register(validatedData);
+            logger.info(`New user registered with ID ${insertId}`);
+            res.status(201).json({ message: 'Usuario registrado correctamente. Pendiente de aprobación.', id: insertId });
         } catch (err) {
             next(err);
         }

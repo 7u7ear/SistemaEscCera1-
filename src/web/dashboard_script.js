@@ -72,7 +72,8 @@ async function cargarUsuario() {
     const res = await api.get("/api/v1/usuarios/me");
     if (!res.ok) { window.location.href = "login.html"; return; }
     usuarioActual = await res.json();
-    document.getElementById("titulo").innerText = "Bienvenido/a " + usuarioActual.nombre;
+    const perfilStr = usuarioActual.perfil ? usuarioActual.perfil : "Usuario";
+    document.getElementById("titulo").innerText = `${perfilStr} - ${usuarioActual.nombre}`;
     document.getElementById("userInfo").innerText = `Usuario: ${usuarioActual.username}`;
 }
 

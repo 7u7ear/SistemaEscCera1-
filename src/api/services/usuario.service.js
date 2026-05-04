@@ -27,6 +27,23 @@ class UsuarioService {
         const { password: _, ...userSafe } = user;
         return userSafe;
     }
+
+    async register(data) {
+        const existing = await UsuarioRepository.findByUsername(data.username);
+        if (existing) {
+            throw new AppError('El nombre de usuario ya está en uso', 400);
+        }
+
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const newUser = {
+            username: data.username,
+            password: hashedPassword,
+            nombre: data.nombre
+        };
+
+        const insertId = await UsuarioRepository.create(newUser);
+        return insertId;
+    }
 }
 
 module.exports = new UsuarioService();
