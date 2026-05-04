@@ -15,7 +15,8 @@ class CargoController {
     async create(req, res, next) {
         try {
             const validatedData = createCargoSchema.parse(req.body);
-            const id = await CargoService.createCargo(validatedData);
+            const userId = req.user?.id;
+            const id = await CargoService.createCargo(validatedData, userId);
             res.status(201).json({ message: 'Cargo creado con éxito', id });
         } catch (err) {
             next(err);
@@ -26,7 +27,8 @@ class CargoController {
         try {
             const { id } = req.params;
             const validatedData = updateCargoSchema.parse(req.body);
-            await CargoService.updateCargo(id, validatedData);
+            const userId = req.user?.id;
+            await CargoService.updateCargo(id, validatedData, userId);
             res.json({ message: 'Cargo actualizado con éxito' });
         } catch (err) {
             next(err);
@@ -48,7 +50,8 @@ class CargoController {
         try {
             const { id } = req.params;
             const validatedData = assignDocenteSchema.parse(req.body);
-            await CargoService.assignDocente(id, validatedData);
+            const userId = req.user?.id;
+            await CargoService.assignDocente(id, validatedData, userId);
             res.json({ message: 'Docente asignado con éxito' });
         } catch (err) {
             next(err);
@@ -79,7 +82,8 @@ class CargoController {
         try {
             const { id } = req.params;
             const validatedData = addDistribucionSchema.parse(req.body);
-            await CargoService.addDistribucion(id, validatedData);
+            const userId = req.user?.id;
+            await CargoService.addDistribucion(id, validatedData, userId);
             res.status(201).json({ message: 'Distribución agregada con éxito' });
         } catch (err) {
             next(err);
@@ -90,7 +94,8 @@ class CargoController {
         try {
             const { id } = req.params; // ID de la distribución
             const validatedData = addDistribucionSchema.parse(req.body);
-            await CargoService.updateDistribucion(id, validatedData);
+            const userId = req.user?.id;
+            await CargoService.updateDistribucion(id, validatedData, userId);
             res.json({ message: 'Distribución actualizada con éxito' });
         } catch (err) {
             next(err);
@@ -100,7 +105,8 @@ class CargoController {
     async deleteDistribucion(req, res, next) {
         try {
             const { id } = req.params; // ID de la distribución
-            await CargoService.deleteDistribucion(id);
+            const userId = req.user?.id;
+            await CargoService.deleteDistribucion(id, userId);
             res.json({ message: 'Distribución eliminada con éxito' });
         } catch (err) {
             next(err);
@@ -120,7 +126,8 @@ class CargoController {
     async createTipoHora(req, res, next) {
         try {
             const { nombre, descripcion } = req.body;
-            await CargoService.createTipoHora(nombre, descripcion);
+            const userId = req.user?.id;
+            await CargoService.createTipoHora(nombre, descripcion, userId);
             res.status(201).json({ message: 'Tipo de hora creado' });
         } catch (err) {
             next(err);

@@ -8,8 +8,6 @@ class UsuarioController {
         try {
             const validatedData = loginSchema.parse(req.body);
             const user = await UsuarioService.authenticate(validatedData.username, validatedData.password);
-            
-            req.session.user = user;
             const token = generarToken(user);
             
             logger.info(`User ${user.username} logged in successfully`);
@@ -21,7 +19,7 @@ class UsuarioController {
 
     async getMe(req, res, next) {
         try {
-            const user = req.user || req.session.user;
+            const user = req.user;
             if (!user) {
                 return res.status(401).json({ error: 'No autorizado' });
             }
@@ -33,10 +31,9 @@ class UsuarioController {
 
     async logout(req, res, next) {
         try {
-            req.session.destroy((err) => {
-                if (err) return next(err);
-                res.json({ message: 'Logout correcto' });
-            });
+            // Dado que usamos JWT, el logout normalmente se maneja en el cliente eliminando el token.
+            // Si tuviéramos tabla de tokens revocados, lo haríamos aquí.
+            res.json({ message: 'Logout correcto. Elimine el token en el cliente.' });
         } catch (err) {
             next(err);
         }

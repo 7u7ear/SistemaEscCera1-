@@ -68,6 +68,8 @@ class PlanillaRepository {
                 d.apellido, d.nombre AS docente_nombre,
                 cd.rol, cd.situacion_revista,
                 c.numero_puesto, c.tipo_cargo,
+                m.nombre AS materia_nombre,
+                cur.anio AS curso_anio, cur.division AS curso_division,
                 CASE 
                     WHEN cd.estado = 'licencia' THEN 'Con Reemplazo (Lic.)'
                     WHEN (cd.estado = 'activo' AND l.id IS NOT NULL) THEN 'Sin Reemplazo (Lic.)'
@@ -77,6 +79,8 @@ class PlanillaRepository {
             JOIN docentes d ON cd.docente_id = d.id
             JOIN cargos c ON cd.cargo_id = c.id
             JOIN distribucion_horas dh ON c.id = dh.cargo_id
+            JOIN materias m ON dh.materia_id = m.id
+            JOIN cursos cur ON dh.curso_id = cur.id
             -- Subconsulta para verificar si el docente activo TIENE licencia hoy
             LEFT JOIN licencias l ON d.id = l.docente_id AND c.id = l.cargo_id 
                  AND l.deleted_at IS NULL 

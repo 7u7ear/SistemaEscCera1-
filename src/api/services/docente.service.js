@@ -1,4 +1,4 @@
-const DocenteRepository = require('../repositories/docente.repository');
+const DocenteRepository = require('../models/docente.model');
 const AppError = require('../../shared/errors/AppError');
 
 class DocenteService {

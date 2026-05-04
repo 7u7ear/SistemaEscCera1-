@@ -1,4 +1,4 @@
-const PlanillaRepository = require('../repositories/planilla.repository');
+const PlanillaRepository = require('../models/planilla.model');
 const AppError = require('../../shared/errors/AppError');
 
 class PlanillaService {

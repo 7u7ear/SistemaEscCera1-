@@ -13,14 +13,19 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
-  const status = err.status || 500;
-  const message = err.message || 'Internal Server Error';
+  const status = err.statusCode || err.status || 500;
+  const internalMessage = err.message || 'Error desconocido';
+  const displayMessage = status === 500 ? 'Error interno del sistema' : internalMessage;
 
-  logger.error(`${message} - ${req.originalUrl} - ${req.method} - ${req.ip} - Status: ${status}`);
+  logger.error(`${internalMessage} - ${req.originalUrl} - ${req.method} - ${req.ip} - Status: ${status}`);
+  if (err.stack) {
+      logger.error(`Stack trace: ${err.stack}`);
+  }
 
   res.status(status).json({
+    message: displayMessage, // Sending standard "message" since most frontends consume this directly
     error: {
-      message,
+      message: displayMessage,
       status,
       timestamp: new Date().toISOString()
     }

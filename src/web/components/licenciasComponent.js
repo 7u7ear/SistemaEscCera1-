@@ -10,11 +10,18 @@ async function verLicencias() {
 
     licenciasGlobal = await res.json();
     
-    // Por defecto mostramos solo las activas/vigentes
+    // Mostrar TODAS las licencias: Activas primero, terminadas debajo
     const hoy = new Date().toISOString().split('T')[0];
-    const activas = licenciasGlobal.filter(l => !l.fecha_fin || l.fecha_fin >= hoy);
+    const ordenadas = licenciasGlobal.sort((a, b) => {
+        const aActive = !a.fecha_fin || a.fecha_fin >= hoy;
+        const bActive = !b.fecha_fin || b.fecha_fin >= hoy;
+        if (aActive && !bActive) return -1;
+        if (!aActive && bActive) return 1;
+        // Si tienen el mismo estado, ordenar por fecha inicio descendente
+        return new Date(b.fecha_inicio) - new Date(a.fecha_inicio);
+    });
     
-    renderTablaLicencias(activas);
+    renderTablaLicencias(ordenadas);
 }
 
 function renderTablaLicencias(data) {
@@ -26,7 +33,7 @@ function renderTablaLicencias(data) {
 
     let html = `<table class="table table-hover align-middle">
         <thead class="table-light">
-            <tr><th>Docente</th><th>Puesto</th><th>Inicio</th><th>Fin</th><th>Tipo / Artículo</th><th>Expediente</th><th>Acciones</th></tr>
+            <tr><th>Docente</th><th>Puesto (Rol)</th><th>Inicio</th><th>Fin</th><th>Tipo / Artículo</th><th>Expediente</th><th>Acciones</th></tr>
         </thead>
         <tbody>`;
 
@@ -47,7 +54,7 @@ function renderTablaLicencias(data) {
 
         html += `<tr>
             <td><strong>${l.docente_nombre}</strong></td>
-            <td>${l.numero_puesto ? `${l.numero_puesto} (${l.tipo_cargo})` : '<span class="text-muted small">General</span>'}</td>
+            <td>${l.numero_puesto ? `${l.numero_puesto} (${l.tipo_cargo}) <span class="badge bg-secondary ms-1">Rol: ${l.rol && l.rol !== '0' ? l.rol : '-'}</span>` : '<span class="text-muted small">General</span>'}</td>
             <td class="small">${inicio}</td>
             <td class="small">${fin}</td>
             <td><span class="badge bg-light text-dark border">${l.tipo_licencia}</span></td>
@@ -65,11 +72,17 @@ function renderTablaLicencias(data) {
 function filtrarLicencias() {
     const texto = document.getElementById("buscadorLicencias").value.toLowerCase().trim();
     
-    // Si el buscador está vacío, volvemos al filtro de "solo activas"
+    // Si el buscador está vacío, volvemos a la lista completa ordenada
     if (texto === "") {
         const hoy = new Date().toISOString().split('T')[0];
-        const activas = licenciasGlobal.filter(l => !l.fecha_fin || l.fecha_fin >= hoy);
-        renderTablaLicencias(activas);
+        const ordenadas = licenciasGlobal.sort((a, b) => {
+            const aActive = !a.fecha_fin || a.fecha_fin >= hoy;
+            const bActive = !b.fecha_fin || b.fecha_fin >= hoy;
+            if (aActive && !bActive) return -1;
+            if (!aActive && bActive) return 1;
+            return new Date(b.fecha_inicio) - new Date(a.fecha_inicio);
+        });
+        renderTablaLicencias(ordenadas);
         return;
     }
 

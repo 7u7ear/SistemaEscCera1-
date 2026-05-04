@@ -1,4 +1,4 @@
-const TramitacionRepository = require('../repositories/tramitacion.repository');
+const TramitacionRepository = require('../models/tramitacion.model');
 const AppError = require('../../shared/errors/AppError');
 
 class TramitacionService {

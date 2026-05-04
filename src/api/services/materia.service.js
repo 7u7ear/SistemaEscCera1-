@@ -1,4 +1,4 @@
-const MateriaRepository = require('../repositories/materia.repository');
+const MateriaRepository = require('../models/materia.model');
 
 class MateriaService {
     async getAllMaterias() {

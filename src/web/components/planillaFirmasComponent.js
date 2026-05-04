@@ -137,16 +137,18 @@ function renderPlanilla(data, fecha, turno) {
             <table class="table table-bordered align-middle">
                 <thead class="table-light">
                     <tr class="text-center align-middle">
-                        <th style="width: 16%">Apellido y Nombre</th>
-                        <th style="width: 5%">Rol</th>
-                        <th style="width: 17%">Puesto / Curso / Materia</th>
-                        <th style="width: 7%">Entrada<br><small>(Prog.)</small></th>
-                        <th style="width: 9%">Entrada<br><small>(Manual)</small></th>
-                        <th style="width: 12%">Firma Entrada</th>
-                        <th style="width: 7%">Salida<br><small>(Prog.)</small></th>
-                        <th style="width: 9%">Salida<br><small>(Manual)</small></th>
-                        <th style="width: 12%">Firma Salida</th>
-                        <th style="width: 6%">Obs.</th>
+                        <th style="width: 15%">Apellido y Nombre</th>
+                        <th style="width: 12%">Materia</th>
+                        <th style="width: 5%">Curso</th>
+                        <th style="width: 6%">Puesto</th>
+                        <th style="width: 6%">Rol</th>
+                        <th style="width: 6%">Entrada<br><small>(Prog.)</small></th>
+                        <th style="width: 7%">Entrada</th>
+                        <th style="width: 11%">Firma Entrada</th>
+                        <th style="width: 6%">Salida<br><small>(Prog.)</small></th>
+                        <th style="width: 7%">Salida</th>
+                        <th style="width: 11%">Firma Salida</th>
+                        <th style="width: 8%">Obs.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -158,19 +160,23 @@ function renderPlanilla(data, fecha, turno) {
         data.cargos.forEach(c => {
             const docente = c.docente_display || '--------------------------';
             const rol = c.rol || '';
-            const infoPuesto = `<b>${c.numero_puesto}</b> | ${c.curso_anio}°${c.curso_division || ''} | ${c.materia_nombre}`;
+            const curso = c.curso_anio ? `${c.curso_anio}°${c.curso_division || ''}` : '--';
+            const materia = c.materia_nombre || '----------------';
+            const puesto = c.numero_puesto || '-';
             const horaEntrada = c.hora_ingreso ? c.hora_ingreso.substring(0, 5) : '--:--';
             const horaSalida = c.hora_egreso ? c.hora_egreso.substring(0, 5) : '--:--';
 
             html += `
                 <tr>
                     <td class="single-line" style="font-weight: 600; ${c.en_licencia ? 'color: #888; font-style: italic;' : ''}" title="${docente}">${docente}</td>
+                    <td class="single-line small" title="${materia}">${materia}</td>
+                    <td class="text-center single-line">${curso}</td>
+                    <td class="text-center single-line"><b>${puesto}</b></td>
                     <td class="text-center fw-bold single-line">${rol}</td>
-                    <td class="single-line" title="${infoPuesto}">${infoPuesto}</td>
-                    <td class="text-center fw-bold single-line" style="background-color: #f9f9f9 !important;">${horaEntrada}</td>
+                    <td class="text-center fw-bold" style="background-color: #f9f9f9 !important;">${horaEntrada}</td>
                     <td class="signature-cell"></td>
                     <td class="signature-cell"></td>
-                    <td class="text-center fw-bold single-line" style="background-color: #f9f9f9 !important;">${horaSalida}</td>
+                    <td class="text-center fw-bold" style="background-color: #f9f9f9 !important;">${horaSalida}</td>
                     <td class="signature-cell"></td>
                     <td class="signature-cell"></td>
                     <td class="small text-center">${c.en_licencia ? 'LIC.' : ''}</td>
@@ -190,10 +196,11 @@ function renderPlanilla(data, fecha, turno) {
             <table class="table table-bordered table-sm align-middle">
                 <thead class="table-light small">
                     <tr>
-                        <th style="width: 30%">Docente</th>
+                        <th style="width: 25%">Apellido y Nombre</th>
+                        <th style="width: 15%">Puesto Afectado</th>
+                        <th style="width: 20%">Materia</th>
+                        <th style="width: 10%">Curso</th>
                         <th style="width: 10%">Rol</th>
-                        <th style="width: 15%">Situación</th>
-                        <th style="width: 25%">Puesto Afectado</th>
                         <th style="width: 20%">Estado</th>
                     </tr>
                 </thead>
@@ -204,12 +211,14 @@ function renderPlanilla(data, fecha, turno) {
         html += `<tr><td colspan="5" class="text-center text-muted p-2">No se registran licencias para este día/turno.</td></tr>`;
     } else {
         data.licencias.forEach(l => {
+            const cursoL = l.curso_anio ? `${l.curso_anio}°${l.curso_division || ''}` : '--';
             html += `
                 <tr class="text-licencia">
                     <td>${l.apellido}, ${l.docente_nombre}</td>
+                    <td class="text-center">${l.numero_puesto} - ${l.tipo_cargo}</td>
+                    <td>${l.materia_nombre || '--'}</td>
+                    <td class="text-center">${cursoL}</td>
                     <td class="text-center">${l.rol || '-'}</td>
-                    <td class="text-capitalize">${l.situacion_revista}</td>
-                    <td>Puesto: ${l.numero_puesto} - ${l.tipo_cargo}</td>
                     <td><span class="badge badge-licencia">LICENCIA (${l.estado_licencia})</span></td>
                 </tr>
             `;

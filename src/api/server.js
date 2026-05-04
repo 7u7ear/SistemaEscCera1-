@@ -1,5 +1,4 @@
 const express = require('express');
-const session = require('express-session');
 const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -14,23 +13,25 @@ const PORT = process.env.PORT || 3000;
 // ==================
 // SECURITY & MIDDLEWARES
 // ==================
+const rateLimit = require('express-rate-limit');
+const xssClean = require('./middlewares/xssClean');
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 150, // Limit each IP to 150 requests per `window`
+    message: 'Demasiadas peticiones desde esta IP, por favor intente nuevamente en 15 minutos.'
+});
+
 app.use(helmet({
-  contentSecurityPolicy: false, // For simplicity in local dev with inline scripts
+  contentSecurityPolicy: false, 
 }));
+app.use('/api/v1', apiLimiter);
+app.use(xssClean);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'ceramica_default_secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production'
-    }
-}));
+// Removed express-session per basic rules (Only JWT is allowed)
 
 // ==================
 // STATIC FILES (Rule 1)

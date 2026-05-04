@@ -1,35 +1,40 @@
-const CargoRepository = require('../repositories/cargo.repository');
+const CargoRepository = require('../models/cargo.model');
 const AppError = require('../../shared/errors/AppError');
 const logger = require('../services/logger.service');
+const AuditoriaService = require('../services/auditoria.service');
 
 class CargoService {
     async getAllCargos() {
         return await CargoRepository.findAll();
     }
 
-    async createCargo(cargoData) {
+    async createCargo(cargoData, userId) {
         const { numero_puesto } = cargoData;
         const exists = await CargoRepository.findByNumeroPuesto(numero_puesto);
         if (exists) {
             throw new AppError('Ya existe un cargo con ese número de puesto', 400);
         }
-        return await CargoRepository.create(cargoData);
+        const cargoId = await CargoRepository.create(cargoData);
+        await AuditoriaService.registrar(userId, 'CREATE', 'CARGO', cargoId, cargoData);
+        return cargoId;
     }
 
-    async updateCargo(id, cargoData) {
+    async updateCargo(id, cargoData, userId) {
         const { numero_puesto } = cargoData;
         const exists = await CargoRepository.findByNumeroPuesto(numero_puesto, id);
         if (exists) {
             throw new AppError('Otro cargo ya tiene ese número de puesto', 400);
         }
         await CargoRepository.update(id, cargoData);
+        await AuditoriaService.registrar(userId, 'UPDATE', 'CARGO', id, cargoData);
     }
 
     async deleteCargo(id, userId) {
         await CargoRepository.delete(id, userId);
+        await AuditoriaService.registrar(userId, 'DELETE', 'CARGO', id, { id });
     }
 
-    async assignDocente(cargoId, assignmentData) {
+    async assignDocente(cargoId, assignmentData, userId) {
         const { docente_id, situacion_revista, fecha_inicio, reemplaza_a } = assignmentData;
         
         if (!docente_id) throw new AppError('Docente es requerido', 400);
@@ -56,7 +61,9 @@ class CargoService {
         }
 
         const data = { ...assignmentData, cargo_id: cargoId };
-        return await CargoRepository.assignDocente(data);
+        const asigId = await CargoRepository.assignDocente(data);
+        await AuditoriaService.registrar(userId, 'ASSIGN_DOCENTE', 'CARGO', cargoId, assignmentData);
+        return asigId;
     }
 
     async getHistorial(id) {
@@ -67,18 +74,32 @@ class CargoService {
         return await CargoRepository.getDistribucion(cargoId);
     }
 
-    async addDistribucion(cargoId, data) {
+    async addDistribucion(cargoId, data, userId) {
+        const cargo = await CargoRepository.findById(cargoId);
+        if (!cargo) throw new AppError('El cargo no existe', 404);
+        
+        const distActual = await CargoRepository.getDistribucion(cargoId);
+        const horasActuales = distActual.reduce((acc, curr) => acc + curr.cantidad_horas, 0);
+        if (horasActuales + data.cantidad_horas > cargo.total_horas) {
+            throw new AppError(`No se pueden asignar ${data.cantidad_horas} horas. Supera el total de horas del puesto (${cargo.total_horas}).`, 400);
+        }
+
         // Enforce the cargo_id in the data
         const distributionData = { ...data, cargo_id: cargoId };
-        return await CargoRepository.addDistribucion(distributionData);
+        const resId = await CargoRepository.addDistribucion(distributionData);
+        await AuditoriaService.registrar(userId, 'ADD_DISTRIBUCION', 'CARGO', cargoId, data);
+        return resId;
     }
 
-    async updateDistribucion(id, data) {
-        return await CargoRepository.updateDistribucion(id, data);
+    async updateDistribucion(id, data, userId) {
+        const currentData = Object.assign({}, data);
+        await CargoRepository.updateDistribucion(id, data);
+        await AuditoriaService.registrar(userId, 'UPDATE_DISTRIBUCION', 'CARGO_DISTRIBUCION', id, currentData);
     }
 
-    async deleteDistribucion(id) {
-        return await CargoRepository.deleteDistribucion(id);
+    async deleteDistribucion(id, userId) {
+        await CargoRepository.deleteDistribucion(id);
+        await AuditoriaService.registrar(userId, 'DELETE_DISTRIBUCION', 'CARGO_DISTRIBUCION', id, { id });
     }
 
     // --- Tipos de Hora ---
@@ -86,8 +107,10 @@ class CargoService {
         return await CargoRepository.findTiposHora();
     }
 
-    async createTipoHora(nombre, descripcion) {
-        return await CargoRepository.createTipoHora(nombre, descripcion);
+    async createTipoHora(nombre, descripcion, userId) {
+        const id = await CargoRepository.createTipoHora(nombre, descripcion);
+        await AuditoriaService.registrar(userId, 'CREATE', 'TIPO_HORA', id, { nombre, descripcion });
+        return id;
     }
 
     // --- Cadena Activa ---

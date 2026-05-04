@@ -1,4 +1,4 @@
-const CodigoTramiteRepository = require('../repositories/codigo_tramite.repository');
+const CodigoTramiteRepository = require('../models/codigo_tramite.model');
 const AppError = require('../../shared/errors/AppError');
 
 class CodigoTramiteService {

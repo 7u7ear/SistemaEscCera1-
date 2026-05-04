@@ -4,10 +4,15 @@ class CargoRepository {
     async findAll() {
         const [rows] = await db.query(`
             SELECT c.id, c.numero_puesto, c.tipo_cargo, c.total_horas, c.estado,
-                   CONCAT(d.apellido, ' ', d.nombre) AS docente_nombre
+                   (SELECT CONCAT(d.apellido, ' ', d.nombre)
+                    FROM cargo_docente cd2
+                    JOIN docentes d ON cd2.docente_id = d.id
+                    WHERE cd2.cargo_id = c.id 
+                      AND cd2.estado = 'activo' 
+                      AND cd2.deleted_at IS NULL
+                    ORDER BY cd2.fecha_inicio DESC
+                    LIMIT 1) AS docente_nombre
             FROM cargos c
-            LEFT JOIN cargo_docente cd ON c.id = cd.cargo_id AND cd.deleted_at IS NULL
-            LEFT JOIN docentes d ON cd.docente_id = d.id AND d.deleted_at IS NULL
             WHERE c.deleted_at IS NULL
         `);
         return rows;

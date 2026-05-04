@@ -1,4 +1,4 @@
-const UsuarioRepository = require('../repositories/usuario.repository');
+const UsuarioRepository = require('../models/usuario.model');
 const AppError = require('../../shared/errors/AppError');
 const bcrypt = require('bcrypt');
 

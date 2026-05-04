@@ -1,5 +1,5 @@
-const LicenciaRepository = require('../repositories/licencia.repository');
-const TramitacionRepository = require('../repositories/tramitacion.repository');
+const LicenciaRepository = require('../models/licencia.model');
+const TramitacionRepository = require('../models/tramitacion.model');
 const AppError = require('../../shared/errors/AppError');
 const logger = require('../services/logger.service');
 

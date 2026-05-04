@@ -6,7 +6,8 @@ class LicenciaRepository {
             SELECT l.*, 
                    CONCAT(d.apellido, ' ', d.nombre) AS docente_nombre,
                    c.numero_puesto, c.tipo_cargo,
-                   t.estado AS tramite_estado, t.id AS tramite_id
+                   t.estado AS tramite_estado, t.id AS tramite_id,
+                   (SELECT cd.rol FROM cargo_docente cd WHERE cd.docente_id = l.docente_id AND cd.cargo_id = l.cargo_id AND cd.deleted_at IS NULL ORDER BY cd.fecha_inicio DESC LIMIT 1) AS rol
             FROM licencias l
             JOIN docentes d ON l.docente_id = d.id
             LEFT JOIN cargos c ON l.cargo_id = c.id
