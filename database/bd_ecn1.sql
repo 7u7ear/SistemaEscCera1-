@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 05-05-2026 a las 00:11:31
+-- Tiempo de generación: 14-05-2026 a las 21:18:44
 -- Versión del servidor: 8.2.0
 -- Versión de PHP: 8.2.13
 
@@ -647,7 +647,7 @@ CREATE TABLE IF NOT EXISTS `modulos` (
   `descripcion` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre` (`nombre`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `modulos`
@@ -658,7 +658,85 @@ INSERT INTO `modulos` (`id`, `nombre`, `descripcion`) VALUES
 (2, 'estudiantes', 'Gestion estudiantes'),
 (3, 'biblioteca', 'Sistema biblioteca'),
 (4, 'tramitaciones', NULL),
-(5, 'permisos', 'Gestión de permisos');
+(5, 'permisos', 'Gestión de permisos'),
+(6, 'cargos', 'Gestión de puestos y cargos'),
+(7, 'licencias', 'Gestión de licencias docentes'),
+(8, 'planilla_firmas', 'Planilla de firmas diaria'),
+(9, 'auditoria', 'Registro de auditoría del sistema'),
+(10, 'usuarios', 'Gestión de usuarios y accesos');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `perfiles`
+--
+
+DROP TABLE IF EXISTS `perfiles`;
+CREATE TABLE IF NOT EXISTS `perfiles` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nombre` (`nombre`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `perfiles`
+--
+
+INSERT INTO `perfiles` (`id`, `nombre`, `created_at`) VALUES
+(1, 'ADMINISTRADOR', '2026-05-09 13:41:41'),
+(2, 'SECRETARIO', '2026-05-09 13:41:41'),
+(3, 'CONDUCCION', '2026-05-09 13:41:41'),
+(4, 'AUXILIAR ADMINISTRATIVO', '2026-05-09 13:41:41'),
+(5, 'OFICINA DE ALUMNOS', '2026-05-09 13:41:41'),
+(6, 'PRECEPTOR/A', '2026-05-09 13:41:41'),
+(7, 'DOCENTE', '2026-05-09 13:41:41'),
+(8, 'BIBLIOTECA', '2026-05-09 13:41:41'),
+(9, 'ESTUDIANTE', '2026-05-09 13:41:41');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `perfil_modulo`
+--
+
+DROP TABLE IF EXISTS `perfil_modulo`;
+CREATE TABLE IF NOT EXISTS `perfil_modulo` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `perfil_id` int NOT NULL,
+  `modulo_id` int NOT NULL,
+  `permiso` enum('lectura','edicion','ninguno') COLLATE utf8mb4_unicode_ci DEFAULT 'ninguno',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_perfil_modulo` (`perfil_id`,`modulo_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `perfil_modulo`
+--
+
+INSERT INTO `perfil_modulo` (`id`, `perfil_id`, `modulo_id`, `permiso`) VALUES
+(1, 1, 1, 'edicion'),
+(2, 2, 1, 'edicion'),
+(3, 1, 2, 'edicion'),
+(4, 2, 2, 'edicion'),
+(5, 1, 3, 'edicion'),
+(6, 2, 3, 'edicion'),
+(7, 1, 4, 'edicion'),
+(8, 2, 4, 'edicion'),
+(9, 1, 5, 'edicion'),
+(10, 2, 5, 'edicion'),
+(11, 1, 6, 'edicion'),
+(12, 2, 6, 'edicion'),
+(13, 1, 7, 'edicion'),
+(14, 2, 7, 'edicion'),
+(15, 1, 8, 'edicion'),
+(16, 2, 8, 'edicion'),
+(17, 1, 9, 'edicion'),
+(18, 2, 9, 'edicion'),
+(19, 1, 10, 'edicion'),
+(20, 2, 10, 'edicion'),
+(21, 4, 1, 'lectura');
 
 -- --------------------------------------------------------
 
@@ -753,14 +831,14 @@ CREATE TABLE IF NOT EXISTS `tramitaciones` (
 --
 
 INSERT INTO `tramitaciones` (`id`, `fecha`, `tipo_tramite`, `codigo_tramite_id`, `docente_id`, `rol`, `expediente`, `cargo_id`, `estado`, `observaciones`, `created_at`, `updated_at`, `deleted_at`, `created_by`) VALUES
-(1, '2026-04-03', '', 1, 6, 2, 'EX-2025*-14544125-GCABA-DGPDYNG', 2, 'caratulado', NULL, '2026-04-03 17:34:27', '2026-04-03 18:02:13', NULL, 1),
+(1, '2026-04-03', '', 1, 6, 2, 'EX-2025-14544125-GCABA-DGPDYNG', 2, 'caratulado', NULL, '2026-04-03 17:34:27', '2026-05-09 14:19:55', NULL, 1),
 (2, '2026-04-03', '', 1, 16, 15, 'EX-2025-1004125-GCABA-DGPDYNG', 5, 'caratulado', NULL, '2026-04-03 18:04:24', '2026-04-03 18:14:28', NULL, 1),
 (3, '2026-04-03', '', 3, 16, 45, 'EX-2025-1000005-GCABA-DGPDYNG', 2, 'caratulado', NULL, '2026-04-03 18:30:33', NULL, NULL, 1),
 (4, '2026-04-03', '', 4, 16, 45, 'EX-2025-100006-GCABA-DGPDYNG', 2, 'realizado', 'FALTA QR', '2026-04-03 18:34:54', '2026-04-03 18:47:05', NULL, 1),
 (5, '2026-04-03', '', 3, 21, 27, 'EX-2025-100010-GCABA-DGPDYNG', 5, 'caratulado', NULL, '2026-04-03 19:41:08', NULL, NULL, 1),
 (6, '2026-04-03', '', 4, 21, 27, 'EX-2025-100011-GCABA-DGPDYNG', 5, 'caratulado', NULL, '2026-04-03 19:42:42', NULL, NULL, 1),
 (7, '2024-08-12', '', 1, 29, 12, 'EX-2025-100006-GCABA-DGPDYNG', 16, 'caratulado', NULL, '2026-04-19 15:26:26', '2026-04-19 16:02:11', NULL, 1),
-(8, '2026-04-19', '', 3, 20, 35, 'EX-2025-222222-GCABA-DGPDYNG', 16, 'caratulado', NULL, '2026-04-19 16:30:03', NULL, NULL, 1);
+(8, '2026-04-19', '', 3, 20, 35, 'EX-2025-222222-GCABA-DGPDYNG', 16, 'realizado', NULL, '2026-04-19 16:30:03', '2026-05-09 14:20:41', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -818,16 +896,18 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `activo` tinyint DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `perfil` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `perfil_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `username`, `password`, `nombre`, `estado`, `activo`, `created_at`, `perfil`) VALUES
-(1, 'secretaria', '$2b$10$kTJt/7854b9oIUNx/eeDqet9WH8/kitJ.GDKfnOKsUCjJswnYbiZG', 'Secretaria', 'activo', 1, '2026-02-21 18:18:59', NULL);
+INSERT INTO `usuarios` (`id`, `username`, `password`, `nombre`, `estado`, `activo`, `created_at`, `perfil`, `perfil_id`) VALUES
+(1, 'sergio', '$2b$10$v7Jg0c.3OAGtRis7N3oW2OPZ2Bt14YEQNouxO8bnLCHUSDxbRk7Gu', 'Sergio', 'activo', 1, '2026-02-21 18:18:59', 'SECRETARIO', 2),
+(2, '7u7e', '$2b$10$CgllvOsABzYhsN5zNekoluZMKpUMuYCRJAzDrWRZ82sjcHKaVxBPK', '7u7e', 'activo', 1, '2026-05-09 13:27:43', 'ADMINISTRADOR', 1);
 
 -- --------------------------------------------------------
 
@@ -860,7 +940,7 @@ CREATE TABLE IF NOT EXISTS `usuario_modulo` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `usuario_id` (`usuario_id`,`modulo_id`),
   KEY `modulo_id` (`modulo_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `usuario_modulo`
@@ -869,129 +949,14 @@ CREATE TABLE IF NOT EXISTS `usuario_modulo` (
 INSERT INTO `usuario_modulo` (`id`, `usuario_id`, `modulo_id`, `permiso`) VALUES
 (1, 1, 1, 'edicion'),
 (2, 1, 2, 'edicion'),
-(5, 1, 4, 'edicion');
-
--- --------------------------------------------------------
-
---
--- Estructura Stand-in para la vista `vista_designaciones`
--- (Véase abajo para la vista actual)
---
-DROP VIEW IF EXISTS `vista_designaciones`;
-CREATE TABLE IF NOT EXISTS `vista_designaciones` (
-`apellido` varchar(191)
-,`estado` varchar(191)
-,`fecha_fin` date
-,`fecha_inicio` date
-,`id` bigint unsigned
-,`nombre` varchar(191)
-,`numero_puesto` varchar(191)
-,`reemplaza` varchar(383)
-,`rol` int unsigned
-,`situacion_revista` varchar(191)
-,`tipo_cargo` varchar(191)
-);
-
--- --------------------------------------------------------
-
---
--- Estructura Stand-in para la vista `vista_designaciones_activas`
--- (Véase abajo para la vista actual)
---
-DROP VIEW IF EXISTS `vista_designaciones_activas`;
-CREATE TABLE IF NOT EXISTS `vista_designaciones_activas` (
-`apellido` varchar(191)
-,`estado` varchar(191)
-,`fecha_fin` date
-,`fecha_inicio` date
-,`id` bigint unsigned
-,`nombre` varchar(191)
-,`numero_puesto` varchar(191)
-,`reemplaza` varchar(383)
-,`rol` int unsigned
-,`situacion_revista` varchar(191)
-,`tipo_cargo` varchar(191)
-);
-
--- --------------------------------------------------------
-
---
--- Estructura Stand-in para la vista `vista_licencias_activas`
--- (Véase abajo para la vista actual)
---
-DROP VIEW IF EXISTS `vista_licencias_activas`;
-CREATE TABLE IF NOT EXISTS `vista_licencias_activas` (
-);
-
--- --------------------------------------------------------
-
---
--- Estructura Stand-in para la vista `vista_planilla_diaria`
--- (Véase abajo para la vista actual)
---
-DROP VIEW IF EXISTS `vista_planilla_diaria`;
-CREATE TABLE IF NOT EXISTS `vista_planilla_diaria` (
-);
-
--- --------------------------------------------------------
-
---
--- Estructura Stand-in para la vista `vista_planilla_horaria`
--- (Véase abajo para la vista actual)
---
-DROP VIEW IF EXISTS `vista_planilla_horaria`;
-CREATE TABLE IF NOT EXISTS `vista_planilla_horaria` (
-);
-
--- --------------------------------------------------------
-
---
--- Estructura para la vista `vista_designaciones`
---
-DROP TABLE IF EXISTS `vista_designaciones`;
-
-DROP VIEW IF EXISTS `vista_designaciones`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_designaciones`  AS SELECT `cd`.`id` AS `id`, `d`.`apellido` AS `apellido`, `d`.`nombre` AS `nombre`, `c`.`numero_puesto` AS `numero_puesto`, `c`.`tipo_cargo` AS `tipo_cargo`, `cd`.`rol` AS `rol`, `cd`.`situacion_revista` AS `situacion_revista`, `cd`.`estado` AS `estado`, `cd`.`fecha_inicio` AS `fecha_inicio`, `cd`.`fecha_fin` AS `fecha_fin`, concat(`d2`.`apellido`,' ',`d2`.`nombre`) AS `reemplaza` FROM ((((`cargo_docente` `cd` join `docentes` `d` on((`cd`.`docente_id` = `d`.`id`))) join `cargos` `c` on((`cd`.`cargo_id` = `c`.`id`))) left join `cargo_docente` `cd2` on((`cd`.`reemplaza_a` = `cd2`.`id`))) left join `docentes` `d2` on((`cd2`.`docente_id` = `d2`.`id`))) ;
-
--- --------------------------------------------------------
-
---
--- Estructura para la vista `vista_designaciones_activas`
---
-DROP TABLE IF EXISTS `vista_designaciones_activas`;
-
-DROP VIEW IF EXISTS `vista_designaciones_activas`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_designaciones_activas`  AS SELECT `vista_designaciones`.`id` AS `id`, `vista_designaciones`.`apellido` AS `apellido`, `vista_designaciones`.`nombre` AS `nombre`, `vista_designaciones`.`numero_puesto` AS `numero_puesto`, `vista_designaciones`.`tipo_cargo` AS `tipo_cargo`, `vista_designaciones`.`rol` AS `rol`, `vista_designaciones`.`situacion_revista` AS `situacion_revista`, `vista_designaciones`.`estado` AS `estado`, `vista_designaciones`.`fecha_inicio` AS `fecha_inicio`, `vista_designaciones`.`fecha_fin` AS `fecha_fin`, `vista_designaciones`.`reemplaza` AS `reemplaza` FROM `vista_designaciones` WHERE ((curdate() >= `vista_designaciones`.`fecha_inicio`) AND ((curdate() <= `vista_designaciones`.`fecha_fin`) OR (`vista_designaciones`.`fecha_fin` is null)) AND (`vista_designaciones`.`estado` = 'activo')) ;
-
--- --------------------------------------------------------
-
---
--- Estructura para la vista `vista_licencias_activas`
---
-DROP TABLE IF EXISTS `vista_licencias_activas`;
-
-DROP VIEW IF EXISTS `vista_licencias_activas`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_licencias_activas`  AS SELECT `d`.`apellido` AS `apellido`, `d`.`nombre` AS `nombre`, `c`.`numero_puesto` AS `numero_puesto`, `c`.`tipo_cargo` AS `tipo_cargo`, `l`.`nombre` AS `licencia`, `cdl`.`fecha_inicio` AS `fecha_inicio`, `cdl`.`fecha_fin` AS `fecha_fin`, `cdl`.`observaciones` AS `observaciones` FROM ((((`cargo_docente_licencias` `cdl` join `cargo_docente` `cd` on((`cdl`.`cargo_docente_id` = `cd`.`id`))) join `docentes` `d` on((`cd`.`docente_id` = `d`.`id`))) join `cargos` `c` on((`cd`.`cargo_id` = `c`.`id`))) join `licencias` `l` on((`cdl`.`licencia_id` = `l`.`id`))) WHERE (curdate() between `cdl`.`fecha_inicio` and ifnull(`cdl`.`fecha_fin`,'9999-12-31')) ;
-
--- --------------------------------------------------------
-
---
--- Estructura para la vista `vista_planilla_diaria`
---
-DROP TABLE IF EXISTS `vista_planilla_diaria`;
-
-DROP VIEW IF EXISTS `vista_planilla_diaria`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_planilla_diaria`  AS SELECT `vda`.`apellido` AS `apellido`, `vda`.`nombre` AS `nombre`, `vda`.`numero_puesto` AS `numero_puesto`, `vda`.`tipo_cargo` AS `tipo_cargo`, `vda`.`rol` AS `rol`, `vda`.`situacion_revista` AS `situacion_revista`, NULL AS `observacion` FROM `vista_designaciones_activas` AS `vda`union select `vla`.`apellido` AS `apellido`,`vla`.`nombre` AS `nombre`,`vla`.`numero_puesto` AS `numero_puesto`,`vla`.`tipo_cargo` AS `tipo_cargo`,NULL AS `rol`,'licencia' AS `situacion_revista`,`vla`.`licencia` AS `observacion` from `vista_licencias_activas` `vla`  ;
-
--- --------------------------------------------------------
-
---
--- Estructura para la vista `vista_planilla_horaria`
---
-DROP TABLE IF EXISTS `vista_planilla_horaria`;
-
-DROP VIEW IF EXISTS `vista_planilla_horaria`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_planilla_horaria`  AS SELECT `vpd`.`apellido` AS `apellido`, `vpd`.`nombre` AS `nombre`, `vpd`.`numero_puesto` AS `numero_puesto`, `vpd`.`tipo_cargo` AS `tipo_cargo`, `m`.`nombre` AS `materia`, concat(`c`.`anio`,' ',`c`.`division`,' ',`c`.`modalidad`,(case when ((`c`.`especialidad` is not null) and (`c`.`especialidad` <> '')) then concat(' ',`c`.`especialidad`) else '' end)) AS `curso`, `dh`.`tipo` AS `tipo`, `dh`.`dia` AS `dia`, `dh`.`hora_ingreso` AS `hora_ingreso`, `dh`.`hora_egreso` AS `hora_egreso`, `vpd`.`observacion` AS `observacion` FROM ((((`vista_planilla_diaria` `vpd` join `cargos` `cg` on((`vpd`.`numero_puesto` = `cg`.`numero_puesto`))) join `distribucion_horas` `dh` on((`cg`.`id` = `dh`.`cargo_id`))) join `materias` `m` on((`dh`.`materia_id` = `m`.`id`))) join `cursos` `c` on((`dh`.`curso_id` = `c`.`id`))) ;
+(5, 1, 4, 'edicion'),
+(6, 1, 3, 'edicion'),
+(7, 1, 5, 'edicion'),
+(8, 1, 6, 'edicion'),
+(9, 1, 7, 'edicion'),
+(10, 1, 8, 'edicion'),
+(11, 1, 9, 'edicion'),
+(12, 1, 10, 'edicion');
 
 --
 -- Restricciones para tablas volcadas

@@ -30,11 +30,11 @@ class UsuarioController {
 
     async getMe(req, res, next) {
         try {
-            const user = req.user;
-            if (!user) {
-                return res.status(401).json({ error: 'No autorizado' });
-            }
-            res.json(user);
+            const userToken = req.user;
+            if (!userToken) return res.status(401).json({ error: 'No autorizado' });
+
+            const userFull = await UsuarioService.getUsuarioById(userToken.id);
+            res.json(userFull);
         } catch (err) {
             next(err);
         }
@@ -54,6 +54,38 @@ class UsuarioController {
         try {
             const usuarios = await UsuarioService.getAllUsuarios();
             res.json(usuarios);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async adminCreate(req, res, next) {
+        try {
+            // Se asume validación previa en rutas
+            const insertId = await UsuarioService.adminCreateUser(req.body, req.user.id);
+            res.status(201).json({ message: 'Usuario creado correctamente por administrador.', id: insertId });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async updateStatus(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { estado } = req.body;
+            await UsuarioService.updateUserStatus(id, estado, req.user.id);
+            res.json({ message: `Estado de usuario actualizado a ${estado}` });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async updatePerfil(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { perfil_id } = req.body;
+            await UsuarioService.updateUserPerfil(id, perfil_id, req.user.id);
+            res.json({ message: `Perfil de usuario actualizado a ID ${perfil_id}` });
         } catch (err) {
             next(err);
         }

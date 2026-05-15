@@ -17,6 +17,9 @@ let modalLicencia;
 let modalNuevoTipoLicencia;
 let licenciasGlobal = [];
 let tiposLicenciaGlobal = [];
+let usuariosGlobal = [];
+let modalUsuario;
+let modalCrearUsuario;
 
 // ============================
 // INICIO
@@ -34,6 +37,8 @@ window.addEventListener("DOMContentLoaded", () => {
     modalGestionCodigos = new bootstrap.Modal(document.getElementById('modalGestionCodigos'));
     modalLicencia = new bootstrap.Modal(document.getElementById('modalLicencia'));
     modalNuevoTipoLicencia = new bootstrap.Modal(document.getElementById('modalNuevoTipoLicencia'));
+    modalUsuario = new bootstrap.Modal(document.getElementById('modalUsuario'));
+    modalCrearUsuario = new bootstrap.Modal(document.getElementById('modalCrearUsuario'));
 });
 
 // ============================
@@ -62,6 +67,8 @@ function mostrarSeccion(seccion) {
     if (seccion === 'tramitaciones') verTramitaciones();
     if (seccion === 'licencias') verLicencias();
     if (seccion === 'planilla') verPlanillaFirmas();
+    if (seccion === 'usuarios') verUsuarios();
+    if (seccion === 'permisos') verPermisos();
 }
 
 // ============================
@@ -72,9 +79,9 @@ async function cargarUsuario() {
     const res = await api.get("/api/v1/usuarios/me");
     if (!res.ok) { window.location.href = "login.html"; return; }
     usuarioActual = await res.json();
-    const perfilStr = usuarioActual.perfil ? usuarioActual.perfil : "Usuario";
-    document.getElementById("titulo").innerText = `${perfilStr} - ${usuarioActual.nombre}`;
-    document.getElementById("userInfo").innerText = `Usuario: ${usuarioActual.username}`;
+    const perfilStr = usuarioActual.perfil_nombre ? usuarioActual.perfil_nombre : "Usuario";
+    document.getElementById("titulo").innerText = `Bienvenido/a, ${usuarioActual.nombre}`;
+    document.getElementById("userInfo").innerText = `Cargo: ${perfilStr} | Usuario: ${usuarioActual.username}`;
 }
 
 // ============================

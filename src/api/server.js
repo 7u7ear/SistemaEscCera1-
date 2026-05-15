@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -5,7 +6,6 @@ const helmet = require('helmet');
 const logger = require('./services/logger.service');
 const v1Routes = require('./routes/v1');
 const errorHandler = require('./middlewares/errorHandler');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;

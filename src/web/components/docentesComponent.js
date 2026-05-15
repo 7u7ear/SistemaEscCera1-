@@ -98,7 +98,7 @@ async function guardarDocente() {
     const id = document.getElementById("docenteId").value;
     const url = id ? `/api/v1/docentes/${id}` : "/api/v1/docentes";
     const res = await (id ? api.put(url, data) : api.post(url, data));
-    if (!res.ok) { const msg = await res.json(); alert("Error: " + msg); return; }
+    if (!res.ok) { const msg = await res.json(); alert("Error: " + (msg.error || JSON.stringify(msg))); return; }
     modal.hide();
     verDocentes();
 }
