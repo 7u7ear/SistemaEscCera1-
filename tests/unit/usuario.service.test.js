@@ -5,15 +5,19 @@
 const AppError = require('../../src/shared/errors/AppError');
 
 // --- Mocks ---
-jest.mock('../../src/api/repositories/usuario.repository', () => ({
+jest.mock('../../src/api/models/usuario.model', () => ({
   findByUsername: jest.fn(),
+  findById: jest.fn(),
+  create: jest.fn(),
+  updateStatus: jest.fn(),
+  updatePerfil: jest.fn(),
 }));
 
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
 }));
 
-const UsuarioRepository = require('../../src/api/repositories/usuario.repository');
+const UsuarioRepository = require('../../src/api/models/usuario.model');
 const bcrypt = require('bcrypt');
 const UsuarioService = require('../../src/api/services/usuario.service');
 

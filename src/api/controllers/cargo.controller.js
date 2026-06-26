@@ -1,5 +1,5 @@
 const CargoService = require('../services/cargo.service');
-const { createCargoSchema, updateCargoSchema, assignDocenteSchema, addDistribucionSchema } = require('../validations/cargo.validation');
+const { createCargoSchema, updateCargoSchema, assignDocenteSchema, addDistribucionSchema, createTipoHoraSchema } = require('../validations/cargo.validation');
 const logger = require('../services/logger.service');
 
 class CargoController {
@@ -125,7 +125,7 @@ class CargoController {
 
     async createTipoHora(req, res, next) {
         try {
-            const { nombre, descripcion } = req.body;
+            const { nombre, descripcion } = createTipoHoraSchema.parse(req.body);
             const userId = req.user?.id;
             await CargoService.createTipoHora(nombre, descripcion, userId);
             res.status(201).json({ message: 'Tipo de hora creado' });

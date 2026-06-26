@@ -117,11 +117,19 @@ async function guardarCambiosUsuario() {
 
     // Guardar Perfil
     const resPerfil = await api.patch(`/api/v1/usuarios/${id}/perfil`, { perfil_id });
-    if (!resPerfil.ok) { alert("Error al actualizar perfil"); return; }
+    if (!resPerfil.ok) {
+        const err = await resPerfil.json();
+        alert("Error al actualizar perfil: " + api.getErrorMessage(err));
+        return;
+    }
 
     // Guardar Estado
     const resEstado = await api.patch(`/api/v1/usuarios/${id}/status`, { estado });
-    if (!resEstado.ok) { alert("Error al actualizar estado"); return; }
+    if (!resEstado.ok) {
+        const err = await resEstado.json();
+        alert("Error al actualizar estado: " + api.getErrorMessage(err));
+        return;
+    }
 
     modalUsuario.hide();
     verUsuarios();
@@ -130,8 +138,12 @@ async function guardarCambiosUsuario() {
 async function cambiarEstadoUsuario(id, estado) {
     if (!confirm(`¿Desea cambiar el estado del usuario a ${estado}?`)) return;
     const res = await api.patch(`/api/v1/usuarios/${id}/status`, { estado });
-    if (res.ok) verUsuarios();
-    else alert("Error al cambiar estado");
+    if (res.ok) {
+        verUsuarios();
+    } else {
+        const err = await res.json();
+        alert("Error al cambiar estado: " + api.getErrorMessage(err));
+    }
 }
 
 function abrirModalCrearUsuario() {
@@ -155,6 +167,6 @@ async function ejecutarCrearUsuario() {
         verUsuarios();
     } else {
         const err = await res.json();
-        alert("Error: " + (err.message || "No se pudo crear el usuario"));
+        alert("Error al crear usuario: " + api.getErrorMessage(err));
     }
 }

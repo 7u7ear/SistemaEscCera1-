@@ -32,9 +32,15 @@ const addDistribucionSchema = z.object({
     hora_egreso: z.string().regex(/^([01]\d|2[0-3]):?([0-5]\d)$/).optional().nullable()
 });
 
+const createTipoHoraSchema = z.object({
+    nombre: z.string().min(1, 'Nombre del tipo de hora es requerido'),
+    descripcion: z.string().optional().nullable(),
+});
+
 module.exports = {
     createCargoSchema,
     updateCargoSchema,
     assignDocenteSchema,
-    addDistribucionSchema
+    addDistribucionSchema,
+    createTipoHoraSchema,
 };

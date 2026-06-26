@@ -20,6 +20,8 @@ let tiposLicenciaGlobal = [];
 let usuariosGlobal = [];
 let modalUsuario;
 let modalCrearUsuario;
+let modalDetallePuesto;
+let modalBajaSuplente;
 
 // ============================
 // INICIO

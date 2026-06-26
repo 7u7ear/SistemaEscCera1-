@@ -73,15 +73,20 @@ async function guardarCargo() {
     const id = document.getElementById("cargoId").value;
     const url = id ? `/api/v1/cargos/${id}` : "/api/v1/cargos";
     const res = await (id ? api.put(url, data) : api.post(url, data));
-    if (!res.ok) { const msg = await res.json(); alert("Error: " + msg); return; }
+    if (!res.ok) { const msg = await res.json(); alert("Error: " + api.getErrorMessage(msg)); return; }
     modalCargo.hide();
     verCargos();
 }
 
 async function eliminarCargo(id) {
     if (!confirm("¿Desea eliminar este cargo?")) return;
-    await api.delete(`/api/v1/cargos/${id}`);
-    verCargos();
+    const res = await api.delete(`/api/v1/cargos/${id}`);
+    if (res.ok) {
+        verCargos();
+    } else {
+        const err = await res.json();
+        alert("Error al eliminar cargo: " + api.getErrorMessage(err));
+    }
 }
 
 // ============================
@@ -350,7 +355,7 @@ async function confirmarBaja() {
         verCargos();
     } else {
         const msg = await res.json();
-        alert("Error al registrar baja: " + JSON.stringify(msg));
+        alert("Error al registrar baja: " + api.getErrorMessage(msg));
     }
 }
 
@@ -386,7 +391,7 @@ async function asignarDocente() {
         new bootstrap.Tab(document.getElementById('tab-asignaciones')).show();
     } else {
         const msg = await res.json();
-        alert("Error al asignar: " + (msg.message || JSON.stringify(msg)));
+        alert("Error al asignar: " + api.getErrorMessage(msg));
     }
 }
 
@@ -426,7 +431,7 @@ async function agregarMateria() {
         document.getElementById("formRapidoMateria").style.display = "none";
     } else {
         const msg = await res.json();
-        alert("Error al guardar materia: " + JSON.stringify(msg));
+        alert("Error al guardar materia: " + api.getErrorMessage(msg));
     }
 }
 
@@ -488,7 +493,8 @@ async function eliminarMateria(id) {
         const cargoId = document.getElementById("gestionCargoId").value;
         cargarDistribucion(cargoId);
     } else {
-        alert("Error al eliminar");
+        const err = await res.json();
+        alert("Error al eliminar: " + api.getErrorMessage(err));
     }
 }
 
@@ -499,6 +505,9 @@ async function abrirGestionTiposHora() {
     const res = await api.post("/api/v1/cargos/config/tipos-hora", { nombre });
     if (res.ok) {
         cargarTiposHora();
+    } else {
+        const err = await res.json();
+        alert("Error al crear tipo de hora: " + api.getErrorMessage(err));
     }
 }
 

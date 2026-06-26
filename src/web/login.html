@@ -172,7 +172,8 @@
                 localStorage.setItem('user_perfil', data.user.perfil || 'Usuario');
                 window.location.href = "dashboard.html";
             } else {
-                msg.innerText = data.error || data.message || 'Error al ingresar';
+                const errMsg = (data.error && typeof data.error === 'object' ? data.error.message : data.error) || data.message || 'Error al ingresar';
+                msg.innerText = errMsg;
                 msg.classList.remove('d-none');
             }
         } catch (err) {
@@ -211,7 +212,8 @@
                 }, 3000);
             } else {
                 msg.classList.add('alert-danger');
-                msg.innerText = data.error || data.message || 'Error al registrar';
+                const errMsg = (data.error && typeof data.error === 'object' ? data.error.message : data.error) || data.message || 'Error al registrar';
+                msg.innerText = errMsg;
                 msg.classList.remove('d-none');
             }
         } catch (err) {

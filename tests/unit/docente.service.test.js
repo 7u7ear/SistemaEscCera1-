@@ -4,7 +4,7 @@
  */
 const AppError = require('../../src/shared/errors/AppError');
 
-jest.mock('../../src/api/repositories/docente.repository', () => ({
+jest.mock('../../src/api/models/docente.model', () => ({
   findAll: jest.fn(),
   findDuplicate: jest.fn(),
   create: jest.fn(),
@@ -13,7 +13,7 @@ jest.mock('../../src/api/repositories/docente.repository', () => ({
   findCargos: jest.fn(),
 }));
 
-const DocenteRepository = require('../../src/api/repositories/docente.repository');
+const DocenteRepository = require('../../src/api/models/docente.model');
 const DocenteService = require('../../src/api/services/docente.service');
 
 describe('DocenteService', () => {

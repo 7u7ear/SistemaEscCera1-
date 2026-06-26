@@ -98,14 +98,19 @@ async function guardarDocente() {
     const id = document.getElementById("docenteId").value;
     const url = id ? `/api/v1/docentes/${id}` : "/api/v1/docentes";
     const res = await (id ? api.put(url, data) : api.post(url, data));
-    if (!res.ok) { const msg = await res.json(); alert("Error: " + (msg.error || JSON.stringify(msg))); return; }
+    if (!res.ok) { const msg = await res.json(); alert("Error: " + api.getErrorMessage(msg)); return; }
     modal.hide();
     verDocentes();
 }
 
 async function eliminarDocente(id) {
     if (!confirm("¿Desea eliminar este docente?")) return;
-    await api.delete(`/api/v1/docentes/${id}`);
-    verDocentes();
+    const res = await api.delete(`/api/v1/docentes/${id}`);
+    if (res.ok) {
+        verDocentes();
+    } else {
+        const err = await res.json();
+        alert("Error al eliminar docente: " + api.getErrorMessage(err));
+    }
 }
 

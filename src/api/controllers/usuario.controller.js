@@ -1,5 +1,5 @@
 const UsuarioService = require('../services/usuario.service');
-const { loginSchema, registerSchema } = require('../validations/usuario.validation');
+const { loginSchema, registerSchema, adminCreateSchema, updateStatusSchema, updatePerfilSchema } = require('../validations/usuario.validation');
 const logger = require('../services/logger.service');
 const { generarToken } = require('../utils/jwt.util');
 
@@ -61,8 +61,8 @@ class UsuarioController {
 
     async adminCreate(req, res, next) {
         try {
-            // Se asume validación previa en rutas
-            const insertId = await UsuarioService.adminCreateUser(req.body, req.user.id);
+            const validatedData = adminCreateSchema.parse(req.body);
+            const insertId = await UsuarioService.adminCreateUser(validatedData, req.user.id);
             res.status(201).json({ message: 'Usuario creado correctamente por administrador.', id: insertId });
         } catch (err) {
             next(err);
@@ -72,7 +72,7 @@ class UsuarioController {
     async updateStatus(req, res, next) {
         try {
             const { id } = req.params;
-            const { estado } = req.body;
+            const { estado } = updateStatusSchema.parse(req.body);
             await UsuarioService.updateUserStatus(id, estado, req.user.id);
             res.json({ message: `Estado de usuario actualizado a ${estado}` });
         } catch (err) {
@@ -83,7 +83,7 @@ class UsuarioController {
     async updatePerfil(req, res, next) {
         try {
             const { id } = req.params;
-            const { perfil_id } = req.body;
+            const { perfil_id } = updatePerfilSchema.parse(req.body);
             await UsuarioService.updateUserPerfil(id, perfil_id, req.user.id);
             res.json({ message: `Perfil de usuario actualizado a ID ${perfil_id}` });
         } catch (err) {

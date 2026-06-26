@@ -51,7 +51,44 @@ const api = {
         headers: { 'Content-Type': 'application/json', ...options?.headers },
         body: JSON.stringify(data)
     }),
-    delete: (url, options) => api.fetch(url, { ...options, method: 'DELETE' })
+    delete: (url, options) => api.fetch(url, { ...options, method: 'DELETE' }),
+
+    /**
+     * Obtiene el mensaje de error legible de una respuesta JSON de la API
+     * @param {Object} errObj - Objeto de error parseado desde la respuesta
+     */
+    getErrorMessage(errObj) {
+        if (!errObj) return 'Error desconocido';
+        
+        if (errObj.error) {
+            if (typeof errObj.error === 'string') {
+                return errObj.error;
+            }
+            if (errObj.error.message) {
+                let msg = errObj.error.message;
+                if (errObj.error.details && Array.isArray(errObj.error.details)) {
+                    const detailsStr = errObj.error.details
+                        .map(d => {
+                            const field = d.path && d.path.length > 0 ? d.path[d.path.length - 1] : '';
+                            return `${field}: ${d.message}`;
+                        })
+                        .join(', ');
+                    msg += ` (${detailsStr})`;
+                }
+                return msg;
+            }
+        }
+        
+        if (typeof errObj.message === 'string') {
+            return errObj.message;
+        }
+        
+        if (typeof errObj === 'string') {
+            return errObj;
+        }
+        
+        return JSON.stringify(errObj);
+    }
 };
 
 // Exponer globalmente para los scripts legacy

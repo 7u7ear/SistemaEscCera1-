@@ -1,4 +1,5 @@
 const TramitacionService = require('../services/tramitacion.service');
+const { createTramitacionSchema, updateTramitacionSchema } = require('../validations/tramitacion.validation');
 
 class TramitacionController {
     async getAll(req, res, next) {
@@ -12,8 +13,9 @@ class TramitacionController {
 
     async create(req, res, next) {
         try {
+            const validatedData = createTramitacionSchema.parse(req.body);
             const userId = req.user.id;
-            const id = await TramitacionService.create(req.body, userId);
+            const id = await TramitacionService.create(validatedData, userId);
             res.status(201).json({ message: 'Tramitación registrada', id });
         } catch (err) {
             next(err);
@@ -22,7 +24,8 @@ class TramitacionController {
 
     async update(req, res, next) {
         try {
-            await TramitacionService.update(req.params.id, req.body);
+            const validatedData = updateTramitacionSchema.parse(req.body);
+            await TramitacionService.update(req.params.id, validatedData);
             res.json({ message: 'Tramitación actualizada' });
         } catch (err) {
             next(err);

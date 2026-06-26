@@ -1,4 +1,5 @@
 const CodigoTramiteService = require('../services/codigo_tramite.service');
+const { codigoTramiteSchema } = require('../validations/codigo_tramite.validation');
 
 class CodigoTramiteController {
     async getAll(req, res, next) {
@@ -12,7 +13,8 @@ class CodigoTramiteController {
 
     async create(req, res, next) {
         try {
-            const id = await CodigoTramiteService.create(req.body);
+            const validatedData = codigoTramiteSchema.parse(req.body);
+            const id = await CodigoTramiteService.create(validatedData);
             res.status(201).json({ message: 'Código de trámite creado', id });
         } catch (err) {
             next(err);
@@ -21,7 +23,8 @@ class CodigoTramiteController {
 
     async update(req, res, next) {
         try {
-            await CodigoTramiteService.update(req.params.id, req.body);
+            const validatedData = codigoTramiteSchema.parse(req.body);
+            await CodigoTramiteService.update(req.params.id, validatedData);
             res.json({ message: 'Código de trámite actualizado' });
         } catch (err) {
             next(err);

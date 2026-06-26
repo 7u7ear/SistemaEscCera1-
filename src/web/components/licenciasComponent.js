@@ -196,7 +196,8 @@ async function guardarNuevoTipoLicencia() {
         poblarSelectTiposLicencia();
         document.getElementById("licenciaTipo").value = cod_licencia;
     } else {
-        alert("Error al guardar el tipo de licencia");
+        const err = await res.json();
+        alert("Error al guardar el tipo de licencia: " + api.getErrorMessage(err));
     }
 }
 
@@ -351,7 +352,7 @@ async function guardarLicencia(evt) {
             if (data.actualizar_puesto || data.finalizar_puesto) verCargos();
         } else {
             const error = await res.json();
-            alert("Error: " + JSON.stringify(error));
+            alert("Error: " + api.getErrorMessage(error));
         }
     } catch (err) {
         alert("Error de conexión con el servidor");

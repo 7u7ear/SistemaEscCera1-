@@ -212,7 +212,8 @@ async function guardarCodigoTramite() {
         await verGestionCodigos();
         poblarSelectCodigosTramite(); // Refrescar datalist de Nueva Tramitación
     } else {
-        alert("Error al guardar código");
+        const err = await res.json();
+        alert("Error al guardar código: " + api.getErrorMessage(err));
     }
 }
 
@@ -226,11 +227,14 @@ function editarCodigoTramite(id) {
 }
 
 async function eliminarCodigoTramite(id) {
-    if (!confirm("¿Desea desactivar este código de trámite?")) return;
+    if (!confirm("¿Desea eliminar este código de trámite?")) return;
     const res = await api.delete(`/api/v1/codigos-tramite/${id}`);
     if (res.ok) {
         await verGestionCodigos();
         poblarSelectCodigosTramite();
+    } else {
+        const err = await res.json();
+        alert("Error al eliminar código: " + api.getErrorMessage(err));
     }
 }
 
@@ -403,6 +407,18 @@ async function guardarTramitacion() {
         modalTramitacion.hide();
         verTramitaciones();
     } else {
-        alert("Error al guardar tramitación");
+        const err = await res.json();
+        alert("Error al guardar tramitación: " + api.getErrorMessage(err));
+    }
+}
+
+async function eliminarTramitacion(id) {
+    if (!confirm("¿Desea eliminar esta tramitación?")) return;
+    const res = await api.delete(`/api/v1/tramitaciones/${id}`);
+    if (res.ok) {
+        verTramitaciones();
+    } else {
+        const err = await res.json();
+        alert("Error al eliminar tramitación: " + api.getErrorMessage(err));
     }
 }
