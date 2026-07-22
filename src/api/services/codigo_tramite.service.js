@@ -7,12 +7,12 @@ class CodigoTramiteService {
     }
 
     async create(data) {
-        if (!data.codigo || !data.descripcion) {
+        if (!data.codigo || !data.descripcion_tramite) {
             throw new AppError('Código y descripción son obligatorios', 400);
         }
         return await CodigoTramiteRepository.create({
             codigo: data.codigo,
-            descripcion_tramite: data.descripcion
+            descripcion_tramite: data.descripcion_tramite
         });
     }
 

@@ -37,10 +37,17 @@ const createTipoHoraSchema = z.object({
     descripcion: z.string().optional().nullable(),
 });
 
+const bajaDocenteSchema = z.object({
+    fecha_fin: z.string().optional().nullable(),
+    expediente_baja: z.string().optional().nullable(),
+    titular_regresa: z.boolean().optional().default(true)
+});
+
 module.exports = {
     createCargoSchema,
     updateCargoSchema,
     assignDocenteSchema,
     addDistribucionSchema,
     createTipoHoraSchema,
+    bajaDocenteSchema,
 };

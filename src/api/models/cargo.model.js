@@ -113,6 +113,32 @@ class CargoRepository {
         return result.insertId;
     }
 
+    async findAssignmentById(id) {
+        const [rows] = await db.query(
+            "SELECT * FROM cargo_docente WHERE id = ? AND deleted_at IS NULL",
+            [id]
+        );
+        return rows[0];
+    }
+
+    async bajaDocente(cargoDocenteId, data) {
+        const { fecha_fin, expediente_baja } = data;
+        const sql = `
+            UPDATE cargo_docente 
+            SET estado = 'inactivo', 
+                fecha_fin = ${fecha_fin ? '?' : 'CURDATE()'}, 
+                expediente_baja = ?, 
+                updated_at = NOW()
+            WHERE id = ? AND deleted_at IS NULL
+        `;
+        const params = [];
+        if (fecha_fin) params.push(fecha_fin);
+        params.push(expediente_baja || null);
+        params.push(cargoDocenteId);
+
+        await db.query(sql, params);
+    }
+
     async getHistorial(id) {
         const [rows] = await db.query(`
             SELECT cd.*, 

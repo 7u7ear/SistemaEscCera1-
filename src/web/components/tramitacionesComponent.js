@@ -358,57 +358,77 @@ async function abrirModalTramitacion() {
 }
 
 async function guardarTramitacion() {
-    const data = {
-        fecha: document.getElementById("tramiteFecha").value,
-        docente_id: document.getElementById("tramiteDocente").value,
-        rol: document.getElementById("tramiteRol").value,
-        expediente: document.getElementById("tramiteExpediente").value,
-        cargo_id: document.getElementById("tramiteCargo").value,
-        codigo_tramite_id: document.getElementById("tramiteCodigoId").value,
-        estado: document.getElementById("tramiteEstado").value,
-        observaciones: document.getElementById("tramiteObs").value
-    };
+    const btnGuardar = document.querySelector("#modalTramitacion .modal-footer .btn-primary");
+    if (btnGuardar) btnGuardar.disabled = true;
 
-    if (!data.fecha || !data.codigo_tramite_id) return alert("Fecha y Código de Trámite son obligatorios");
+    try {
+        const data = {
+            fecha: document.getElementById("tramiteFecha").value,
+            docente_id: document.getElementById("tramiteDocente").value,
+            rol: document.getElementById("tramiteRol").value,
+            expediente: document.getElementById("tramiteExpediente").value,
+            cargo_id: document.getElementById("tramiteCargo").value,
+            codigo_tramite_id: document.getElementById("tramiteCodigoId").value,
+            estado: document.getElementById("tramiteEstado").value,
+            observaciones: document.getElementById("tramiteObs").value
+        };
 
-    const id = document.getElementById("tramiteId").value;
-    const url = id ? `/api/v1/tramitaciones/${id}` : "/api/v1/tramitaciones";
-    const res = await (id ? api.put(url, data) : api.post(url, data));
-
-    if (res.ok) {
-        // Logica de ABM unificado
-        if (document.getElementById("checkAplicarABMPuesto").checked && data.cargo_id && data.docente_id) {
-            const situacionABM = document.getElementById("tramiteABMSituacion").value;
-            if (situacionABM) {
-                // Es un ALTA
-                const payloadAlta = {
-                    docente_id: data.docente_id,
-                    situacion_revista: situacionABM,
-                    fecha_inicio: data.fecha,
-                    reemplaza_a: document.getElementById("tramiteABMReemplaza").value || null,
-                    rol: data.rol ? parseInt(data.rol, 10) : 0,
-                    expediente_alta: data.expediente
-                };
-                await api.post(`/api/v1/cargos/${data.cargo_id}/asignar`, payloadAlta);
-            } else {
-                // Es una BAJA
-                const bajaId = document.getElementById("tramiteABMAsignacionBaja").value;
-                if (bajaId) {
-                    const payloadBaja = {
-                        fecha_fin: data.fecha,
-                        expediente_baja: data.expediente,
-                        titular_regresa: document.getElementById("tramiteABMRegresaTitular").checked
-                    };
-                    await api.post(`/api/v1/cargos/${data.cargo_id}/baja/${bajaId}`, payloadBaja);
-                }
-            }
+        if (!data.fecha || !data.codigo_tramite_id) {
+            alert("Fecha y Código de Trámite son obligatorios");
+            return;
         }
 
-        modalTramitacion.hide();
-        verTramitaciones();
-    } else {
-        const err = await res.json();
-        alert("Error al guardar tramitación: " + api.getErrorMessage(err));
+        const id = document.getElementById("tramiteId").value;
+        const url = id ? `/api/v1/tramitaciones/${id}` : "/api/v1/tramitaciones";
+        const res = await (id ? api.put(url, data) : api.post(url, data));
+
+        if (res.ok) {
+            // Logica de ABM unificado
+            if (document.getElementById("checkAplicarABMPuesto").checked && data.cargo_id && data.docente_id) {
+                const situacionABM = document.getElementById("tramiteABMSituacion").value;
+                if (situacionABM) {
+                    // Es un ALTA
+                    const payloadAlta = {
+                        docente_id: data.docente_id,
+                        situacion_revista: situacionABM,
+                        fecha_inicio: data.fecha,
+                        reemplaza_a: document.getElementById("tramiteABMReemplaza").value || null,
+                        rol: data.rol ? parseInt(data.rol, 10) : 0,
+                        expediente_alta: data.expediente
+                    };
+                    const resAlta = await api.post(`/api/v1/cargos/${data.cargo_id}/asignar`, payloadAlta);
+                    if (!resAlta.ok) {
+                        const errAlta = await resAlta.json();
+                        alert("Tramitación guardada, pero hubo un error al aplicar Alta en puesto: " + api.getErrorMessage(errAlta));
+                    }
+                } else {
+                    // Es una BAJA
+                    const bajaId = document.getElementById("tramiteABMAsignacionBaja").value;
+                    if (bajaId) {
+                        const payloadBaja = {
+                            fecha_fin: data.fecha,
+                            expediente_baja: data.expediente,
+                            titular_regresa: document.getElementById("tramiteABMRegresaTitular").checked
+                        };
+                        const resBaja = await api.post(`/api/v1/cargos/${data.cargo_id}/baja/${bajaId}`, payloadBaja);
+                        if (!resBaja.ok) {
+                            const errBaja = await resBaja.json();
+                            alert("Tramitación guardada, pero hubo un error al aplicar Baja en puesto: " + api.getErrorMessage(errBaja));
+                        }
+                    }
+                }
+            }
+
+            modalTramitacion.hide();
+            verTramitaciones();
+        } else {
+            const err = await res.json();
+            alert("Error al guardar tramitación: " + api.getErrorMessage(err));
+        }
+    } catch (e) {
+        alert("Error inesperado: " + e.message);
+    } finally {
+        if (btnGuardar) btnGuardar.disabled = false;
     }
 }
 

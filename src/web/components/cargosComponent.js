@@ -65,17 +65,26 @@ function abrirModalEditarCargo(id) {
 }
 
 async function guardarCargo() {
-    const data = {
-        numero_puesto: document.getElementById("numero_puesto").value,
-        tipo_cargo: document.getElementById("tipo_cargo").value,
-        total_horas: document.getElementById("total_horas").value
-    };
-    const id = document.getElementById("cargoId").value;
-    const url = id ? `/api/v1/cargos/${id}` : "/api/v1/cargos";
-    const res = await (id ? api.put(url, data) : api.post(url, data));
-    if (!res.ok) { const msg = await res.json(); alert("Error: " + api.getErrorMessage(msg)); return; }
-    modalCargo.hide();
-    verCargos();
+    const btnGuardar = document.querySelector("#modalCargo .modal-footer .btn-primary");
+    if (btnGuardar) btnGuardar.disabled = true;
+
+    try {
+        const data = {
+            numero_puesto: document.getElementById("numero_puesto").value,
+            tipo_cargo: document.getElementById("tipo_cargo").value,
+            total_horas: document.getElementById("total_horas").value
+        };
+        const id = document.getElementById("cargoId").value;
+        const url = id ? `/api/v1/cargos/${id}` : "/api/v1/cargos";
+        const res = await (id ? api.put(url, data) : api.post(url, data));
+        if (!res.ok) { const msg = await res.json(); alert("Error: " + api.getErrorMessage(msg)); return; }
+        modalCargo.hide();
+        verCargos();
+    } catch (e) {
+        alert("Error inesperado: " + e.message);
+    } finally {
+        if (btnGuardar) btnGuardar.disabled = false;
+    }
 }
 
 async function eliminarCargo(id) {

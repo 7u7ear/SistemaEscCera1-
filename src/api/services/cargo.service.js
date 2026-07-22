@@ -66,6 +66,21 @@ class CargoService {
         return asigId;
     }
 
+    async bajaDocente(cargoId, cargoDocenteId, bajaData, userId) {
+        const assignment = await CargoRepository.findAssignmentById(cargoDocenteId);
+        if (!assignment) throw new AppError('Designación no encontrada', 404);
+        if (assignment.cargo_id != cargoId) throw new AppError('La designación no pertenece a este puesto', 400);
+
+        await CargoRepository.bajaDocente(cargoDocenteId, bajaData);
+
+        // Si el docente a dar de baja estaba reemplazando a alguien y titular_regresa es true, reactivar al reemplazado
+        if (bajaData.titular_regresa !== false && assignment.reemplaza_a) {
+            await CargoRepository.updateAssignmentState(assignment.reemplaza_a, 'activo');
+        }
+
+        await AuditoriaService.registrar(userId, 'BAJA_DOCENTE', 'CARGO', cargoId, { cargoDocenteId, ...bajaData });
+    }
+
     async getHistorial(id) {
         return await CargoRepository.getHistorial(id);
     }

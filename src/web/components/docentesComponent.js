@@ -82,25 +82,34 @@ function abrirModalEditar(id) {
 }
 
 async function guardarDocente() {
-    const data = {
-        rrhh_id: document.getElementById("rrhh_id").value,
-        apellido: document.getElementById("apellido").value,
-        nombre: document.getElementById("nombre").value,
-        fechaNac: document.getElementById("fechaNac").value,
-        dni: document.getElementById("dni").value,
-        cuil: document.getElementById("cuil").value,
-        fichaCensal: document.getElementById("fichaCensal").value,
-        email: document.getElementById("email").value,
-        direccion: document.getElementById("direccion").value,
-        telefono: document.getElementById("telefono").value,
-        fecha_ingreso: document.getElementById("fecha_ingreso").value
-    };
-    const id = document.getElementById("docenteId").value;
-    const url = id ? `/api/v1/docentes/${id}` : "/api/v1/docentes";
-    const res = await (id ? api.put(url, data) : api.post(url, data));
-    if (!res.ok) { const msg = await res.json(); alert("Error: " + api.getErrorMessage(msg)); return; }
-    modal.hide();
-    verDocentes();
+    const btnGuardar = document.querySelector("#modalDocente .modal-footer .btn-primary");
+    if (btnGuardar) btnGuardar.disabled = true;
+
+    try {
+        const data = {
+            rrhh_id: document.getElementById("rrhh_id").value,
+            apellido: document.getElementById("apellido").value,
+            nombre: document.getElementById("nombre").value,
+            fechaNac: document.getElementById("fechaNac").value,
+            dni: document.getElementById("dni").value,
+            cuil: document.getElementById("cuil").value,
+            fichaCensal: document.getElementById("fichaCensal").value,
+            email: document.getElementById("email").value,
+            direccion: document.getElementById("direccion").value,
+            telefono: document.getElementById("telefono").value,
+            fecha_ingreso: document.getElementById("fecha_ingreso").value
+        };
+        const id = document.getElementById("docenteId").value;
+        const url = id ? `/api/v1/docentes/${id}` : "/api/v1/docentes";
+        const res = await (id ? api.put(url, data) : api.post(url, data));
+        if (!res.ok) { const msg = await res.json(); alert("Error: " + api.getErrorMessage(msg)); return; }
+        modal.hide();
+        verDocentes();
+    } catch (e) {
+        alert("Error inesperado: " + e.message);
+    } finally {
+        if (btnGuardar) btnGuardar.disabled = false;
+    }
 }
 
 async function eliminarDocente(id) {

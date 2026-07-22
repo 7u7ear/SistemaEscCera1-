@@ -7,12 +7,16 @@ const router = express.Router();
 
 router.use(auth);
 
-router.get('/', permisoModulo('docentes', 'lectura'), LicenciaController.getAll);
-router.post('/', permisoModulo('docentes', 'edicion'), LicenciaController.create);
-router.put('/:id', permisoModulo('docentes', 'edicion'), LicenciaController.update);
-router.delete('/:id', permisoModulo('docentes', 'edicion'), LicenciaController.delete);
-
+// Sub-rutas específicas (PRIMERO)
 router.get('/tipos', LicenciaController.getTipos);
 router.post('/tipos', permisoModulo('docentes', 'edicion'), LicenciaController.createTipo);
+
+// Rutas base
+router.get('/', permisoModulo('docentes', 'lectura'), LicenciaController.getAll);
+router.post('/', permisoModulo('docentes', 'edicion'), LicenciaController.create);
+
+// Rutas por :id
+router.put('/:id', permisoModulo('docentes', 'edicion'), LicenciaController.update);
+router.delete('/:id', permisoModulo('docentes', 'edicion'), LicenciaController.delete);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 const CargoService = require('../services/cargo.service');
-const { createCargoSchema, updateCargoSchema, assignDocenteSchema, addDistribucionSchema, createTipoHoraSchema } = require('../validations/cargo.validation');
+const { createCargoSchema, updateCargoSchema, assignDocenteSchema, addDistribucionSchema, createTipoHoraSchema, bajaDocenteSchema } = require('../validations/cargo.validation');
 const logger = require('../services/logger.service');
 
 class CargoController {
@@ -53,6 +53,18 @@ class CargoController {
             const userId = req.user?.id;
             await CargoService.assignDocente(id, validatedData, userId);
             res.json({ message: 'Docente asignado con éxito' });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async bajaDocente(req, res, next) {
+        try {
+            const { id, cargoDocenteId } = req.params;
+            const validatedData = bajaDocenteSchema.parse(req.body);
+            const userId = req.user?.id;
+            await CargoService.bajaDocente(id, cargoDocenteId, validatedData, userId);
+            res.json({ message: 'Baja registrada con éxito' });
         } catch (err) {
             next(err);
         }
