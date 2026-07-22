@@ -201,8 +201,8 @@ function renderPlanilla(data, fecha, turno) {
                         <th style="width: 15%">Materia</th>
                         <th style="width: 8%">Curso</th>
                         <th style="width: 8%">Rol</th>
-                        <th style="width: 15%">Finaliza</th>
                         <th style="width: 14%">Tipo / Artículo</th>
+                        <th style="width: 15%">Finaliza</th>
                     </tr>
                 </thead>
                 <tbody class="small">
@@ -230,8 +230,8 @@ function renderPlanilla(data, fecha, turno) {
                     <td>${l.materia_nombre || '--'}</td>
                     <td class="text-center">${cursoL}</td>
                     <td class="text-center">${l.rol || '-'}</td>
-                    <td class="text-center fw-bold">${finalizaDisplay}</td>
                     <td class="small">${l.tipo_licencia || '--'}</td>
+                    <td class="text-center fw-bold">${finalizaDisplay}</td>
                 </tr>
             `;
         });
