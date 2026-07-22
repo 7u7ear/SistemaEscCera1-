@@ -201,7 +201,7 @@ function renderPlanilla(data, fecha, turno) {
                         <th style="width: 15%">Materia</th>
                         <th style="width: 8%">Curso</th>
                         <th style="width: 8%">Rol</th>
-                        <th style="width: 15%">Estado</th>
+                        <th style="width: 15%">Finaliza</th>
                         <th style="width: 14%">Tipo / Artículo</th>
                     </tr>
                 </thead>
@@ -209,10 +209,20 @@ function renderPlanilla(data, fecha, turno) {
     `;
 
     if (data.licencias.length === 0) {
-        html += `<tr><td colspan="5" class="text-center text-muted p-2">No se registran licencias para este día/turno.</td></tr>`;
+        html += `<tr><td colspan="7" class="text-center text-muted p-2">No se registran licencias para este día/turno.</td></tr>`;
     } else {
         data.licencias.forEach(l => {
             const cursoL = l.curso_anio ? `${l.curso_anio}°${l.curso_division || ''}` : '--';
+
+            let finalizaDisplay = 'Indefinida';
+            if (l.fecha_fin) {
+                const fechaOnly = l.fecha_fin.split('T')[0];
+                const parts = fechaOnly.split('-');
+                if (parts.length === 3) {
+                    finalizaDisplay = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+            }
+
             html += `
                 <tr class="text-licencia">
                     <td>${l.apellido}, ${l.docente_nombre}</td>
@@ -220,7 +230,7 @@ function renderPlanilla(data, fecha, turno) {
                     <td>${l.materia_nombre || '--'}</td>
                     <td class="text-center">${cursoL}</td>
                     <td class="text-center">${l.rol || '-'}</td>
-                    <td><span class="badge badge-licencia">LICENCIA (${l.estado_licencia})</span></td>
+                    <td class="text-center fw-bold">${finalizaDisplay}</td>
                     <td class="small">${l.tipo_licencia || '--'}</td>
                 </tr>
             `;

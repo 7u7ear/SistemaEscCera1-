@@ -72,6 +72,7 @@ class PlanillaRepository {
                 m.nombre AS materia_nombre,
                 cur.anio AS curso_anio, cur.division AS curso_division,
                 l.tipo_licencia,
+                l.fecha_fin,
                 -- Obtener el suplente activo que reemplaza a este docente de licencia
                 CONCAT(ds.apellido, ' ', ds.nombre) AS suplente_nombre,
                 CASE 
@@ -93,8 +94,8 @@ class PlanillaRepository {
                 AND cd_sup.estado = 'activo' 
                 AND cd_sup.deleted_at IS NULL
             LEFT JOIN docentes ds ON ds.id = cd_sup.docente_id AND ds.deleted_at IS NULL
-            -- Subconsulta para verificar si el docente activo TIENE licencia hoy
-            LEFT JOIN licencias l ON d.id = l.docente_id AND c.id = l.cargo_id 
+            -- Subconsulta para verificar si el docente TIENE licencia hoy
+            LEFT JOIN licencias l ON d.id = l.docente_id AND (l.cargo_id IS NULL OR l.cargo_id = c.id) 
                  AND l.deleted_at IS NULL 
                  AND l.fecha_inicio <= ? AND (l.fecha_fin IS NULL OR l.fecha_fin >= ?)
             WHERE dh.dia = ? AND dh.deleted_at IS NULL
