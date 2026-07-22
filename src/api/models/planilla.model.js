@@ -33,7 +33,7 @@ class PlanillaRepository {
             FROM distribucion_horas dh
             JOIN cargos c ON dh.cargo_id = c.id
             JOIN materias m ON dh.materia_id = m.id
-            JOIN cursos cur ON dh.curso_id = cur.id
+            LEFT JOIN cursos cur ON dh.curso_id = cur.id
             -- Priorizamos al docente ACTIVO en este puesto (sea titular o suplente)
             LEFT JOIN cargo_docente cd ON c.id = cd.cargo_id AND cd.estado = 'activo' AND cd.deleted_at IS NULL
             -- Si no hay activo, buscamos al que está de LICENCIA para al menos mostrar el puesto/rol
@@ -66,12 +66,18 @@ class PlanillaRepository {
         const [rows] = await db.query(`
             SELECT DISTINCT
                 d.apellido, d.nombre AS docente_nombre,
+                cd.id AS cargo_docente_id,
                 cd.rol, cd.situacion_revista,
                 c.numero_puesto, c.tipo_cargo,
                 m.nombre AS materia_nombre,
                 cur.anio AS curso_anio, cur.division AS curso_division,
+                l.tipo_licencia,
+                -- Obtener el suplente activo que reemplaza a este docente de licencia
+                CONCAT(ds.apellido, ' ', ds.nombre) AS suplente_nombre,
                 CASE 
-                    WHEN cd.estado = 'licencia' THEN 'Con Reemplazo (Lic.)'
+                    WHEN cd.estado = 'licencia' AND ds.id IS NOT NULL 
+                        THEN CONCAT('Con Reemplazo: ', ds.apellido, ' ', ds.nombre)
+                    WHEN cd.estado = 'licencia' AND ds.id IS NULL THEN 'Con Reemplazo (Lic.)'
                     WHEN (cd.estado = 'activo' AND l.id IS NOT NULL) THEN 'Sin Reemplazo (Lic.)'
                     ELSE 'Licencia'
                 END AS estado_licencia
@@ -80,7 +86,13 @@ class PlanillaRepository {
             JOIN cargos c ON cd.cargo_id = c.id
             JOIN distribucion_horas dh ON c.id = dh.cargo_id
             JOIN materias m ON dh.materia_id = m.id
-            JOIN cursos cur ON dh.curso_id = cur.id
+            LEFT JOIN cursos cur ON dh.curso_id = cur.id
+            -- JOIN para obtener el suplente activo que reemplaza a este docente (reemplaza_a = cd.id)
+            LEFT JOIN cargo_docente cd_sup ON cd_sup.cargo_id = c.id 
+                AND cd_sup.reemplaza_a = cd.id 
+                AND cd_sup.estado = 'activo' 
+                AND cd_sup.deleted_at IS NULL
+            LEFT JOIN docentes ds ON ds.id = cd_sup.docente_id AND ds.deleted_at IS NULL
             -- Subconsulta para verificar si el docente activo TIENE licencia hoy
             LEFT JOIN licencias l ON d.id = l.docente_id AND c.id = l.cargo_id 
                  AND l.deleted_at IS NULL 

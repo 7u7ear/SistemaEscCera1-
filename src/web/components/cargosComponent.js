@@ -447,7 +447,7 @@ async function cargarDistribucion(cargoId) {
         <tbody>`;
     distribucionActual.forEach(d => {
         const horario = (d.hora_ingreso && d.hora_egreso) ? `${d.hora_ingreso.substring(0, 5)} a ${d.hora_egreso.substring(0, 5)}` : 'A definir';
-        let cursoTxt = 'N/A';
+        let cursoTxt = '';
         if (d.curso_anio) {
             cursoTxt = `${d.curso_anio} ${d.curso_division || ''} ${d.curso_modalidad || ''} ${d.curso_turno || ''}`;
             cursoTxt = cursoTxt.trim().replace(/\s+/g, ' ');

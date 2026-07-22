@@ -25,9 +25,9 @@ class TramitacionRepository {
     async create(data) {
         const { fecha, docente_id, rol, expediente, cargo_id, codigo_tramite_id, estado, observaciones, created_by } = data;
         const [result] = await db.query(`
-            INSERT INTO tramitaciones (fecha, docente_id, rol, expediente, cargo_id, codigo_tramite_id, estado, observaciones, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [fecha || null, docente_id || null, rol || null, expediente || null, cargo_id || null, codigo_tramite_id || null, estado || 'caratulado', observaciones || null, created_by]);
+            INSERT INTO tramitaciones (fecha, tipo_tramite, docente_id, rol, expediente, cargo_id, codigo_tramite_id, estado, observaciones, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [fecha || null, '', docente_id || null, rol || null, expediente || null, cargo_id || null, codigo_tramite_id || null, estado || 'caratulado', observaciones || null, created_by]);
         return result.insertId;
     }
 

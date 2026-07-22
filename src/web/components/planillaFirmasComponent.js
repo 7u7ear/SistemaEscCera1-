@@ -27,7 +27,7 @@ async function verPlanillaFirmas() {
                 <div class="col-md-4">
                     <label class="form-label small fw-bold">Turno</label>
                     <select id="turnoPlanilla" class="form-select">
-                        <option value="mañana">Mañana (08:00 - 12:40)</option>
+                        <option value="mañana">Mañana (07:40 - 12:40)</option>
                         <option value="tarde">Tarde (12:40 - 18:30)</option>
                         <option value="noche">Noche (18:30+)</option>
                     </select>
@@ -198,10 +198,11 @@ function renderPlanilla(data, fecha, turno) {
                     <tr>
                         <th style="width: 25%">Apellido y Nombre</th>
                         <th style="width: 15%">Puesto Afectado</th>
-                        <th style="width: 20%">Materia</th>
-                        <th style="width: 10%">Curso</th>
-                        <th style="width: 10%">Rol</th>
-                        <th style="width: 20%">Estado</th>
+                        <th style="width: 15%">Materia</th>
+                        <th style="width: 8%">Curso</th>
+                        <th style="width: 8%">Rol</th>
+                        <th style="width: 15%">Estado</th>
+                        <th style="width: 14%">Tipo / Artículo</th>
                     </tr>
                 </thead>
                 <tbody class="small">
@@ -220,6 +221,7 @@ function renderPlanilla(data, fecha, turno) {
                     <td class="text-center">${cursoL}</td>
                     <td class="text-center">${l.rol || '-'}</td>
                     <td><span class="badge badge-licencia">LICENCIA (${l.estado_licencia})</span></td>
+                    <td class="small">${l.tipo_licencia || '--'}</td>
                 </tr>
             `;
         });
