@@ -58,11 +58,14 @@ async function verCursosHorarios() {
                                     </select>
                                 </div>
                                 <div class="col-auto d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos(false)">
-                                        <i class="bi bi-printer me-1"></i> Imprimir Lista (con DNI)
+                                    <button type="button" class="btn btn-sm btn-outline-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos('nombres')">
+                                        <i class="bi bi-person me-1"></i> Solo Nombres
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos(true)">
-                                        <i class="bi bi-envelope-at me-1"></i> Imprimir Lista (DNI y Email)
+                                    <button type="button" class="btn btn-sm btn-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos('dni')">
+                                        <i class="bi bi-person-lines-fill me-1"></i> Con DNI
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos('completo')">
+                                        <i class="bi bi-envelope-at me-1"></i> DNI y Email
                                     </button>
                                 </div>
                             </div>
@@ -694,16 +697,21 @@ window.imprimirGrillaHoraria = function() {
     }, 1000);
 };
 
-window.imprimirListaAlumnos = function(conEmail) {
+window.imprimirListaAlumnos = function(modo) {
     const el = document.getElementById("listaAlumnosCursoContainer");
     if (!el || el.querySelector(".spinner-border")) {
         alert("La lista de estudiantes aún no está cargada.");
         return;
     }
     const clon = el.cloneNode(true);
-    if (!conEmail) {
+    
+    if (modo === 'nombres') {
+        clon.querySelectorAll('.col-dni').forEach(e => e.style.display = 'none');
+        clon.querySelectorAll('.col-email').forEach(e => e.style.display = 'none');
+    } else if (modo === 'dni' || modo === false) {
         clon.querySelectorAll('.col-email').forEach(e => e.style.display = 'none');
     }
+
     clon.querySelectorAll('.d-none').forEach(e => e.style.display = 'block');
     clon.querySelectorAll('.d-print-block').forEach(e => e.style.display = 'block');
 
