@@ -20,7 +20,7 @@ async function verPlanillaFirmas() {
                     <h3 class="fw-bold mb-0 text-primary"><i class="bi bi-pen-fill"></i> Planilla de Firmas</h3>
                     <p class="text-muted small mb-0">Generación de asistencia diaria por turnos</p>
                 </div>
-                <button class="btn btn-dark px-4 shadow-sm" onclick="imprimirPlanilla()">
+                <button class="btn btn-primary px-4 shadow-sm" onclick="imprimirPlanilla()">
                     <i class="bi bi-printer"></i> Imprimir Planilla
                 </button>
             </div>

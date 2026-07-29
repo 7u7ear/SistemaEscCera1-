@@ -373,7 +373,7 @@ function renderFichaLayout(a) {
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="abrirModalTrasladar(${a.id})"><i class="bi bi-arrow-left-right"></i> Pase de Curso</button>
-                <button class="btn btn-dark" onclick="verBitacoraAlumno(${a.id})"><i class="bi bi-clock-history"></i> Historial de Movimientos</button>
+                <button class="btn btn-outline-primary fw-bold" onclick="verBitacoraAlumno(${a.id})"><i class="bi bi-clock-history"></i> Historial de Movimientos</button>
             </div>
         </div>
 
@@ -694,7 +694,7 @@ async function verBitacoraAlumno(id) {
     const movimientos = await res.json();
 
     let html = `
-        <div class="modal-header border-0 bg-dark text-white">
+        <div class="modal-header border-0 bg-primary text-white">
             <h5 class="modal-title fw-bold"><i class="bi bi-clock-history"></i> Historial de Movimientos</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
