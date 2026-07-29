@@ -28,26 +28,18 @@ async function verCursosHorarios() {
                             <h3 class="fw-bold mb-1 text-dark" id="cursoDetalleTitulo">1º 1º B.E.C</h3>
                             <p class="text-muted small mb-0" id="cursoDetalleSubtitulo">Especialidad: Computación | Turno Mañana</p>
                         </div>
-                        <div class="dropdown">
-                            <button class="btn btn-dark dropdown-toggle px-3 fw-bold" type="button" id="btnDropdownImpresion" data-bs-toggle="dropdown">
-                                <i class="bi bi-printer me-1"></i> Opciones de Impresión
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" id="menuOpcionesImpresion">
-                                <!-- Generado dinámicamente según la solapa activa -->
-                            </ul>
-                        </div>
                     </div>
 
                     <!-- Pestañas de Navegación -->
                     <ul class="nav nav-tabs mb-4 no-print" id="cursoTabs" role="tablist">
                         <li class="nav-item">
                             <button class="nav-link active fw-bold" id="tab-alumnos" data-bs-toggle="tab" data-bs-target="#panel-alumnos" type="button">
-                                <i class="bi bi-people"></i> Lista de Alumnos
+                                <i class="bi bi-people me-1"></i> Lista de Estudiantes
                             </button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link fw-bold" id="tab-horario" data-bs-toggle="tab" data-bs-target="#panel-horario" type="button">
-                                <i class="bi bi-calendar3"></i> Horario Semanal
+                                <i class="bi bi-calendar3 me-1"></i> Horario Semanal
                             </button>
                         </li>
                     </ul>
@@ -56,16 +48,22 @@ async function verCursosHorarios() {
                     <div class="tab-content" id="cursoTabsContent">
                         <!-- Panel Alumnos -->
                         <div class="tab-pane fade show active" id="panel-alumnos" role="tabpanel">
-                            <div class="row g-3 align-items-center mb-3 no-print bg-light p-3 rounded">
-                                <div class="col-auto">
-                                    <label class="col-form-label fw-bold text-muted small">Año Lectivo:</label>
-                                </div>
-                                <div class="col-auto">
+                            <div class="row g-3 align-items-center justify-content-between mb-3 no-print bg-light p-3 rounded">
+                                <div class="col-auto d-flex align-items-center gap-2">
+                                    <label class="col-form-label fw-bold text-muted small mb-0">Año Lectivo:</label>
                                     <select class="form-select form-select-sm fw-bold text-dark" id="selectAnioLectivoCurso" onchange="cargarAlumnosDelCursoActivo()">
                                         <option value="2026">2026</option>
                                         <option value="2025">2025</option>
                                         <option value="2024">2024</option>
                                     </select>
+                                </div>
+                                <div class="col-auto d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos(false)">
+                                        <i class="bi bi-printer me-1"></i> Imprimir Lista (con DNI)
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos(true)">
+                                        <i class="bi bi-envelope-at me-1"></i> Imprimir Lista (DNI y Email)
+                                    </button>
                                 </div>
                             </div>
                             <div class="table-responsive" id="listaAlumnosCursoContainer">
@@ -75,6 +73,11 @@ async function verCursosHorarios() {
 
                         <!-- Panel Horario -->
                         <div class="tab-pane fade" id="panel-horario" role="tabpanel">
+                            <div class="d-flex justify-content-end mb-3 no-print bg-light p-3 rounded">
+                                <button type="button" class="btn btn-sm btn-dark fw-bold shadow-sm" onclick="window.imprimirGrillaHoraria()">
+                                    <i class="bi bi-printer me-1"></i> Imprimir Horario Semanal
+                                </button>
+                            </div>
                             <div class="table-responsive" id="grillaHorariaContainer">
                                 <div class="text-center p-5"><div class="spinner-border text-primary"></div></div>
                             </div>
@@ -652,81 +655,82 @@ async function verCadenaCargoPorDocente(cargoId) {
     modalHistorialReemplazos.show();
 }
 
-// --- IMPRESIÓN SELECTIVA ---
-function imprimirElemento(tipo) {
-    console.log('[IMPRIMIR] Función llamada con tipo:', tipo, '| cursoActivoId:', cursoActivoId);
-
-    if (!cursoActivoId) {
-        alert("Seleccione un curso antes de imprimir.");
+// --- IMPRESIÓN DIRECTA ---
+window.imprimirGrillaHoraria = function() {
+    const el = document.getElementById("grillaHorariaContainer");
+    if (!el || el.querySelector(".spinner-border")) {
+        alert("El horario aún no está cargado. Seleccione un curso válido.");
         return;
     }
+    const clon = el.cloneNode(true);
+    clon.querySelectorAll('.d-none').forEach(e => e.style.display = 'block');
+    clon.querySelectorAll('.d-print-block').forEach(e => e.style.display = 'block');
 
-    let sourceId;
-    let ocultarEmail = false;
-
-    if (tipo === 'horario') {
-        sourceId = 'grillaHorariaContainer';
-    } else if (tipo === 'alumnos-dni') {
-        sourceId = 'listaAlumnosCursoContainer';
-        ocultarEmail = true;
-    } else if (tipo === 'alumnos-email') {
-        sourceId = 'listaAlumnosCursoContainer';
-    } else {
-        return;
-    }
-
-    const sourceEl = document.getElementById(sourceId);
-    console.log('[IMPRIMIR] sourceEl:', sourceEl, '| tiene spinner:', !!sourceEl?.querySelector('.spinner-border'));
-
-    if (!sourceEl || sourceEl.innerHTML.trim() === '' || sourceEl.querySelector('.spinner-border')) {
-        alert("El contenido aún no está cargado. Aguarde y vuelva a intentar.");
-        return;
-    }
-
-    const clon = sourceEl.cloneNode(true);
-
-    if (ocultarEmail) {
-        clon.querySelectorAll('.col-email').forEach(el => el.style.display = 'none');
-    }
-
-    clon.querySelectorAll('.d-none').forEach(el => { el.style.display = 'block'; });
-    clon.querySelectorAll('.d-print-block').forEach(el => { el.style.display = 'block'; });
-
-    const existing = document.getElementById('areaTempImpresion');
-    if (existing) existing.remove();
-    const existingStyle = document.getElementById('styleTempImpresion');
-    if (existingStyle) existingStyle.remove();
-
-    const printDiv = document.createElement('div');
-    printDiv.id = 'areaTempImpresion';
-    printDiv.appendChild(clon);
-    document.body.appendChild(printDiv);
+    const area = document.createElement('div');
+    area.id = 'areaPrintTemp';
+    area.appendChild(clon);
+    document.body.appendChild(area);
 
     const style = document.createElement('style');
-    style.id = 'styleTempImpresion';
+    style.id = 'stylePrintTemp';
     style.innerHTML = `
-        @media screen { #areaTempImpresion { display: none !important; } }
+        @media screen { #areaPrintTemp { display: none !important; } }
         @media print {
-            body > *:not(#areaTempImpresion) { display: none !important; }
-            #areaTempImpresion { display: block !important; padding: 10px; }
+            body > *:not(#areaPrintTemp) { display: none !important; }
+            #areaPrintTemp { display: block !important; padding: 15px; }
             table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; }
-            th, td { border: 1px solid #000 !important; padding: 6px 4px !important; font-size: 8.5pt !important; vertical-align: middle !important; word-wrap: break-word !important; }
+            th, td { border: 1px solid #000 !important; padding: 6px 4px !important; font-size: 8.5pt !important; text-align: center !important; vertical-align: middle !important; word-wrap: break-word !important; }
             th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            @page { margin: 1.5cm; }
+            @page { margin: 1cm; }
         }
     `;
     document.head.appendChild(style);
 
-    console.log('[IMPRIMIR] Llamando window.print()...');
     window.print();
 
     setTimeout(() => {
-        const d = document.getElementById('areaTempImpresion');
-        const s = document.getElementById('styleTempImpresion');
-        if (d) d.remove();
-        if (s) s.remove();
-    }, 1500);
-}
+        area.remove();
+        style.remove();
+    }, 1000);
+};
 
-// Exponer en scope global por si se llama desde HTML inline
-window.imprimirElemento = imprimirElemento;
+window.imprimirListaAlumnos = function(conEmail) {
+    const el = document.getElementById("listaAlumnosCursoContainer");
+    if (!el || el.querySelector(".spinner-border")) {
+        alert("La lista de estudiantes aún no está cargada.");
+        return;
+    }
+    const clon = el.cloneNode(true);
+    if (!conEmail) {
+        clon.querySelectorAll('.col-email').forEach(e => e.style.display = 'none');
+    }
+    clon.querySelectorAll('.d-none').forEach(e => e.style.display = 'block');
+    clon.querySelectorAll('.d-print-block').forEach(e => e.style.display = 'block');
+
+    const area = document.createElement('div');
+    area.id = 'areaPrintTemp';
+    area.appendChild(clon);
+    document.body.appendChild(area);
+
+    const style = document.createElement('style');
+    style.id = 'stylePrintTemp';
+    style.innerHTML = `
+        @media screen { #areaPrintTemp { display: none !important; } }
+        @media print {
+            body > *:not(#areaPrintTemp) { display: none !important; }
+            #areaPrintTemp { display: block !important; padding: 15px; }
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #000 !important; padding: 6px 4px !important; font-size: 8.5pt !important; text-align: left !important; vertical-align: middle !important; word-wrap: break-word !important; }
+            th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; text-align: center !important; }
+            @page { margin: 1cm; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    window.print();
+
+    setTimeout(() => {
+        area.remove();
+        style.remove();
+    }, 1000);
+};
