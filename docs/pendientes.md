@@ -1,30 +1,57 @@
-# Listado de Pendientes - Proyecto CERA 1
+# Listado de Pendientes - Proyecto CERA 1 (Checkpoint Definitivo)
 
-Este documento sirve para realizar el seguimiento de las tareas y módulos restantes del sistema.
+Este documento centraliza el 100% de las tareas, especificaciones y parámetros acordados para continuar en el próximo desarrollo.
 
-## 🔴 Alta Prioridad (Próximos Pasos)
-- [ ] **Módulo RBAC (Permisos Dinámicos)**:
-    - [x] Fase 1: Preparación de Base de Datos (Tablas `perfiles` y `perfil_modulo`).
-    - [x] Fase 2: Backend y Middleware (Refactorización de seguridad).
-    - [x] Fase 3: Frontend (Interfaz visual de la Matriz).
-    - [ ] Fase 4: Verificación y Auditoría.
-- [ ] **Módulo de Alumnos**: Creación de legajos, inscripciones y gestión de datos personales de los estudiantes.
-- [ ] **Gestión de Asistencia de Alumnos**: Registro diario por curso/preceptor.
+## 📌 Checklist Definitiva de Desarrollo (Próximos Pasos)
 
-## 🟡 Media Prioridad (Funcionalidades Adicionales)
-- [ ] **Interfaz de Auditoría**: Pantalla para que el administrador pueda ver el historial de cambios de forma visual.
-- [ ] **Reportes en PDF**: Generación de constancias de alumno regular y reportes de licencias.
-- [ ] **Módulo de Biblioteca**: Gestión de catálogo y préstamos.
+### 1️⃣ Licencias Pendientes y Envíos de Mails
+- [ ] **Solicitud Docente**: Solicitud de licencia que afecta al puesto inmediatamente y genera la solicitud en estado `PENDIENTE`.
+- [ ] **Asignación Preceptor-Curso**: Tabla `curso_preceptor` e interfaz para asignar los preceptores a cargo de cada curso.
+- [ ] **Notificación Automática por Email (Entrada)**: Envío de correo en HTML al Preceptor del curso afectado y a Secretaría (`licencias@...`).
+- [ ] **Notificación Automática por Email (Resolución)**: Envío de correo en HTML al Docente avisándole cuando su licencia sea **Aprobada** o **Rechazada**.
+- [ ] **Servicio SMTP & Fallback**: Módulo `email.service.js` (si no hay SMTP configurado en `.env`, escribe el correo en `logs/email.log`).
 
-## 🟢 Baja Prioridad / Mejoras
-- [ ] **Dashboard Estadístico**: Gráficos de ausentismo docente y cupos de alumnos.
-- [ ] **Notificaciones**: Sistema de alertas para licencias que están por vencer.
+### 2️⃣ Recuperación de Contraseña ("¿Olvidaste tu contraseña?")
+- [ ] **Opción en Login**: Enlace en `login.html` para solicitar restablecimiento de clave sin intervención administrativa.
+- [ ] **Token de Seguridad**: Enlace enviado por email con token único y validez de **1 hora**.
+
+### 3️⃣ Botones y Archivos de Mails por Curso Específico
+- [ ] **Tres Listas Independientes por Curso**:
+  - 1. Mails de **Estudiantes**.
+  - 2. Mails de **Tutores / Padres**.
+  - 3. Mails de **Docentes de ese curso** (únicamente profesores que dictan materias en ese curso).
+- [ ] **Botón "Copiar al Portapapeles"**: Copia todas las direcciones en formato separado por comas (listo para pegar en CCO/BCC de Gmail/Outlook).
+- [ ] **Botón "Descargar Archivo"**: Descarga del listado en archivo `.txt` / `.csv`.
+
+### 4️⃣ Visibilidad Dinámica por Permisos (Sidebar)
+- [ ] **Ocultamiento Total**: Ocultar por completo las opciones del menú lateral para los módulos donde el rol del usuario no tenga permisos de lectura o edición.
+
+### 5️⃣ Visualizador de Auditoría
+- [ ] **Pantalla de Logs**: Interfaz para Administradores y Conducción con filtro por fecha, usuario y entidad.
 
 ---
 
-## ✅ Completado recientemente
-- [x] Gestión de Usuarios (Aprobación y Perfiles iniciales).
+## 🟡 Media Prioridad (Funcionalidades Adicionales)
+
+- [ ] **Reportes y Constancias en PDF**: Generación automatizada de constancias de Alumno Regular y pases.
+- [ ] **Módulo de Biblioteca**: Gestión del catálogo bibliográfico y préstamos.
+
+---
+
+## 🟢 Baja Prioridad / Mejoras Futuras
+
+- [ ] **Dashboard Estadístico**: Gráficos interactivos de ausentismo docente y cupos de alumnos.
+- [ ] **Alertas Generales**: Avisos automáticos sobre vencimiento de licencias.
+
+---
+
+## ✅ Completado Recientemente
+
+- [x] Gestión de Usuarios (Aprobación, perfiles iniciales y creación por admin).
 - [x] Definición de los 9 perfiles institucionales.
-- [x] Módulo de Planilla de Firmas funcional.
+- [x] Módulo de Planilla de Firmas funcional cruzando cargos, horarios y licencias.
 - [x] Módulo de Tramitaciones integrado con Cargos.
-- [x] Gestión de Licencias vinculada a cargos.
+- [x] Módulo de Licencias vinculado a cargos docentes.
+- [x] Módulo de Alumnos (Legajos, matriculación y materias adeudadas).
+- [x] Documentación oficial en `docs/manual/manual_usuario.md` y `docs/manual/manual_tecnico.md`.
+- [x] Actualización de credenciales de base de datos Aiven MySQL Cloud en `docs/README.md`.

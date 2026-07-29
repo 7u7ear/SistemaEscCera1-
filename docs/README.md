@@ -8,10 +8,10 @@ Sistema web de gestión administrativa escolar para docentes, cargos, licencias 
 |------|-----------|
 | Runtime | Node.js 18+ |
 | Framework | Express.js 4 |
-| Base de Datos | MySQL 8 (WAMP) |
+| Base de Datos | MySQL 8 (Aiven Cloud / Local) |
 | Validación | Zod |
 | Logging | Winston |
-| Seguridad | Helmet, bcrypt, express-session |
+| Seguridad | Helmet, bcrypt, JWT |
 | Testing | Jest + Supertest |
 | Calidad | ESLint v9, Prettier |
 
@@ -56,17 +56,19 @@ npm install
 
 ```bash
 cp .env.example .env
-# Editar .env con tus credenciales locales
+# Editar .env con tus credenciales
 ```
 
 Variables requeridas en `.env`:
-```
+```env
 PORT=3000
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=
-DB_NAME=bd_ecn1
-SESSION_SECRET=una_clave_segura_aqui
+DB_HOST=mysql-fde0d9c-bdecn1.i.aivencloud.com
+DB_PORT=23887
+DB_USER=avnadmin
+DB_PASS=tu_contraseña_aqui
+DB_NAME=defaultdb
+SESSION_SECRET=ceramica_secret_dev_2024
+JWT_SECRET=ceramica_jwt_token_secret_2024
 NODE_ENV=development
 ```
 
