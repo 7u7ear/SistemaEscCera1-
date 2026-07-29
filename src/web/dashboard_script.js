@@ -76,6 +76,7 @@ function mostrarSeccion(seccion) {
         globalHeader.style.display = (seccion === 'planilla') ? 'none' : 'flex';
     }
 
+    if (seccion === 'dashboard') verInicio();
     if (seccion === 'docentes') verDocentes();
     if (seccion === 'cargos') verCargos();
     if (seccion === 'tramitaciones') verTramitaciones();
@@ -98,6 +99,8 @@ async function cargarUsuario() {
     const perfilStr = usuarioActual.perfil_nombre ? usuarioActual.perfil_nombre : "Usuario";
     document.getElementById("titulo").innerText = `Bienvenido/a, ${usuarioActual.nombre}`;
     document.getElementById("userInfo").innerText = `Cargo: ${perfilStr} | Usuario: ${usuarioActual.username}`;
+    
+    verInicio();
 }
 
 // ============================
