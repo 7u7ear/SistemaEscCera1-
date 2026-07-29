@@ -5,6 +5,12 @@
 let cursoActivoId = null;
 let cursosListGlobal = [];
 
+// Sanitiza el año: si ya trae º o ° no lo duplica
+function fmtAnio(val) {
+    if (!val) return '';
+    return String(val).replace(/[°º]+$/, '') + 'º';
+}
+
 async function verCursosHorarios() {
     const container = document.getElementById("seccion-cursos_horarios");
     container.innerHTML = `
@@ -411,7 +417,7 @@ function seleccionarCurso(id) {
     // Configurar cabecera
     const curso = cursosListGlobal.find(c => c.id === id);
     const divStr = curso.division ? ` ${curso.division}` : '';
-    document.getElementById("cursoDetalleTitulo").innerText = `${curso.anio}°${divStr} ${curso.especialidad.toUpperCase()}`;
+    document.getElementById("cursoDetalleTitulo").innerText = `${fmtAnio(curso.anio)}${divStr} ${curso.especialidad.toUpperCase()}`;
     document.getElementById("cursoDetalleSubtitulo").innerText = `Especialidad: ${curso.especialidad} (${curso.modalidad}) | Turno: ${curso.turno.toUpperCase()}`;
 
     // Cargar horario y alumnos
@@ -447,7 +453,7 @@ async function cargarHorarioDelCurso() {
             <!-- Encabezado exclusivo de Impresión -->
             <div class="d-none d-print-block text-center mb-4">
                 <h3 class="fw-bold mb-1">E.S.E.A en Ceramica Nº1 D.E II</h3>
-                <h4 class="mb-0">HORARIO SEMANAL: ${curso.anio}°${curso.division || ''} ${curso.especialidad.toUpperCase()}</h4>
+                <h4 class="mb-0">HORARIO SEMANAL: ${fmtAnio(curso.anio)}${curso.division || ''} ${curso.especialidad.toUpperCase()}</h4>
                 <p class="text-muted small">Turno: ${curso.turno.toUpperCase()}</p>
                 <hr style="border-top: 2px solid #000; margin: 15px 0;">
             </div>
@@ -552,7 +558,7 @@ async function cargarAlumnosDelCursoActivo() {
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h3 class="fw-bold mb-1">E.S.E.A en Ceramica Nº1 D.E II</h3>
-                        <h4 class="mb-0">LISTA DE ESTUDIANTES: ${curso.anio}°${divStr} ${curso.especialidad.toUpperCase()}</h4>
+                        <h4 class="mb-0">LISTA DE ESTUDIANTES: ${fmtAnio(curso.anio)}${divStr} ${curso.especialidad.toUpperCase()}</h4>
                     </div>
                     <div class="text-end">
                         <h5 class="fw-bold mb-0">Ciclo Lectivo: ${anioLectivo}</h5>
