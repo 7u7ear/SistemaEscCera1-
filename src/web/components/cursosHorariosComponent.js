@@ -64,13 +64,13 @@ async function verCursosHorarios() {
                                     </select>
                                 </div>
                                 <div class="col-auto d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos('nombres')">
+                                    <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="window.imprimirListaAlumnos('nombres')">
                                         <i class="bi bi-person me-1"></i> Solo Nombres
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos('dni')">
+                                    <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="window.imprimirListaAlumnos('dni')">
                                         <i class="bi bi-person-lines-fill me-1"></i> Con DNI
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-dark fw-bold shadow-sm" onclick="window.imprimirListaAlumnos('completo')">
+                                    <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="window.imprimirListaAlumnos('completo')">
                                         <i class="bi bi-envelope-at me-1"></i> DNI y Email
                                     </button>
                                 </div>
@@ -83,7 +83,7 @@ async function verCursosHorarios() {
                         <!-- Panel Horario -->
                         <div class="tab-pane fade" id="panel-horario" role="tabpanel">
                             <div class="d-flex justify-content-end mb-3 no-print bg-light p-3 rounded">
-                                <button type="button" class="btn btn-sm btn-dark fw-bold shadow-sm" onclick="window.imprimirGrillaHoraria()">
+                                <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="window.imprimirGrillaHoraria()">
                                     <i class="bi bi-printer me-1"></i> Imprimir Horario Semanal
                                 </button>
                             </div>
