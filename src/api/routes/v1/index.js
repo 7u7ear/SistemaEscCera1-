@@ -11,6 +11,8 @@ const tramitacionRoutes = require('./tramitacion.routes');
 const codigoTramiteRoutes = require('./codigo_tramite.routes');
 const planillaRoutes = require('./planilla.routes');
 const permisosRoutes = require('./permisos.routes');
+const alumnoRoutes = require('./alumno.routes');
+const bloqueHorarioRoutes = require('./bloque_horario.routes');
 
 // Define API v1 routes
 router.use('/cargos', cargoRoutes);
@@ -23,6 +25,8 @@ router.use('/tramitaciones', tramitacionRoutes);
 router.use('/codigos-tramite', codigoTramiteRoutes);
 router.use('/planilla-firmas', planillaRoutes);
 router.use('/permisos', permisosRoutes);
+router.use('/alumnos', alumnoRoutes);
+router.use('/bloques-horarios', bloqueHorarioRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ status: 'API v1 is healthy', timestamp: new Date() });

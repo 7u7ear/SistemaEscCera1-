@@ -7,5 +7,6 @@ const router = express.Router();
 router.use(auth);
 
 router.get('/', CursoController.getAll);
+router.get('/:id/horario', CursoController.getHorario);
 
 module.exports = router;

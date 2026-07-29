@@ -192,6 +192,12 @@
         <a class="sidebar-link" onclick="mostrarSeccion('planilla')">
             <i class="bi bi-pen"></i> Planilla de Firmas
         </a>
+        <a class="sidebar-link" id="link-alumnos" onclick="mostrarSeccion('alumnos')">
+            <i class="bi bi-person-workspace"></i> Estudiantes
+        </a>
+        <a class="sidebar-link" id="link-cursos_horarios" onclick="mostrarSeccion('cursos_horarios')">
+            <i class="bi bi-calendar3"></i> Cursos y Horarios
+        </a>
         <a class="sidebar-link" id="link-usuarios" onclick="mostrarSeccion('usuarios')">
             <i class="bi bi-person-lock"></i> Usuarios
         </a>
@@ -366,6 +372,204 @@
             </div>
         </div>
     </div>
+
+    <!-- SECCION ALUMNOS -->
+    <div id="seccion-alumnos" class="view-section">
+        <div id="listaAlumnosCard" class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Gestión de Estudiantes</h3>
+                <button class="btn btn-success px-4" onclick="abrirModalNuevoAlumno()">
+                    <i class="bi bi-person-plus"></i> Nuevo Estudiante
+                </button>
+            </div>
+            <div class="mb-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="buscadorAlumnos" class="form-control border-start-0" placeholder="Buscar por apellido, nombre o DNI..." onkeyup="filtrarAlumnos()">
+                </div>
+            </div>
+            <div class="table-responsive" id="tablaAlumnos">
+                <div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div></div>
+            </div>
+        </div>
+        
+        <!-- Ficha del Alumno (inicialmente oculta) -->
+        <div id="fichaAlumnoContainer" class="card p-4 bg-light border-0 shadow-sm" style="display: none;"></div>
+    </div>
+
+    <!-- SECCION CURSOS Y HORARIOS -->
+    <div id="seccion-cursos_horarios" class="view-section">
+        <!-- Renderizado dinámico desde cursosHorariosComponent.js -->
+    </div>
+</div>
+
+<!-- MODAL NUEVO/EDITAR ALUMNO -->
+<div class="modal fade" id="modalAlumno" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-dark text-white">
+        <h5 class="modal-title fw-bold" id="modalAlumnoTitulo">Datos del Alumno</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="alumnoId">
+        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-person-fill"></i> Datos Personales del Estudiante</h6>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label text-muted small fw-bold">Apellido</label>
+                <input type="text" id="alumnoApellido" class="form-control" placeholder="Ej: Perez">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small fw-bold">Nombre</label>
+                <input type="text" id="alumnoNombre" class="form-control" placeholder="Ej: Juan">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold">DNI</label>
+                <input type="text" id="alumnoDni" class="form-control" placeholder="Ej: 45678901">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold">Fecha de Nacimiento</label>
+                <input type="date" id="alumnoFechaNac" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label text-muted small fw-bold">Email de Contacto</label>
+                <input type="email" id="alumnoEmail" class="form-control" placeholder="ejemplo@mail.com">
+            </div>
+            <div class="col-md-12">
+                <label class="form-label text-muted small fw-bold">Dirección Residencial</label>
+                <input type="text" id="alumnoDireccion" class="form-control" placeholder="Dirección completa">
+            </div>
+        </div>
+
+        <div>
+            <hr class="my-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-primary m-0"><i class="bi bi-people-fill"></i> Responsables / Tutores</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="agregarFilaResponsable()">
+                    <i class="bi bi-plus-circle me-1"></i> Agregar Responsable
+                </button>
+            </div>
+            <div id="contenedorResponsables" class="d-flex flex-column gap-3">
+                <!-- Tarjetas de responsables inyectadas dinámicamente -->
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-primary px-4 fw-bold shadow-sm" onclick="guardarAlumno()">Guardar Alumno</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MATRICULAR ALUMNO -->
+<div class="modal fade" id="modalMatricular" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-dark text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-mortarboard-fill"></i> Registrar Matriculación</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="matricularAlumnoId">
+        <input type="hidden" id="matricularCursoId">
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label text-muted small d-block">Estudiante</label>
+                <h6 class="fw-bold text-dark" id="matricularAlumnoNombre">-</h6>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-muted small fw-bold">Año Lectivo / Ciclo</label>
+                <input type="number" id="matricularCiclo" class="form-control fw-bold" value="2026">
+            </div>
+        </div>
+        <hr class="my-2">
+        <label class="form-label text-muted small fw-bold mb-2">Seleccione el Curso</label>
+        <div class="row g-0" style="min-height: 260px;">
+            <!-- Panel izquierdo: Menú Acordeón -->
+            <div class="col-md-5 border-end pe-2" style="max-height: 260px; overflow-y: auto;">
+                <div id="acordeonMatricular"></div>
+            </div>
+            <!-- Panel derecho: Curso Seleccionado -->
+            <div class="col-md-7 ps-3 d-flex flex-column justify-content-center">
+                <div id="cursoSeleccionadoMatricular" class="text-center text-muted p-3">
+                    <i class="bi bi-arrow-left-circle display-5 mb-2 d-block"></i>
+                    <p class="small">Seleccione un curso del menú</p>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-primary px-4 fw-bold shadow-sm" onclick="guardarMatriculacion()">Registrar Matriculación</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TRASLADAR / PASE DE CURSO -->
+<div class="modal fade" id="modalTrasladar" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-dark text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-arrow-left-right"></i> Pase de Curso (Traslado)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="trasladarAlumnoId">
+        <input type="hidden" id="trasladarCursoOrigenId">
+        <div class="mb-3">
+            <label class="form-label text-muted small d-block">Estudiante</label>
+            <h6 class="fw-bold text-dark" id="trasladarAlumnoNombre">-</h6>
+        </div>
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-bold">Año Lectivo</label>
+            <input type="number" id="trasladarCiclo" class="form-control" readonly>
+        </div>
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-bold">Curso Origen</label>
+            <input type="text" id="trasladarCursoOrigenDisplay" class="form-control text-muted" readonly>
+        </div>
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-bold">Curso Destino</label>
+            <select id="trasladarCursoDestinoId" class="form-select"></select>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-primary px-4 fw-bold shadow-sm" onclick="guardarTraslado()">Confirmar Pase</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVA MATERIA ADEUDADA -->
+<div class="modal fade" id="modalMateriaAdeudada" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-dark text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-circle-fill"></i> Registrar Materia Adeudada</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-bold">Materia</label>
+            <select id="materiaAdeudadaId" class="form-select"></select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label text-muted small fw-bold">Estado Inicial</label>
+            <select id="materiaAdeudadaEstado" class="form-select">
+                <option value="pendiente">Pendiente</option>
+                <option value="aprobada">Aprobada</option>
+            </select>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-danger px-4 fw-bold shadow-sm" onclick="guardarMateriaAdeudada()">Guardar Registro</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL DETALLE PUESTO (NODAL) -->
@@ -732,6 +936,15 @@
   </div>
 </div>
 
+<!-- MODAL HISTORIAL GENERICO (Movimientos Alumno / Cadena de Reemplazos) -->
+<div class="modal fade" id="modalHistorialGenerico" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg" id="modalHistorialReemplazosContent">
+      <!-- Contenido dinámico inyectado desde alumnosComponent.js y cursosHorariosComponent.js -->
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- MODAL GESTIÓN CÓDIGOS DE TRÁMITE -->
 <div class="modal fade" id="modalGestionCodigos" tabindex="-1">
@@ -982,6 +1195,8 @@
 <script src="components/planillaFirmasComponent.js?v=final_fix_v5"></script>
 <script src="components/usuariosComponent.js"></script>
 <script src="components/permisosComponent.js"></script>
+<script src="components/alumnosComponent.js?v=final_fix_v5"></script>
+<script src="components/cursosHorariosComponent.js?v=print_fix_v2"></script>
 
 </body>
 </html>

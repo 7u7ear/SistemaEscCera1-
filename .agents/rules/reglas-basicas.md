@@ -208,3 +208,19 @@ Debe ser:
 - Comprensible por otro desarrollador
 
 Evitar soluciones rápidas que comprometan el producto.
+
+---
+
+## 23. MENSAJES DE ERROR EN FRONTEND (OBLIGATORIO)
+
+- NUNCA mostrar `[object Object]` al usuario.
+- SIEMPRE usar `api.getErrorMessage(err)` para parsear respuestas de error del backend.
+- El backend devuelve `{ error: { message, details } }` o `{ error: "string" }` — `api.getErrorMessage()` maneja ambos casos.
+- En todos los `alert()`, `toast()` o mensajes de error visibles al usuario, el texto debe ser legible y descriptivo.
+- Esta regla aplica a **todo** componente frontend del proyecto, sin excepción.
+
+Patrón obligatorio:
+```js
+const err = await res.json();
+alert(`Error: ${api.getErrorMessage(err)}`);
+```

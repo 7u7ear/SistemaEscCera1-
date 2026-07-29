@@ -3,6 +3,7 @@ let docentesGlobal = [];
 let cargosGlobal = [];
 let materiasGlobal = [];
 let cursosGlobal = [];
+let alumnosGlobal = [];
 let modal;
 let modalCargo;
 let modalVerCargos;
@@ -22,6 +23,11 @@ let modalUsuario;
 let modalCrearUsuario;
 let modalDetallePuesto;
 let modalBajaSuplente;
+let modalAlumno;
+let modalMatricular;
+let modalTrasladar;
+let modalMateriaAdeudada;
+let modalHistorialReemplazos;
 
 // ============================
 // INICIO
@@ -41,6 +47,12 @@ window.addEventListener("DOMContentLoaded", () => {
     modalNuevoTipoLicencia = new bootstrap.Modal(document.getElementById('modalNuevoTipoLicencia'));
     modalUsuario = new bootstrap.Modal(document.getElementById('modalUsuario'));
     modalCrearUsuario = new bootstrap.Modal(document.getElementById('modalCrearUsuario'));
+    modalAlumno = new bootstrap.Modal(document.getElementById('modalAlumno'));
+    modalMatricular = new bootstrap.Modal(document.getElementById('modalMatricular'));
+    modalTrasladar = new bootstrap.Modal(document.getElementById('modalTrasladar'));
+    modalMateriaAdeudada = new bootstrap.Modal(document.getElementById('modalMateriaAdeudada'));
+    // Reusar el modal de historial de reemplazos para movimientos y cadena de suplentes
+    modalHistorialReemplazos = new bootstrap.Modal(document.getElementById('modalHistorialGenerico'));
 });
 
 // ============================
@@ -71,6 +83,8 @@ function mostrarSeccion(seccion) {
     if (seccion === 'planilla') verPlanillaFirmas();
     if (seccion === 'usuarios') verUsuarios();
     if (seccion === 'permisos') verPermisos();
+    if (seccion === 'alumnos') verAlumnos();
+    if (seccion === 'cursos_horarios') verCursosHorarios();
 }
 
 // ============================
