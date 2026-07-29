@@ -573,10 +573,10 @@ async function cargarAlumnosDelCursoActivo() {
             <table class="table table-striped align-middle tabla-alumnos-print">
                 <thead class="table-light">
                     <tr>
-                        <th class="text-center" style="width: 5%">#</th>
-                        <th style="width: 40%">Apellido y Nombre</th>
-                        <th class="col-dni text-center" style="width: 25%">DNI</th>
-                        <th class="col-email text-center" style="width: 30%">Email</th>
+                        <th class="text-center" style="width: 1%; white-space: nowrap;">#</th>
+                        <th>Apellido y Nombre</th>
+                        <th class="col-dni text-center" style="width: 120px; white-space: nowrap;">DNI</th>
+                        <th class="col-email text-center" style="width: 220px; white-space: nowrap;">Email</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -728,9 +728,12 @@ window.imprimirListaAlumnos = function(modo) {
             body > *:not(#areaPrintTemp) { display: none !important; }
             #areaPrintTemp { display: block !important; padding: 15px; }
             table { width: 100% !important; border-collapse: collapse !important; }
-            th, td { border: 1px solid #000 !important; padding: 6px 4px !important; font-size: 8.5pt !important; text-align: left !important; vertical-align: middle !important; word-wrap: break-word !important; }
+            th, td { border: 1px solid #000 !important; padding: 5px 8px !important; font-size: 8.5pt !important; text-align: left !important; vertical-align: middle !important; }
             th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; text-align: center !important; }
             .text-center { text-align: center !important; }
+            th:first-child, td:first-child { width: 35px !important; text-align: center !important; }
+            .col-dni { width: 110px !important; white-space: nowrap !important; text-align: center !important; }
+            .col-email { width: 220px !important; white-space: nowrap !important; text-align: center !important; }
             @page { margin: 1cm; }
         }
     `;
