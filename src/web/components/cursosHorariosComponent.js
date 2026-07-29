@@ -573,10 +573,10 @@ async function cargarAlumnosDelCursoActivo() {
             <table class="table table-striped align-middle tabla-alumnos-print">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 5%">#</th>
+                        <th class="text-center" style="width: 5%">#</th>
                         <th style="width: 40%">Apellido y Nombre</th>
-                        <th class="col-dni" style="width: 25%">DNI</th>
-                        <th class="col-email" style="width: 30%">Email</th>
+                        <th class="col-dni text-center" style="width: 25%">DNI</th>
+                        <th class="col-email text-center" style="width: 30%">Email</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -585,10 +585,10 @@ async function cargarAlumnosDelCursoActivo() {
         alumnos.forEach((a, index) => {
             html += `
                 <tr>
-                    <td>${index + 1}</td>
+                    <td class="text-center">${index + 1}</td>
                     <td><strong>${a.apellido}, ${a.nombre}</strong></td>
-                    <td class="col-dni">${a.dni}</td>
-                    <td class="col-email">${a.email || '-'}</td>
+                    <td class="col-dni text-center">${a.dni}</td>
+                    <td class="col-email text-center">${a.email || '-'}</td>
                 </tr>
             `;
         });
@@ -730,6 +730,7 @@ window.imprimirListaAlumnos = function(modo) {
             table { width: 100% !important; border-collapse: collapse !important; }
             th, td { border: 1px solid #000 !important; padding: 6px 4px !important; font-size: 8.5pt !important; text-align: left !important; vertical-align: middle !important; word-wrap: break-word !important; }
             th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; text-align: center !important; }
+            .text-center { text-align: center !important; }
             @page { margin: 1cm; }
         }
     `;
