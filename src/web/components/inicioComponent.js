@@ -6,14 +6,31 @@ async function verInicio() {
     const container = document.getElementById("seccion-dashboard");
     if (!container) return;
 
-    // Render baseline loading layout
+    // Render baseline layout
     container.innerHTML = `
         <div id="alertUsuariosPendientes"></div>
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="card p-4 bg-primary text-white h-100 shadow-sm border-0">
-                    <h5 class="fw-bold"><i class="bi bi-graph-up-arrow me-2"></i> Resumen Institucional</h5>
-                    <p class="mb-0 mt-3 opacity-75">Sistema de administración escolar sincronizado y actualizado.</p>
+                    <h5 class="fw-bold mb-3"><i class="bi bi-bank me-2"></i> Resumen Institucional</h5>
+                    <div class="d-flex flex-column gap-2 mt-1">
+                        <div class="d-flex justify-content-between align-items-center bg-white bg-opacity-10 p-2 px-3 rounded" style="backdrop-filter: blur(5px);">
+                            <span class="small fw-semibold"><i class="bi bi-people me-2"></i> Docentes</span>
+                            <span class="badge bg-white text-primary fs-6 fw-bold" id="metricDocentes"><span class="spinner-border spinner-border-sm text-primary"></span></span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center bg-white bg-opacity-10 p-2 px-3 rounded" style="backdrop-filter: blur(5px);">
+                            <span class="small fw-semibold"><i class="bi bi-briefcase me-2"></i> Puestos Institucionales</span>
+                            <span class="badge bg-white text-primary fs-6 fw-bold" id="metricCargos"><span class="spinner-border spinner-border-sm text-primary"></span></span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center bg-white bg-opacity-10 p-2 px-3 rounded" style="backdrop-filter: blur(5px);">
+                            <span class="small fw-semibold"><i class="bi bi-person-workspace me-2"></i> Estudiantes Inscriptos</span>
+                            <span class="badge bg-white text-primary fs-6 fw-bold" id="metricEstudiantes"><span class="spinner-border spinner-border-sm text-primary"></span></span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center bg-white bg-opacity-10 p-2 px-3 rounded" style="backdrop-filter: blur(5px);">
+                            <span class="small fw-semibold"><i class="bi bi-calendar3 me-2"></i> Cursos Configurados</span>
+                            <span class="badge bg-white text-primary fs-6 fw-bold" id="metricCursos"><span class="spinner-border spinner-border-sm text-primary"></span></span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-8">
@@ -50,8 +67,58 @@ async function verInicio() {
         </div>
     `;
 
-    // Cargar alerta de usuarios pendientes si es Admin / Secretario o tiene permisos
-    await cargarAlertaUsuariosPendientes();
+    // Cargar alerta de usuarios pendientes y métricas en paralelo
+    cargarAlertaUsuariosPendientes();
+    cargarMetricasResumen();
+}
+
+async function cargarMetricasResumen() {
+    try {
+        const [resD, resC, resA, resCur] = await Promise.all([
+            api.get("/api/v1/docentes").catch(() => null),
+            api.get("/api/v1/cargos").catch(() => null),
+            api.get("/api/v1/alumnos").catch(() => null),
+            api.get("/api/v1/cursos").catch(() => null)
+        ]);
+
+        if (resD && resD.ok) {
+            const data = await resD.json();
+            const el = document.getElementById("metricDocentes");
+            if (el) el.innerText = Array.isArray(data) ? data.length : '-';
+        } else {
+            const el = document.getElementById("metricDocentes");
+            if (el) el.innerText = '-';
+        }
+
+        if (resC && resC.ok) {
+            const data = await resC.json();
+            const el = document.getElementById("metricCargos");
+            if (el) el.innerText = Array.isArray(data) ? data.length : '-';
+        } else {
+            const el = document.getElementById("metricCargos");
+            if (el) el.innerText = '-';
+        }
+
+        if (resA && resA.ok) {
+            const data = await resA.json();
+            const el = document.getElementById("metricEstudiantes");
+            if (el) el.innerText = Array.isArray(data) ? data.length : '-';
+        } else {
+            const el = document.getElementById("metricEstudiantes");
+            if (el) el.innerText = '-';
+        }
+
+        if (resCur && resCur.ok) {
+            const data = await resCur.json();
+            const el = document.getElementById("metricCursos");
+            if (el) el.innerText = Array.isArray(data) ? data.length : '-';
+        } else {
+            const el = document.getElementById("metricCursos");
+            if (el) el.innerText = '-';
+        }
+    } catch (err) {
+        console.error("Error al cargar métricas del resumen institucional:", err);
+    }
 }
 
 async function cargarAlertaUsuariosPendientes() {
@@ -99,7 +166,6 @@ async function cargarAlertaUsuariosPendientes() {
                 </div>
             `;
         } else {
-            // Si es administrador/secretario y no hay pendientes
             const perfilNombre = (usuarioActual && usuarioActual.perfil_nombre) ? usuarioActual.perfil_nombre.toUpperCase() : '';
             if (perfilNombre.includes('ADMIN') || perfilNombre.includes('SECRETARI')) {
                 alertDiv.innerHTML = `
