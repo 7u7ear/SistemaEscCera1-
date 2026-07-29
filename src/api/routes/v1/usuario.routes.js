@@ -8,6 +8,7 @@ router.post('/login', UsuarioController.login);
 router.post('/register', UsuarioController.register);
 router.post('/logout', auth, UsuarioController.logout);
 router.get('/me', auth, UsuarioController.getMe);
+router.get('/perfiles', auth, UsuarioController.getPerfiles);
 router.get('/', auth, UsuarioController.getAll);
 
 // Rutas Administrativas

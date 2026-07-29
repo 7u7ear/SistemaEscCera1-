@@ -8,6 +8,10 @@ class UsuarioService {
         return await UsuarioRepository.findAll();
     }
 
+    async getAllPerfiles() {
+        return await UsuarioRepository.findAllPerfiles();
+    }
+
     async getUsuarioById(id) {
         return await UsuarioRepository.findById(id);
     }

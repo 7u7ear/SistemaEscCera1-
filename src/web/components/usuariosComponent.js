@@ -7,11 +7,10 @@ let perfilesListaGlobal = [];
 async function cargarUsuariosData() {
     const res = await api.get("/api/v1/usuarios");
     if (res.ok) usuariosGlobal = await res.json();
-    
-    const resP = await api.get("/api/v1/permisos/matriz");
+
+    const resP = await api.get("/api/v1/usuarios/perfiles");
     if (resP.ok) {
-        const data = await resP.json();
-        perfilesListaGlobal = data.perfiles;
+        perfilesListaGlobal = await resP.json();
         popularSelectsPerfiles();
     }
 
@@ -78,7 +77,10 @@ function renderTablaUsuarios(data) {
         html += `<tr>
             <td><span class="badge bg-light text-dark">${u.username}</span></td>
             <td>${u.nombre}</td>
-            <td><span class="badge bg-info text-dark">${u.perfil || 'Sin Perfil'}</span></td>
+            <td>${u.perfil_nombre
+                ? `<span class="badge bg-primary">${u.perfil_nombre}</span>`
+                : `<span class="badge bg-secondary">Sin Perfil</span>`
+            }</td>
             <td><span class="badge ${u.estado === 'activo' ? 'bg-success' : 'bg-secondary'}">${u.estado}</span></td>
             <td>
                 <div class="btn-group">

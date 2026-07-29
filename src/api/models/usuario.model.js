@@ -2,7 +2,18 @@ const db = require('../../../config/database');
 
 class UsuarioRepository {
     async findAll() {
-        const [rows] = await db.query("SELECT id, username, nombre, estado, perfil_id, created_at FROM usuarios");
+        const [rows] = await db.query(`
+            SELECT u.id, u.username, u.nombre, u.estado, u.perfil_id,
+                   p.nombre AS perfil_nombre, u.created_at
+            FROM usuarios u
+            LEFT JOIN perfiles p ON u.perfil_id = p.id
+            ORDER BY u.created_at DESC
+        `);
+        return rows;
+    }
+
+    async findAllPerfiles() {
+        const [rows] = await db.query('SELECT id, nombre FROM perfiles ORDER BY nombre');
         return rows;
     }
 

@@ -59,6 +59,15 @@ class UsuarioController {
         }
     }
 
+    async getPerfiles(req, res, next) {
+        try {
+            const perfiles = await UsuarioService.getAllPerfiles();
+            res.json(perfiles);
+        } catch (err) {
+            next(err);
+        }
+    }
+
     async adminCreate(req, res, next) {
         try {
             const validatedData = adminCreateSchema.parse(req.body);
