@@ -4,6 +4,13 @@
 
 let alumnoDataActivo = null;
 
+// Sanitiza año/división: evita duplicar ordinales (ej: 1º° -> 1º)
+function fmtOrdinal(val) {
+    if (!val && val !== 0) return '';
+    const clean = String(val).trim().replace(/[°º]+$/g, '');
+    return clean ? `${clean}º` : '';
+}
+
 async function cargarAlumnosData() {
     const res = await api.get("/api/v1/alumnos");
     if (res.ok) {
@@ -311,11 +318,11 @@ function renderFichaLayout(a) {
         inscripcionesHtml = '<tr><td colspan="5" class="text-center text-muted p-3">El alumno no registra inscripciones.</td></tr>';
     } else {
         a.inscripciones.forEach(i => {
-            const divisionStr = i.division ? ` ${i.division}` : '';
+            const divisionStr = i.division ? ` ${fmtOrdinal(i.division)}` : '';
             inscripcionesHtml += `
                 <tr>
                     <td><strong>${i.anio_lectivo}</strong></td>
-                    <td>${i.anio}°${divisionStr}</td>
+                    <td>${fmtOrdinal(i.anio)}${divisionStr}</td>
                     <td><span class="badge bg-light text-dark border">${i.turno.toUpperCase()}</span></td>
                     <td>${i.especialidad} (${i.modalidad})</td>
                     <td>
@@ -449,8 +456,8 @@ function renderFichaLayout(a) {
 
 function formatCursoCompleto(c) {
     if (!c) return '';
-    const anioStr = c.anio ? (c.anio.includes('°') ? c.anio : `${c.anio}°`) : '';
-    const divStr = c.division ? (c.division.includes('°') ? c.division : `${c.division}°`) : '';
+    const anioStr = fmtOrdinal(c.anio);
+    const divStr = fmtOrdinal(c.division);
     const anioDiv = `${anioStr} ${divStr}`.trim();
     const esp = (c.especialidad && c.especialidad.trim() !== '') ? ` ${c.especialidad}` : (c.modalidad ? ` ${c.modalidad}` : '');
     const mod = (c.modalidad && c.modalidad !== '-' && c.especialidad && c.especialidad.trim() !== '') ? ` - ${c.modalidad}` : '';
@@ -519,18 +526,20 @@ function buildAcordeonMatricular(cursos) {
             });
             Object.keys(byAnio).sort().forEach((anio, ai) => {
                 const subId = `accMat-${mi}-anio-${ai}`;
+                const cleanAnio = String(anio).trim().replace(/[°º]+$/g, '');
+                const displayAnio = cleanAnio ? `${cleanAnio}º` : anio;
                 html += `
                 <div class="accordion-item border-0">
                     <h2 class="accordion-header">
                         <button class="accordion-button py-1 px-2 small collapsed" type="button"
                             data-bs-toggle="collapse" data-bs-target="#${subId}">
-                            <i class="bi bi-folder2 text-primary me-2"></i>${anio}° Año
+                            <i class="bi bi-folder2 text-primary me-2"></i>${displayAnio} Año
                         </button>
                     </h2>
                     <div id="${subId}" class="accordion-collapse collapse">
                         <div class="accordion-body p-0 ps-3">`;
                 byAnio[anio].sort((a, b) => (a.division || '').localeCompare(b.division || '')).forEach(c => {
-                    const label = `${c.anio}° ${c.division || ''} ${c.especialidad || c.modalidad}`.trim();
+                    const label = `${fmtOrdinal(c.anio)} ${fmtOrdinal(c.division)} ${c.especialidad || c.modalidad}`.trim().replace(/\s+/g, ' ');
                     html += `<button class="list-group-item list-group-item-action py-1 px-2 small border-0"
                         onclick="seleccionarCursoMatricular(${c.id}, '${label.replace(/'/g, "\\'")}')">
                         ${label}
@@ -561,7 +570,7 @@ function buildAcordeonMatricular(cursos) {
                     <div id="${subId}" class="accordion-collapse collapse">
                         <div class="accordion-body p-0 ps-3">`;
                 byTurno[turno].sort((a, b) => (`${a.anio}${a.division}`).localeCompare(`${b.anio}${b.division}`)).forEach(c => {
-                    const label = `${c.anio}° ${c.division || ''} ${c.especialidad || c.modalidad}`.trim();
+                    const label = `${fmtOrdinal(c.anio)} ${fmtOrdinal(c.division)} ${c.especialidad || c.modalidad}`.trim().replace(/\s+/g, ' ');
                     html += `<button class="list-group-item list-group-item-action py-1 px-2 small border-0"
                         onclick="seleccionarCursoMatricular(${c.id}, '${label.replace(/'/g, "\\'")}')">
                         ${label}

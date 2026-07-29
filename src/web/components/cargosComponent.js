@@ -2,6 +2,12 @@
 // MODULO CARGOS
 // ============================
 
+function fmtOrdinal(val) {
+    if (!val && val !== 0) return '';
+    const clean = String(val).trim().replace(/[°º]+$/g, '');
+    return clean ? `${clean}º` : '';
+}
+
 async function verCargos() {
     const res = await api.get("/api/v1/cargos");
     if (!res.ok) return alert("No tiene permiso para ver cargos");
@@ -141,7 +147,7 @@ async function abrirModalGestion(cargoId, defaultTab = 'asignaciones') {
     selectCursos.innerHTML = '<option value="">-- Seleccionar Curso --</option>';
     selectCursos.innerHTML += '<option value="null">-- No aplica (Extraclase) --</option>';
     cursosGlobal.forEach(c => {
-        let nombreCurso = `${c.anio} ${c.division || ''} ${c.modalidad || ''}`;
+        let nombreCurso = `${fmtOrdinal(c.anio)} ${fmtOrdinal(c.division)} ${c.modalidad || ''}`;
         if (c.especialidad && c.especialidad.trim() !== '') {
             nombreCurso += ` ${c.especialidad}`;
         }
@@ -458,7 +464,7 @@ async function cargarDistribucion(cargoId) {
         const horario = (d.hora_ingreso && d.hora_egreso) ? `${d.hora_ingreso.substring(0, 5)} a ${d.hora_egreso.substring(0, 5)}` : 'A definir';
         let cursoTxt = '';
         if (d.curso_anio) {
-            cursoTxt = `${d.curso_anio} ${d.curso_division || ''} ${d.curso_modalidad || ''} ${d.curso_turno || ''}`;
+            cursoTxt = `${fmtOrdinal(d.curso_anio)} ${fmtOrdinal(d.curso_division)} ${d.curso_modalidad || ''} ${d.curso_turno || ''}`;
             cursoTxt = cursoTxt.trim().replace(/\s+/g, ' ');
         }
         html += `<tr>

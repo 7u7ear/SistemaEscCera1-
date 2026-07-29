@@ -5,10 +5,15 @@
 let cursoActivoId = null;
 let cursosListGlobal = [];
 
-// Sanitiza el año: si ya trae º o ° no lo duplica
+// Sanitiza el año/división: evita duplicación de símbolos ordinales (ej: 1º° -> 1º)
+function fmtOrdinal(val) {
+    if (!val && val !== 0) return '';
+    const clean = String(val).trim().replace(/[°º]+$/g, '');
+    return clean ? `${clean}º` : '';
+}
+
 function fmtAnio(val) {
-    if (!val) return '';
-    return String(val).replace(/[°º]+$/, '') + 'º';
+    return fmtOrdinal(val);
 }
 
 async function verCursosHorarios() {
@@ -311,8 +316,8 @@ async function cargarCursosList() {
                 `;
 
                 cursosTur.forEach(c => {
-                    const anioStr = c.anio ? (c.anio.includes('°') ? c.anio : `${c.anio}°`) : '';
-                    const divStr = c.division ? (c.division.includes('°') ? ` ${c.division}` : ` ${c.division}°`) : '';
+                    const anioStr = fmtOrdinal(c.anio);
+                    const divStr = c.division ? ` ${fmtOrdinal(c.division)}` : '';
                     const espStr = (c.especialidad && c.especialidad.trim() !== '') ? ` (${c.especialidad})` : '';
 
                     html += `
@@ -339,7 +344,8 @@ async function cargarCursosList() {
             const porAnio = {};
             cursosMod.forEach(c => {
                 const anioKey = (c.anio || 'General').trim();
-                const anioLabel = anioKey.includes('º') || anioKey.includes('°') ? `${anioKey} Año` : `${anioKey}° Año`;
+                const cleanKey = anioKey.replace(/[°º]+$/g, '');
+                const anioLabel = cleanKey === 'General' ? 'General' : `${cleanKey}º Año`;
                 if (!porAnio[anioLabel]) porAnio[anioLabel] = [];
                 porAnio[anioLabel].push(c);
             });
@@ -364,7 +370,7 @@ async function cargarCursosList() {
                 `;
 
                 cursosAnio.forEach(c => {
-                    const divStr = c.division ? (c.division.includes('°') ? `Div. ${c.division}` : `Div. ${c.division}°`) : 'Única div.';
+                    const divStr = c.division ? `Div. ${fmtOrdinal(c.division)}` : 'Única div.';
 
                     html += `
                         <button class="list-group-item list-group-item-action border-0 rounded mb-1 py-1 px-2 fw-semibold" 
@@ -416,8 +422,8 @@ function seleccionarCurso(id) {
 
     // Configurar cabecera
     const curso = cursosListGlobal.find(c => c.id === id);
-    const divStr = curso.division ? ` ${curso.division}` : '';
-    document.getElementById("cursoDetalleTitulo").innerText = `${fmtAnio(curso.anio)}${divStr} ${curso.especialidad.toUpperCase()}`;
+    const divStr = curso.division ? ` ${fmtOrdinal(curso.division)}` : '';
+    document.getElementById("cursoDetalleTitulo").innerText = `${fmtOrdinal(curso.anio)}${divStr} ${curso.especialidad.toUpperCase()}`;
     document.getElementById("cursoDetalleSubtitulo").innerText = `Especialidad: ${curso.especialidad} (${curso.modalidad}) | Turno: ${curso.turno.toUpperCase()}`;
 
     // Cargar horario y alumnos
@@ -453,7 +459,7 @@ async function cargarHorarioDelCurso() {
             <!-- Encabezado exclusivo de Impresión -->
             <div class="d-none d-print-block text-center mb-4">
                 <h3 class="fw-bold mb-1">E.S.E.A en Ceramica Nº1 D.E II</h3>
-                <h4 class="mb-0">HORARIO SEMANAL: ${fmtAnio(curso.anio)}${curso.division || ''} ${curso.especialidad.toUpperCase()}</h4>
+                <h4 class="mb-0">HORARIO SEMANAL: ${fmtOrdinal(curso.anio)}${curso.division ? ' ' + fmtOrdinal(curso.division) : ''} ${curso.especialidad.toUpperCase()}</h4>
                 <p class="text-muted small">Turno: ${curso.turno.toUpperCase()}</p>
                 <hr style="border-top: 2px solid #000; margin: 15px 0;">
             </div>
@@ -550,7 +556,7 @@ async function cargarAlumnosDelCursoActivo() {
         const alumnos = await res.json();
 
         const curso = cursosListGlobal.find(c => c.id === cursoActivoId);
-        const divStr = curso.division ? ` ${curso.division}` : '';
+        const divStr = curso.division ? ` ${fmtOrdinal(curso.division)}` : '';
 
         let html = `
             <!-- Encabezado de Impresión -->
@@ -558,7 +564,7 @@ async function cargarAlumnosDelCursoActivo() {
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h3 class="fw-bold mb-1">E.S.E.A en Ceramica Nº1 D.E II</h3>
-                        <h4 class="mb-0">LISTA DE ESTUDIANTES: ${fmtAnio(curso.anio)}${divStr} ${curso.especialidad.toUpperCase()}</h4>
+                        <h4 class="mb-0">LISTA DE ESTUDIANTES: ${fmtOrdinal(curso.anio)}${divStr} ${curso.especialidad.toUpperCase()}</h4>
                     </div>
                     <div class="text-end">
                         <h5 class="fw-bold mb-0">Ciclo Lectivo: ${anioLectivo}</h5>

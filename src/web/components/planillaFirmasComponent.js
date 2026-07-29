@@ -5,6 +5,12 @@
 
 let planillaDataActiva = { cargos: [], licencias: [] };
 
+function fmtOrdinal(val) {
+    if (!val && val !== 0) return '';
+    const clean = String(val).trim().replace(/[°º]+$/g, '');
+    return clean ? `${clean}º` : '';
+}
+
 async function verPlanillaFirmas() {
     const container = document.getElementById("seccion-planilla");
     container.innerHTML = `
@@ -160,7 +166,9 @@ function renderPlanilla(data, fecha, turno) {
         data.cargos.forEach(c => {
             const docente = c.docente_display || '--------------------------';
             const rol = c.rol || '';
-            const curso = c.curso_anio ? `${c.curso_anio}°${c.curso_division || ''}` : '--';
+            const anioFmt = fmtOrdinal(c.curso_anio);
+            const divFmt = fmtOrdinal(c.curso_division);
+            const curso = anioFmt ? `${anioFmt}${divFmt ? ' ' + divFmt : ''}` : '--';
             const materia = c.materia_nombre || '----------------';
             const puesto = c.numero_puesto || '-';
             const horaEntrada = c.hora_ingreso ? c.hora_ingreso.substring(0, 5) : '--:--';
@@ -212,7 +220,9 @@ function renderPlanilla(data, fecha, turno) {
         html += `<tr><td colspan="7" class="text-center text-muted p-2">No se registran licencias para este día/turno.</td></tr>`;
     } else {
         data.licencias.forEach(l => {
-            const cursoL = l.curso_anio ? `${l.curso_anio}°${l.curso_division || ''}` : '--';
+            const anioLFmt = fmtOrdinal(l.curso_anio);
+            const divLFmt = fmtOrdinal(l.curso_division);
+            const cursoL = anioLFmt ? `${anioLFmt}${divLFmt ? ' ' + divLFmt : ''}` : '--';
 
             let finalizaDisplay = 'Indefinida';
             if (l.fecha_fin) {
