@@ -29,13 +29,11 @@ async function verCursosHorarios() {
                             <p class="text-muted small mb-0" id="cursoDetalleSubtitulo">Especialidad: Computación | Turno Mañana</p>
                         </div>
                         <div class="dropdown">
-                            <button class="btn btn-dark dropdown-toggle px-3 fw-bold" type="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-printer"></i> Opciones de Impresión
+                            <button class="btn btn-dark dropdown-toggle px-3 fw-bold" type="button" id="btnDropdownImpresion" data-bs-toggle="dropdown">
+                                <i class="bi bi-printer me-1"></i> Opciones de Impresión
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                                <li><button class="dropdown-item fw-bold text-dark" data-tipo="horario"><i class="bi bi-calendar3"></i> Imprimir Horario Solo</button></li>
-                                <li><button class="dropdown-item fw-bold text-dark" data-tipo="alumnos-dni"><i class="bi bi-person-lines-fill"></i> Imprimir Alumnos (con DNI)</button></li>
-                                <li><button class="dropdown-item fw-bold text-dark" data-tipo="alumnos-email"><i class="bi bi-envelope-at"></i> Imprimir Alumnos (DNI y Email)</button></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" id="menuOpcionesImpresion">
+                                <!-- Generado dinámicamente según la solapa activa -->
                             </ul>
                         </div>
                     </div>
@@ -147,13 +145,71 @@ async function verCursosHorarios() {
 
     await cargarCursosList();
 
-    // Registrar handlers de impresión (evita conflictos con Bootstrap dropdown)
-    document.querySelectorAll('[data-tipo]').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            imprimirElemento(this.dataset.tipo);
+    // Escuchar cambios de pestaña para actualizar menú de impresión dinámicamente
+    const tabAlumnos = document.getElementById("tab-alumnos");
+    const tabHorario = document.getElementById("tab-horario");
+
+    if (tabAlumnos) {
+        tabAlumnos.addEventListener("click", () => actualizarMenuImpresion('alumnos'));
+        tabAlumnos.addEventListener("shown.bs.tab", () => actualizarMenuImpresion('alumnos'));
+    }
+    if (tabHorario) {
+        tabHorario.addEventListener("click", () => actualizarMenuImpresion('horario'));
+        tabHorario.addEventListener("shown.bs.tab", () => actualizarMenuImpresion('horario'));
+    }
+
+    actualizarMenuImpresion('alumnos');
+}
+
+function actualizarMenuImpresion(pestaña) {
+    const menu = document.getElementById("menuOpcionesImpresion");
+    if (!menu) return;
+
+    if (pestaña === 'horario') {
+        menu.innerHTML = `
+            <li>
+                <button type="button" class="dropdown-item fw-bold text-dark py-2" id="btnImpHorario">
+                    <i class="bi bi-calendar3 text-primary me-2"></i> Imprimir Horario Semanal
+                </button>
+            </li>
+        `;
+        document.getElementById("btnImpHorario")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            lanzarImpresionConRetardo('horario');
         });
-    });
+    } else {
+        menu.innerHTML = `
+            <li>
+                <button type="button" class="dropdown-item fw-bold text-dark py-2" id="btnImpAlumnosDni">
+                    <i class="bi bi-person-lines-fill text-primary me-2"></i> Imprimir Alumnos (con DNI)
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item fw-bold text-dark py-2" id="btnImpAlumnosEmail">
+                    <i class="bi bi-envelope-at text-primary me-2"></i> Imprimir Alumnos (DNI y Email)
+                </button>
+            </li>
+        `;
+        document.getElementById("btnImpAlumnosDni")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            lanzarImpresionConRetardo('alumnos-dni');
+        });
+        document.getElementById("btnImpAlumnosEmail")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            lanzarImpresionConRetardo('alumnos-email');
+        });
+    }
+}
+
+function lanzarImpresionConRetardo(tipo) {
+    const btnDrop = document.getElementById("btnDropdownImpresion");
+    if (btnDrop && typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+        const instance = bootstrap.Dropdown.getInstance(btnDrop);
+        if (instance) instance.hide();
+    }
+    setTimeout(() => {
+        imprimirElemento(tipo);
+    }, 150);
 }
 
 async function cargarCursosList() {
@@ -353,6 +409,7 @@ function seleccionarCurso(id) {
     document.getElementById("cursoDetalleSubtitulo").innerText = `Especialidad: ${curso.especialidad} (${curso.modalidad}) | Turno: ${curso.turno.toUpperCase()}`;
 
     // Cargar horario y alumnos
+    actualizarMenuImpresion('alumnos');
     cargarHorarioDelCurso();
     cargarAlumnosDelCursoActivo();
 }
@@ -597,6 +654,8 @@ async function verCadenaCargoPorDocente(cargoId) {
 
 // --- IMPRESIÓN SELECTIVA ---
 function imprimirElemento(tipo) {
+    console.log('[IMPRIMIR] Función llamada con tipo:', tipo, '| cursoActivoId:', cursoActivoId);
+
     if (!cursoActivoId) {
         alert("Seleccione un curso antes de imprimir.");
         return;
@@ -617,62 +676,50 @@ function imprimirElemento(tipo) {
     }
 
     const sourceEl = document.getElementById(sourceId);
+    console.log('[IMPRIMIR] sourceEl:', sourceEl, '| tiene spinner:', !!sourceEl?.querySelector('.spinner-border'));
+
     if (!sourceEl || sourceEl.innerHTML.trim() === '' || sourceEl.querySelector('.spinner-border')) {
         alert("El contenido aún no está cargado. Aguarde y vuelva a intentar.");
         return;
     }
 
-    // Clonar contenido
     const clon = sourceEl.cloneNode(true);
 
     if (ocultarEmail) {
         clon.querySelectorAll('.col-email').forEach(el => el.style.display = 'none');
     }
 
-    // Mostrar encabezados de impresión que Bootstrap oculta con d-none
-    clon.querySelectorAll('.d-none').forEach(el => {
-        el.style.display = 'block';
-    });
-    // Asegurar que todo lo que tiene d-print-block esté visible
-    clon.querySelectorAll('.d-print-block').forEach(el => {
-        el.style.display = 'block';
-    });
+    clon.querySelectorAll('.d-none').forEach(el => { el.style.display = 'block'; });
+    clon.querySelectorAll('.d-print-block').forEach(el => { el.style.display = 'block'; });
 
-    // Limpiar área de impresión anterior si existe
     const existing = document.getElementById('areaTempImpresion');
     if (existing) existing.remove();
     const existingStyle = document.getElementById('styleTempImpresion');
     if (existingStyle) existingStyle.remove();
 
-    // Crear div de impresión temporal (oculto en pantalla)
     const printDiv = document.createElement('div');
     printDiv.id = 'areaTempImpresion';
     printDiv.appendChild(clon);
     document.body.appendChild(printDiv);
 
-    // Inyectar estilos de impresión en <head>
     const style = document.createElement('style');
     style.id = 'styleTempImpresion';
     style.innerHTML = `
-        @media screen {
-            #areaTempImpresion { display: none !important; }
-        }
+        @media screen { #areaTempImpresion { display: none !important; } }
         @media print {
             body > *:not(#areaTempImpresion) { display: none !important; }
             #areaTempImpresion { display: block !important; padding: 10px; }
             table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; }
-            th, td { border: 1px solid #000 !important; padding: 6px 4px !important; font-size: 8.5pt !important; text-align: center !important; vertical-align: middle !important; word-wrap: break-word !important; }
+            th, td { border: 1px solid #000 !important; padding: 6px 4px !important; font-size: 8.5pt !important; vertical-align: middle !important; word-wrap: break-word !important; }
             th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            td { text-align: left !important; }
             @page { margin: 1.5cm; }
         }
     `;
     document.head.appendChild(style);
 
-    // Imprimir
+    console.log('[IMPRIMIR] Llamando window.print()...');
     window.print();
 
-    // Limpiar después de imprimir
     setTimeout(() => {
         const d = document.getElementById('areaTempImpresion');
         const s = document.getElementById('styleTempImpresion');
