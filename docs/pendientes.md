@@ -1,57 +1,82 @@
-# Listado de Pendientes - Proyecto CERA 1 (Checkpoint Definitivo)
+# Tareas Pendientes — Sistema Escolar CERA 1
 
-Este documento centraliza el 100% de las tareas, especificaciones y parámetros acordados para continuar en el próximo desarrollo.
-
-## 📌 Checklist Definitiva de Desarrollo (Próximos Pasos)
-
-### 1️⃣ Licencias Pendientes y Envíos de Mails
-- [ ] **Solicitud Docente**: Solicitud de licencia que afecta al puesto inmediatamente y genera la solicitud en estado `PENDIENTE`.
-- [ ] **Asignación Preceptor-Curso**: Tabla `curso_preceptor` e interfaz para asignar los preceptores a cargo de cada curso.
-- [ ] **Notificación Automática por Email (Entrada)**: Envío de correo en HTML al Preceptor del curso afectado y a Secretaría (`licencias@...`).
-- [ ] **Notificación Automática por Email (Resolución)**: Envío de correo en HTML al Docente avisándole cuando su licencia sea **Aprobada** o **Rechazada**.
-- [ ] **Servicio SMTP & Fallback**: Módulo `email.service.js` (si no hay SMTP configurado en `.env`, escribe el correo en `logs/email.log`).
-
-### 2️⃣ Recuperación de Contraseña ("¿Olvidaste tu contraseña?")
-- [ ] **Opción en Login**: Enlace en `login.html` para solicitar restablecimiento de clave sin intervención administrativa.
-- [ ] **Token de Seguridad**: Enlace enviado por email con token único y validez de **1 hora**.
-
-### 3️⃣ Botones y Archivos de Mails por Curso Específico
-- [ ] **Tres Listas Independientes por Curso**:
-  - 1. Mails de **Estudiantes**.
-  - 2. Mails de **Tutores / Padres**.
-  - 3. Mails de **Docentes de ese curso** (únicamente profesores que dictan materias en ese curso).
-- [ ] **Botón "Copiar al Portapapeles"**: Copia todas las direcciones en formato separado por comas (listo para pegar en CCO/BCC de Gmail/Outlook).
-- [ ] **Botón "Descargar Archivo"**: Descarga del listado en archivo `.txt` / `.csv`.
-
-### 4️⃣ Visibilidad Dinámica por Permisos (Sidebar)
-- [ ] **Ocultamiento Total**: Ocultar por completo las opciones del menú lateral para los módulos donde el rol del usuario no tenga permisos de lectura o edición.
-
-### 5️⃣ Visualizador de Auditoría
-- [ ] **Pantalla de Logs**: Interfaz para Administradores y Conducción con filtro por fecha, usuario y entidad.
+> Última actualización: 2026-08-01
+> Este documento es la fuente de verdad del estado del proyecto. Leerlo al inicio de cada sesión.
 
 ---
 
-## 🟡 Media Prioridad (Funcionalidades Adicionales)
+## 🔴 ALTA PRIORIDAD — Funcionalidades Nuevas
 
-- [ ] **Reportes y Constancias en PDF**: Generación automatizada de constancias de Alumno Regular y pases.
-- [ ] **Módulo de Biblioteca**: Gestión del catálogo bibliográfico y préstamos.
+### Módulo Email + Licencias
+- [ ] `email.service.js` — Nodemailer + SMTP con fallback a `logs/email.log`
+- [ ] `licencia_notificacion_template.js` — Plantillas HTML (solicitud + resolución)
+- [ ] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`)
+- [ ] Tabla `curso_preceptor` + interfaz de asignación en admin de cursos
+- [ ] Email automático a Preceptor/Secretaría al ingresar licencia
+- [ ] Email automático al Docente al Aprobar/Rechazar licencia
+
+### Módulo Recuperación de Contraseña
+- [ ] `password_reset.service.js` — token único, expiración 1 hora
+- [ ] `password_reset.routes.js` — endpoints `forgot-password` y `reset-password`
+- [ ] Enlace + modal "¿Olvidaste tu contraseña?" en `login.html`
+
+### Módulo Mails por Curso
+- [ ] Endpoints para extraer mails: Estudiantes / Tutores / Docentes del curso
+- [ ] 3 listas independientes en `cursosHorariosComponent.js`
+- [ ] Botón "Copiar al portapapeles" (formato CCO/BCC)
+- [ ] Botón "Descargar TXT/CSV"
+
+### Sidebar Dinámico por Permisos
+- [ ] `dashboard_script.js` — ocultar (no deshabilitar) ítems del menú sin permisos L o E
+
+### Visualizador de Auditoría
+- [ ] Pantalla con filtros por fecha, usuario y entidad (roles: Admin / Conducción)
 
 ---
 
-## 🟢 Baja Prioridad / Mejoras Futuras
+## 🟠 DEUDA TÉCNICA / REFACTORING
 
-- [ ] **Dashboard Estadístico**: Gráficos interactivos de ausentismo docente y cupos de alumnos.
-- [ ] **Alertas Generales**: Avisos automáticos sobre vencimiento de licencias.
+- [ ] Eliminar fallback de sesiones en `src/api/middlewares/auth.js`
+- [ ] Esquemas Zod: `tramitacion.validation.js`, `codigo_tramite.validation.js`, `permiso.validation.js`
+- [ ] Actualizar `usuario.validation.js` — añadir adminCreate, status y perfil
+- [ ] Actualizar `cargo.validation.js` — añadir tipos-hora
+- [ ] Refactorizar módulo Permisos → MVC + Service Layer:
+  - [ ] `src/api/models/permiso.model.js`
+  - [ ] `src/api/services/permiso.service.js`
+  - [ ] `src/api/controllers/permiso.controller.js`
+  - [ ] Modificar `src/api/routes/v1/permisos.routes.js`
+- [ ] Aplicar Zod en controllers: `usuario`, `cargo`, `tramitacion`, `codigo_tramite`
+- [ ] Campo `anio_materia` en materias adeudadas del alumno (BD + frontend ficha)
+- [ ] Revisión visual botones negros→azules en modales: tramitaciones, licencias, docentes, cargos
 
 ---
 
-## ✅ Completado Recientemente
+## 🟡 MEDIA PRIORIDAD
 
-- [x] Gestión de Usuarios (Aprobación, perfiles iniciales y creación por admin).
-- [x] Definición de los 9 perfiles institucionales.
-- [x] Módulo de Planilla de Firmas funcional cruzando cargos, horarios y licencias.
-- [x] Módulo de Tramitaciones integrado con Cargos.
-- [x] Módulo de Licencias vinculado a cargos docentes.
-- [x] Módulo de Alumnos (Legajos, matriculación y materias adeudadas).
-- [x] Documentación oficial en `docs/manual/manual_usuario.md` y `docs/manual/manual_tecnico.md`.
-- [x] Actualización de credenciales de base de datos Aiven MySQL Cloud en `docs/README.md`.
+- [ ] Reportes y constancias en PDF (Alumno Regular, pases)
+- [ ] Módulo de Biblioteca (catálogo bibliográfico + préstamos)
+
+---
+
+## 🟢 BAJA PRIORIDAD / MEJORAS FUTURAS
+
+- [ ] Dashboard estadístico con gráficos interactivos (ausentismo docente, cupos de alumnos)
+- [ ] Alertas automáticas por vencimiento de licencias
+
+---
+
+## ✅ COMPLETADO
+
+- [x] Gestión de Usuarios (aprobación, perfiles iniciales, creación por admin)
+- [x] Definición de los 9 perfiles institucionales
+- [x] Módulo Planilla de Firmas (cargos × horarios × licencias)
+- [x] Módulo Tramitaciones integrado con Cargos
+- [x] Módulo Licencias vinculado a cargos docentes
+- [x] Módulo Alumnos (legajos, matriculación, materias adeudadas)
+- [x] `api.getErrorMessage()` helper + parseo correcto de errores en todo el frontend
+- [x] Alerta de usuarios pendientes de aprobación en Dashboard
+- [x] Métricas en vivo en Dashboard (docentes, puestos, estudiantes, cursos)
+- [x] Normalización de ordinales (1º° → 1º en todo el frontend)
+- [x] Botones negros→azules (detección y corrección estática en archivos principales)
+- [x] Documentación oficial: `docs/manual/manual_usuario.md` y `docs/manual/manual_tecnico.md`
+- [x] Credenciales de base de datos Aiven MySQL Cloud en `docs/README.md`

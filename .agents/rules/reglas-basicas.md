@@ -4,223 +4,316 @@ trigger: always_on
 
 # ⚙️ REGLAS OPERATIVAS IA (OBLIGATORIAS)
 
-## 1. CONTEXTO FIJO
+## 1. CONTEXTO DEL PROYECTO
 
-- Proyecto real en desarrollo (NO ejemplo)
-- Backend: Node.js + Express
-- Base de datos: MySQL
-- Frontend: HTML + Bootstrap
-- Arquitectura: MVC + Service Layer
-- Autenticación: JWT
+* Proyecto real en producción (NO ejemplo).
+* Sistema de gestión escolar destinado a comercializarse.
+* Backend: Node.js + Express.
+* Base de datos: MySQL.
+* Frontend: HTML + Bootstrap.
+* Arquitectura: MVC + Service Layer.
+* Autenticación: JWT.
 
-NO cambiar stack ni arquitectura.
-
----
-
-## 2. FORMA DE RESPUESTA
-
-- Responder SOLO lo pedido
-- Sin introducciones ni conclusiones
-- Priorizar código sobre explicación
-- Explicaciones máximo 5 líneas
-- No repetir información
+**No cambiar tecnologías ni arquitectura sin autorización explícita.**
 
 ---
 
-## 3. CÓDIGO
+## 2. OBJETIVO
 
-- Código listo para producción
-- No código de ejemplo ni tutorial
-- No simplificar lógica real
-- Mantener consistencia con el proyecto existente
+Toda solución debe priorizar:
+
+* Calidad.
+* Seguridad.
+* Escalabilidad.
+* Mantenibilidad.
+* Rendimiento.
+* Reutilización.
+* Fácil instalación.
+* Fácil mantenimiento por otros desarrolladores.
+
+Nunca proponer soluciones rápidas que comprometan el producto.
 
 ---
 
-## 4. ESTRUCTURA
+## 3. FORMA DE RESPUESTA
+
+* Responder únicamente lo solicitado.
+* Priorizar código listo para producción.
+* Explicar solo cuando sea necesario.
+* No escribir como tutorial.
+* No repetir información.
+
+---
+
+## 4. CONSISTENCIA DEL PROYECTO
+
+Antes de generar código:
+
+* Revisar el código relacionado.
+* Mantener el estilo existente.
+* Reutilizar funciones, clases y archivos existentes.
+* No crear código duplicado.
+* No romper compatibilidad.
+
+---
+
+## 5. ARQUITECTURA
 
 Respetar siempre:
 
-/controllers  
-/services  
-/routes  
-/models  
-/middlewares  
-/config  
+* controllers
+* services
+* models
+* routes
+* middlewares
+* config
 
-- No mezclar responsabilidades
+Controllers únicamente Request / Response.
 
----
-
-## 5. BASE DE DATOS
-
-- NO inventar tablas ni campos
-- Respetar estructura existente
-- No asumir relaciones
-
-Si falta información → preguntar
+Toda la lógica pertenece a Services.
 
 ---
 
-## 6. LÓGICA
+## 6. BASE DE DATOS
 
-- Toda lógica en services
-- Controllers solo request/response
-- No duplicar lógica
+* No inventar tablas.
+* No inventar columnas.
+* No asumir relaciones.
+* No modificar el modelo sin autorización.
 
----
+Si falta información:
 
-## 7. DRY
-
-- No repetir código
-- Reutilizar funciones existentes
+**Preguntar antes de generar código.**
 
 ---
 
-## 8. ASYNC
+## 7. VALIDACIONES
 
-- Usar async/await
-- NO usar .then()
+Siempre validar:
 
----
+* datos recibidos
+* tipos
+* campos obligatorios
+* reglas de negocio
+* permisos
 
-## 9. VALIDACIÓN
-
-- Validar todos los inputs
-- No confiar en frontend
-
----
-
-## 10. ERRORES
-
-- try/catch obligatorio
-- Respuestas HTTP correctas
-- No console.log en producción
-- No exponer errores internos
+Nunca confiar en el frontend.
 
 ---
 
-## 11. AUTENTICACIÓN
+## 8. ERRORES
 
-- Usar JWT
-- No usar sesiones
-- Proteger rutas con middleware
+Obligatorio:
 
----
+* try/catch
+* respuestas HTTP correctas
+* mensajes claros para el usuario
+* no exponer errores internos
+* registrar errores mediante logger
 
-## 12. SEGURIDAD
-
-- Sanitizar inputs (SQL Injection, XSS)
-- Hash de contraseñas (bcrypt)
-- Rate limit en endpoints críticos
-- No hardcodear datos sensibles
-- Usar variables de entorno
+Nunca usar console.log() en producción.
 
 ---
 
-## 13. CONSISTENCIA
+## 9. SEGURIDAD
 
-- Naming en inglés
-- camelCase
-- Mismo estilo en todo el proyecto
+Siempre aplicar:
 
----
+* JWT
+* bcrypt
+* consultas parametrizadas
+* sanitización de entradas
+* protección contra SQL Injection
+* protección contra XSS
+* variables de entorno
+* rate limit cuando corresponda
 
-## 14. PERFORMANCE
-
-- Evitar queries innecesarias
-- Usar joins correctamente
-- Preparar paginación
-
----
-
-## 15. FRONTEND
-
-- HTML + Bootstrap simple
-- Sin lógica compleja
-- Consumir API backend
+Nunca hardcodear información sensible.
 
 ---
 
-## 16. REGLAS DE NEGOCIO
+## 10. SQL Y RENDIMIENTO
 
-- Validar consistencia antes de guardar
-- No permitir estados inválidos
-- Centralizar reglas en services
-
----
-
-## 17. AUDITORÍA
-
-Registrar:
-- creación
-- edición
-- eliminación
-
-Campos:
-- user_id
-- acción
-- entidad
-- fecha
+* Evitar SELECT *
+* Optimizar consultas
+* Evitar consultas repetidas
+* Usar JOIN correctamente
+* Preparar paginación
+* Filtrar en la base de datos, no en JavaScript
 
 ---
 
-## 18. CONTROL DE ERRORES PREVIOS
+## 11. TRANSACCIONES
 
-- No repetir soluciones que fallaron
-- Adaptarse al estado actual del sistema
+Cuando una operación afecte varias tablas:
 
----
+* usar transacciones
+* rollback completo ante cualquier error
 
-## 19. MODO PROFESIONAL
-
-- No explicar conceptos básicos
-- No usar lenguaje de tutorial
-- Actuar como desarrollador senior
+Nunca dejar datos inconsistentes.
 
 ---
 
-## 20. OPTIMIZACIÓN DE TOKENS
+## 12. FRONTEND
 
-- Respuestas cortas
-- Sin relleno
-- Sin redundancias
+* HTML + Bootstrap.
+* Sin lógica de negocio.
+* Consumir únicamente la API.
+* Componentes reutilizables.
+* JavaScript limpio y mantenible.
+
+---
+
+## 13. MENSAJES DE ERROR
+
+Nunca mostrar:
+
+* [object Object]
+* stack trace
+* errores técnicos
+
+Siempre utilizar:
+
+```javascript
+alert(api.getErrorMessage(err));
+```
+
+Los errores técnicos deben registrarse únicamente en el backend.
+
+---
+
+## 14. AUDITORÍA
+
+Registrar las operaciones importantes:
+
+* creación
+* edición
+* eliminación
+
+Campos mínimos:
+
+* usuario
+* acción
+* entidad
+* fecha
+
+Siempre que sea posible conservar historial de cambios.
+
+---
+
+## 15. ELIMINACIÓN
+
+Evitar DELETE físico.
+
+Preferir:
+
+* estado = Inactivo
+* deleted_at
+
+Eliminar definitivamente solo cuando sea necesario.
+
+---
+
+## 16. CONFIGURACIÓN
+
+Toda configuración debe provenir de:
+
+* variables de entorno
+* archivos de configuración
+
+Nunca hardcodear:
+
+* URLs
+* claves
+* puertos
+* rutas
+
+---
+
+## 17. RESPUESTAS DE LA API
+
+Mantener un formato consistente.
+
+Éxito:
+
+```json
+{
+  "success": true,
+  "data": {}
+}
+```
+
+Error:
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "",
+    "details": {}
+  }
+}
+```
+
+---
+
+## 18. MODIFICACIONES
+
+Antes de modificar código existente:
+
+* analizar impacto
+* mantener compatibilidad
+* no eliminar funcionalidades sin autorización
+* evitar efectos secundarios
+
+---
+
+## 19. CALIDAD DEL CÓDIGO
+
+El código debe ser:
+
+* limpio
+* legible
+* modular
+* reutilizable
+* desacoplado
+* consistente
+
+Seguir principios DRY y responsabilidad única.
+
+---
+
+## 20. DOCUMENTACIÓN
+
+Cuando una modificación sea importante indicar:
+
+* archivos modificados
+* motivo
+* impacto
+* pasos adicionales si fueran necesarios
 
 ---
 
 ## 21. REGLA FINAL
 
-Si falta información:
-→ NO asumir
-→ NO inventar
-→ PREGUNTAR
+Si existe cualquier duda sobre:
+
+* estructura
+* tablas
+* relaciones
+* reglas de negocio
+* funcionamiento actual
+
+**NO asumir.**
+
+**NO inventar.**
+
+**Preguntar primero.**
 
 ---
 
-## 22. NIVEL PRODUCTO (OBLIGATORIO)
+## 22. REGLA MAESTRA
 
-Este sistema está destinado a ser vendido.
+Actuar siempre como un desarrollador senior responsable de un producto comercial.
 
-Debe ser:
-- Seguro
-- Mantenible
-- Escalable
-- Instalable fácilmente
-- Comprensible por otro desarrollador
-
-Evitar soluciones rápidas que comprometan el producto.
-
----
-
-## 23. MENSAJES DE ERROR EN FRONTEND (OBLIGATORIO)
-
-- NUNCA mostrar `[object Object]` al usuario.
-- SIEMPRE usar `api.getErrorMessage(err)` para parsear respuestas de error del backend.
-- El backend devuelve `{ error: { message, details } }` o `{ error: "string" }` — `api.getErrorMessage()` maneja ambos casos.
-- En todos los `alert()`, `toast()` o mensajes de error visibles al usuario, el texto debe ser legible y descriptivo.
-- Esta regla aplica a **todo** componente frontend del proyecto, sin excepción.
-
-Patrón obligatorio:
-```js
-const err = await res.json();
-alert(`Error: ${api.getErrorMessage(err)}`);
-```
+Cada respuesta debe poder incorporarse directamente al sistema con el menor riesgo posible, priorizando estabilidad, calidad y mantenimiento a largo plazo.
