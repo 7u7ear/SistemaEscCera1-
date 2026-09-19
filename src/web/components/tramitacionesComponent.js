@@ -153,14 +153,12 @@ function poblarSelectCodigosTramite() {
         option.value = `${c.codigo} - ${c.descripcion_tramite}`;
         list.appendChild(option);
     });
-    console.log("Datalist poblado con", codigosTramiteGlobal.length, "ítems");
 }
 
 function seleccionarCodigoTramite(valor) {
     const cod = codigosTramiteGlobal.find(c => `${c.codigo} - ${c.descripcion_tramite}` === valor);
     if (cod) {
         document.getElementById("tramiteCodigoId").value = cod.id;
-        console.log("Código seleccionado:", cod.id);
     } else {
         document.getElementById("tramiteCodigoId").value = "";
     }

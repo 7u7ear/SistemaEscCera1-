@@ -18,13 +18,14 @@ class AlumnoService {
                     WHERE i.alumno_id = a.id
                     ORDER BY i.anio_lectivo DESC LIMIT 1) as curso_actual
             FROM alumnos a
+            WHERE a.deleted_at IS NULL
             ORDER BY a.apellido ASC, a.nombre ASC
         `);
         return rows;
     }
 
     async getAlumnoById(id) {
-        const [alumnos] = await db.query("SELECT * FROM alumnos WHERE id = ?", [id]);
+        const [alumnos] = await db.query("SELECT * FROM alumnos WHERE id = ? AND deleted_at IS NULL", [id]);
         if (alumnos.length === 0) {
             throw new AppError('Alumno no encontrado', 404);
         }
@@ -166,10 +167,10 @@ class AlumnoService {
     }
 
     async deleteAlumno(id, userId) {
-        const [alumnos] = await db.query("SELECT id, dni FROM alumnos WHERE id = ?", [id]);
+        const [alumnos] = await db.query("SELECT id, dni FROM alumnos WHERE id = ? AND deleted_at IS NULL", [id]);
         if (alumnos.length === 0) throw new AppError('Alumno no encontrado', 404);
 
-        await db.query("DELETE FROM alumnos WHERE id = ?", [id]);
+        await db.query("UPDATE alumnos SET deleted_at = NOW() WHERE id = ?", [id]);
         await AuditoriaService.registrar(userId, 'DELETE', 'ALUMNOS', id, { dni: alumnos[0].dni });
     }
 

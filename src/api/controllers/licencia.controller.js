@@ -28,8 +28,9 @@ class LicenciaController {
     async update(req, res, next) {
         try {
             const { id } = req.params;
+            const userId = req.user.id;
             const validatedData = updateLicenciaSchema.parse(req.body);
-            await LicenciaService.updateLicencia(id, validatedData);
+            await LicenciaService.updateLicencia(id, validatedData, userId);
             res.json({ message: 'Licencia actualizada con éxito' });
         } catch (err) {
             next(err);
@@ -39,7 +40,8 @@ class LicenciaController {
     async delete(req, res, next) {
         try {
             const { id } = req.params;
-            await LicenciaService.deleteLicencia(id);
+            const userId = req.user.id;
+            await LicenciaService.deleteLicencia(id, userId);
             res.json({ message: 'Licencia eliminada con éxito' });
         } catch (err) {
             next(err);

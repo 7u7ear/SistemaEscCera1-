@@ -1117,15 +1117,6 @@
             <label class="form-label text-muted small fw-bold">Asignar Perfil (Rol)</label>
             <select id="usuarioPerfil" class="form-select">
                 <option value="">-- Seleccionar Perfil --</option>
-                <option value="ADMINISTRADOR">ADMINISTRADOR</option>
-                <option value="SECRETARIO">SECRETARIO</option>
-                <option value="CONDUCCION">CONDUCCION</option>
-                <option value="AUXILIAR ADMINISTRATIVO">AUXILIAR ADMINISTRATIVO</option>
-                <option value="OFICINA DE ALUMNOS">OFICINA DE ALUMNOS</option>
-                <option value="PRECEPTOR/A">PRECEPTOR/A</option>
-                <option value="DOCENTE">DOCENTE</option>
-                <option value="BIBLIOTECA">BIBLIOTECA</option>
-                <option value="ESTUDIANTE">ESTUDIANTE</option>
             </select>
         </div>
         <div class="mb-3" id="divUsuarioEstado">
@@ -1169,11 +1160,7 @@
         <div class="mb-3">
             <label class="form-label text-muted small fw-bold">Perfil</label>
             <select id="crearPerfil" class="form-select">
-                <option value="ADMINISTRADOR">ADMINISTRADOR</option>
-                <option value="SECRETARIO">SECRETARIO</option>
-                <option value="CONDUCCION">CONDUCCION</option>
-                <option value="AUXILIAR ADMINISTRATIVO">AUXILIAR ADMINISTRATIVO</option>
-                <option value="OFICINA DE ALUMNOS">OFICINA DE ALUMNOS</option>
+                <option value="">-- Seleccionar Perfil --</option>
             </select>
         </div>
       </div>
@@ -1186,7 +1173,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="utils/api.js"></script>
+<script src="utils/api.js?v=fix_patch_1"></script>
 <script src="dashboard_script.js?v=final_fix_v5"></script>
 <script src="components/inicioComponent.js"></script>
 <script src="components/docentesComponent.js?v=final_fix_v5"></script>
@@ -1194,7 +1181,7 @@
 <script src="components/tramitacionesComponent.js?v=final_fix_v5"></script>
 <script src="components/licenciasComponent.js?v=final_fix_v5"></script>
 <script src="components/planillaFirmasComponent.js?v=final_fix_v5"></script>
-<script src="components/usuariosComponent.js"></script>
+<script src="components/usuariosComponent.js?v=fix_rol_1"></script>
 <script src="components/permisosComponent.js"></script>
 <script src="components/alumnosComponent.js?v=final_fix_v5"></script>
 <script src="components/cursosHorariosComponent.js?v=print_fix_v4"></script>

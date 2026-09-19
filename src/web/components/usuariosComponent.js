@@ -94,14 +94,22 @@ function renderTablaUsuarios(data) {
     container.innerHTML = html;
 }
 
-function gestionarUsuario(id) {
+async function gestionarUsuario(id) {
     const u = usuariosGlobal.find(user => user.id === id);
     if (!u) return;
+
+    if (!perfilesListaGlobal || perfilesListaGlobal.length === 0) {
+        const resP = await api.get("/api/v1/usuarios/perfiles");
+        if (resP.ok) {
+            perfilesListaGlobal = await resP.json();
+        }
+    }
+    popularSelectsPerfiles();
 
     document.getElementById("usuarioId").value = u.id;
     document.getElementById("usuarioNombre").value = u.nombre;
     document.getElementById("usuarioUsername").value = u.username;
-    document.getElementById("usuarioPerfil").value = u.perfil_id || "";
+    document.getElementById("usuarioPerfil").value = u.perfil_id ? String(u.perfil_id) : "";
     document.getElementById("usuarioEstado").value = u.estado;
 
     modalUsuario.show();
@@ -109,66 +117,84 @@ function gestionarUsuario(id) {
 
 async function guardarCambiosUsuario() {
     const id = document.getElementById("usuarioId").value;
-    const perfil_id = document.getElementById("usuarioPerfil").value;
+    const perfilVal = document.getElementById("usuarioPerfil").value;
     const estado = document.getElementById("usuarioEstado").value;
+
+    const perfil_id = perfilVal ? parseInt(perfilVal, 10) : null;
 
     if (!perfil_id && estado === 'activo') {
         alert("Debe asignar un perfil para activar al usuario");
         return;
     }
 
-    // Guardar Perfil
-    const resPerfil = await api.patch(`/api/v1/usuarios/${id}/perfil`, { perfil_id });
-    if (!resPerfil.ok) {
-        const err = await resPerfil.json();
-        alert("Error al actualizar perfil: " + api.getErrorMessage(err));
-        return;
-    }
+    try {
+        // Guardar Perfil
+        const resPerfil = await api.patch(`/api/v1/usuarios/${id}/perfil`, { perfil_id });
+        if (!resPerfil.ok) {
+            const err = await resPerfil.json();
+            alert("Error al actualizar perfil: " + api.getErrorMessage(err));
+            return;
+        }
 
-    // Guardar Estado
-    const resEstado = await api.patch(`/api/v1/usuarios/${id}/status`, { estado });
-    if (!resEstado.ok) {
-        const err = await resEstado.json();
-        alert("Error al actualizar estado: " + api.getErrorMessage(err));
-        return;
-    }
+        // Guardar Estado
+        const resEstado = await api.patch(`/api/v1/usuarios/${id}/status`, { estado });
+        if (!resEstado.ok) {
+            const err = await resEstado.json();
+            alert("Error al actualizar estado: " + api.getErrorMessage(err));
+            return;
+        }
 
-    modalUsuario.hide();
-    verUsuarios();
+        modalUsuario.hide();
+        await verUsuarios();
+    } catch (err) {
+        alert("Error al guardar cambios: " + api.getErrorMessage(err));
+    }
 }
 
 async function cambiarEstadoUsuario(id, estado) {
     if (!confirm(`¿Desea cambiar el estado del usuario a ${estado}?`)) return;
-    const res = await api.patch(`/api/v1/usuarios/${id}/status`, { estado });
-    if (res.ok) {
-        verUsuarios();
-    } else {
-        const err = await res.json();
+    try {
+        const res = await api.patch(`/api/v1/usuarios/${id}/status`, { estado });
+        if (res.ok) {
+            await verUsuarios();
+        } else {
+            const err = await res.json();
+            alert("Error al cambiar estado: " + api.getErrorMessage(err));
+        }
+    } catch (err) {
         alert("Error al cambiar estado: " + api.getErrorMessage(err));
     }
 }
 
 function abrirModalCrearUsuario() {
+    popularSelectsPerfiles();
     document.querySelectorAll("#modalCrearUsuario input").forEach(i => i.value = "");
+    document.getElementById("crearPerfil").value = "";
     modalCrearUsuario.show();
 }
 
 async function ejecutarCrearUsuario() {
+    const perfilVal = document.getElementById("crearPerfil").value;
     const data = {
         nombre: document.getElementById("crearNombre").value,
         username: document.getElementById("crearUsername").value,
         password: document.getElementById("crearPassword").value,
-        perfil_id: document.getElementById("crearPerfil").value
+        perfil_id: perfilVal ? parseInt(perfilVal, 10) : null
     };
 
-    if (!data.nombre || !data.username || !data.password) return alert("Complete todos los campos");
+    if (!data.nombre || !data.username || !data.password) return alert("Complete todos los campos obligatorios");
 
-    const res = await api.post("/api/v1/usuarios/admin-create", data);
-    if (res.ok) {
-        modalCrearUsuario.hide();
-        verUsuarios();
-    } else {
-        const err = await res.json();
+    try {
+        const res = await api.post("/api/v1/usuarios/admin-create", data);
+        if (res.ok) {
+            modalCrearUsuario.hide();
+            await verUsuarios();
+        } else {
+            const err = await res.json();
+            alert("Error al crear usuario: " + api.getErrorMessage(err));
+        }
+    } catch (err) {
         alert("Error al crear usuario: " + api.getErrorMessage(err));
     }
 }
+

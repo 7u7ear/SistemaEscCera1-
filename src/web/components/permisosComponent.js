@@ -78,7 +78,6 @@ async function actualizarPermiso(perfil_id, modulo_id, permiso) {
         alert("Error al actualizar permiso. Verifique sus privilegios.");
         verPermisos(); // Recargar para revertir visualmente
     } else {
-        // Opcional: Feedback visual suave
-        console.log(`Permiso actualizado: Perfil ${perfil_id}, Módulo ${modulo_id} -> ${permiso}`);
+        // Permiso actualizado correctamente (sin feedback visual adicional necesario)
     }
 }

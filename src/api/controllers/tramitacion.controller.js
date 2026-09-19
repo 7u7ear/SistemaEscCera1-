@@ -24,8 +24,9 @@ class TramitacionController {
 
     async update(req, res, next) {
         try {
+            const userId = req.user.id;
             const validatedData = updateTramitacionSchema.parse(req.body);
-            await TramitacionService.update(req.params.id, validatedData);
+            await TramitacionService.update(req.params.id, validatedData, userId);
             res.json({ message: 'Tramitación actualizada' });
         } catch (err) {
             next(err);
@@ -34,7 +35,8 @@ class TramitacionController {
 
     async delete(req, res, next) {
         try {
-            await TramitacionService.delete(req.params.id);
+            const userId = req.user.id;
+            await TramitacionService.delete(req.params.id, userId);
             res.json({ message: 'Tramitación eliminada' });
         } catch (err) {
             next(err);

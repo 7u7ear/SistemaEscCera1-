@@ -2,6 +2,7 @@ const LicenciaRepository = require('../models/licencia.model');
 const TramitacionRepository = require('../models/tramitacion.model');
 const AppError = require('../../shared/errors/AppError');
 const logger = require('../services/logger.service');
+const AuditoriaService = require('./auditoria.service');
 
 class LicenciaService {
     async getAllLicencias() {
@@ -53,10 +54,11 @@ class LicenciaService {
             }
         }
 
+        await AuditoriaService.registrar(userId, 'CREATE', 'LICENCIAS', results[0] ?? null, { docente_id, tipo_licencia, fecha_inicio, cantidad: results.length });
         return { licencias: results, tramitacion_id: tramitacionId };
     }
 
-    async updateLicencia(id, updateData) {
+    async updateLicencia(id, updateData, userId) {
         const { finalizar_puesto } = updateData;
         const currentLicencia = await LicenciaRepository.findById(id);
         if (!currentLicencia) throw new AppError('Licencia no encontrada', 404);
@@ -67,10 +69,16 @@ class LicenciaService {
         if (finalizar_puesto && currentLicencia.cargo_id && currentLicencia.docente_id) {
             await LicenciaRepository.updateCargoDocenteState(currentLicencia.cargo_id, currentLicencia.docente_id, 'licencia', 'activo');
         }
+
+        await AuditoriaService.registrar(userId, 'UPDATE', 'LICENCIAS', id, { finalizar_puesto });
     }
 
-    async deleteLicencia(id) {
+    async deleteLicencia(id, userId) {
+        const current = await LicenciaRepository.findById(id);
+        if (!current) throw new AppError('Licencia no encontrada', 404);
+
         await LicenciaRepository.delete(id);
+        await AuditoriaService.registrar(userId, 'DELETE', 'LICENCIAS', id, { docente_id: current.docente_id });
     }
 
     async getTiposLicencia() {

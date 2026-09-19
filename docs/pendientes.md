@@ -8,8 +8,8 @@
 ## 🔴 ALTA PRIORIDAD — Funcionalidades Nuevas
 
 ### Módulo Email + Licencias
-- [ ] `email.service.js` — Nodemailer + SMTP con fallback a `logs/email.log`
-- [ ] `licencia_notificacion_template.js` — Plantillas HTML (solicitud + resolución)
+- [x] `email.service.js` — Nodemailer + SMTP con fallback a `logs/email.log`
+- [x] `licencia_notificacion_template.js` — Plantillas HTML (solicitud + resolución)
 - [ ] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`)
 - [ ] Tabla `curso_preceptor` + interfaz de asignación en admin de cursos
 - [ ] Email automático a Preceptor/Secretaría al ingresar licencia
@@ -39,14 +39,14 @@
 > Los ítems marcados con 🔍 fueron detectados en auditoría de compliance (2026-08-01). Son incumplimientos activos de reglas.
 
 ### Correcciones de Compliance (hacer primero)
-- [ ] 🔍 **Eliminar `credentials: "include"`** en `src/web/utils/api.js` línea 21 — residuo del modo híbrido con sesiones, viola regla JWT-only
-- [ ] 🔍 **Eliminar 4 `console.log()`** en frontend:
+- [x] 🔍 **Eliminar `credentials: "include"`** en `src/web/utils/api.js` — eliminado (2026-09-19)
+- [x] 🔍 **Eliminar 4 `console.log()`** en frontend:
   - `src/web/components/licenciasComponent.js` línea 116
   - `src/web/components/permisosComponent.js` línea 82
   - `src/web/components/tramitacionesComponent.js` líneas 156 y 163
-- [ ] 🔍 **Agregar auditoría** a `licencia.service.js` (create, update, delete) — sin ningún registro actualmente
-- [ ] 🔍 **Agregar auditoría** a `tramitacion.service.js` — sin ningún registro actualmente
-- [ ] 🔍 **Revisar DELETE físico** en `alumno.service.js` — usa `DELETE FROM alumnos` y `DELETE FROM familiares`; confirmar si aplicar `deleted_at` o es intencional
+- [x] 🔍 **Agregar auditoría** a `licencia.service.js` (create, update, delete) — implementado (2026-09-19)
+- [x] 🔍 **Agregar auditoría** a `tramitacion.service.js` — implementado (2026-09-19)
+- [x] 🔍 **Revisar DELETE físico** en `alumno.service.js` — convertido a borrado lógico `deleted_at` (migración aplicada 2026-09-19)
 
 ### Refactoring General
 - [ ] Eliminar fallback de sesiones en `src/api/middlewares/auth.js`

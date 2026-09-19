@@ -113,7 +113,6 @@ function poblarSelectTiposLicencia() {
 }
 
 async function abrirModalLicencia() {
-    console.log("Abriendo modal de licencias...");
     try {
         if (!modalLicencia) {
             const el = document.getElementById('modalLicencia');

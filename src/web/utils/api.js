@@ -17,9 +17,6 @@ const api = {
             headers['Authorization'] = `Bearer ${token}`;
         }
         
-        // Asegurar que las credenciales se incluyan para soportar el modo híbrido (sesiones)
-        options.credentials = "include";
-
         const finalOptions = {
             ...options,
             headers: {
@@ -48,6 +45,12 @@ const api = {
     put: (url, data, options) => api.fetch(url, { 
         ...options, 
         method: 'PUT', 
+        headers: { 'Content-Type': 'application/json', ...options?.headers },
+        body: JSON.stringify(data)
+    }),
+    patch: (url, data, options) => api.fetch(url, { 
+        ...options, 
+        method: 'PATCH', 
         headers: { 'Content-Type': 'application/json', ...options?.headers },
         body: JSON.stringify(data)
     }),
