@@ -31,6 +31,10 @@ class DocenteService {
     async getDocenteCargos(id) {
         return await DocenteRepository.findCargos(id);
     }
+
+    async getDocentesByCargo(tipoCargo) {
+        return await DocenteRepository.findByCargo(tipoCargo);
+    }
 }
 
 module.exports = new DocenteService();

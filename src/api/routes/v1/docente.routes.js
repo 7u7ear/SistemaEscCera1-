@@ -8,6 +8,8 @@ const router = express.Router();
 router.use(auth);
 
 router.get('/', permisoModulo('docentes', 'lectura'), DocenteController.getAll);
+router.get('/preceptores', auth, DocenteController.getPreceptores);
+
 router.post('/', permisoModulo('docentes', 'edicion'), DocenteController.create);
 router.put('/:id', permisoModulo('docentes', 'edicion'), DocenteController.update);
 router.delete('/:id', permisoModulo('docentes', 'edicion'), DocenteController.delete);

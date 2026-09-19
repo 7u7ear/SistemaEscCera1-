@@ -66,6 +66,22 @@ class DocenteRepository {
         `, [docenteId]);
         return rows;
     }
+
+    async findByCargo(tipoCargo) {
+        const [rows] = await db.query(`
+            SELECT DISTINCT d.id, d.nombre, d.apellido, d.dni
+            FROM docentes d
+            JOIN cargo_docente cd ON d.id = cd.docente_id
+            JOIN cargos c ON cd.cargo_id = c.id
+            WHERE UPPER(c.tipo_cargo) = UPPER(?)
+              AND cd.estado = 'activo'
+              AND cd.deleted_at IS NULL
+              AND d.deleted_at IS NULL
+              AND c.deleted_at IS NULL
+            ORDER BY d.apellido, d.nombre
+        `, [tipoCargo]);
+        return rows;
+    }
 }
 
 module.exports = new DocenteRepository();

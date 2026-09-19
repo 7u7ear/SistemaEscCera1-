@@ -50,6 +50,31 @@ class CursoController {
             next(err);
         }
     }
+
+    async getPreceptor(req, res, next) {
+        try {
+            const { id } = req.params;
+            const anio_lectivo = req.query.anio_lectivo || new Date().getFullYear();
+            const preceptor = await CursoService.getPreceptorByCurso(id, anio_lectivo);
+            res.json({ preceptor });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async assignPreceptor(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { docente_id, anio_lectivo } = req.body;
+            if (!docente_id || !anio_lectivo) {
+                return res.status(400).json({ error: 'Faltan datos obligatorios (docente_id, anio_lectivo)' });
+            }
+            await CursoService.assignPreceptor(id, docente_id, anio_lectivo);
+            res.json({ success: true, message: 'Preceptor asignado correctamente' });
+        } catch (err) {
+            next(err);
+        }
+    }
 }
 
 module.exports = new CursoController();

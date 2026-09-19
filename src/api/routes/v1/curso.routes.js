@@ -9,4 +9,7 @@ router.use(auth);
 router.get('/', CursoController.getAll);
 router.get('/:id/horario', CursoController.getHorario);
 
+router.get('/:id/preceptor', CursoController.getPreceptor);
+router.post('/:id/preceptor', CursoController.assignPreceptor);
+
 module.exports = router;

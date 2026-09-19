@@ -611,13 +611,27 @@ async function guardarMatriculacion() {
 
     if (!data.curso_id || !data.anio_lectivo) return alert("Por favor complete todos los datos");
 
-    const res = await api.post("/api/v1/alumnos/matricular", data);
-    if (res.ok) {
-        modalMatricular.hide();
-        verAlumnos();
-    } else {
-        const err = await res.json();
-        alert(`Error: ${api.getErrorMessage(err)}`);
+    // Prevenir doble click
+    const btnGuardar = document.querySelector("#modalMatricular .modal-footer .btn-primary");
+    if (btnGuardar) {
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
+    }
+
+    try {
+        const res = await api.post("/api/v1/alumnos/matricular", data);
+        if (res.ok) {
+            modalMatricular.hide();
+            verAlumnos();
+        } else {
+            const err = await res.json();
+            alert(`Error: ${api.getErrorMessage(err)}`);
+        }
+    } finally {
+        if (btnGuardar) {
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = 'Registrar Matriculación';
+        }
     }
 }
 

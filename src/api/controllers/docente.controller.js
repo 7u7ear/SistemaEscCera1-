@@ -11,6 +11,15 @@ class DocenteController {
         }
     }
 
+    async getPreceptores(req, res, next) {
+        try {
+            const preceptores = await DocenteService.getDocentesByCargo('PRECEPTOR');
+            res.json(preceptores);
+        } catch (err) {
+            next(err);
+        }
+    }
+
     async create(req, res, next) {
         try {
             const validatedData = createDocenteSchema.parse(req.body);

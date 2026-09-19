@@ -76,8 +76,8 @@ async function guardarCargo() {
 
     try {
         const data = {
-            numero_puesto: document.getElementById("numero_puesto").value,
-            tipo_cargo: document.getElementById("tipo_cargo").value,
+            numero_puesto: document.getElementById("numero_puesto").value.trim(),
+            tipo_cargo: document.getElementById("tipo_cargo").value.trim().toUpperCase(),
             total_horas: document.getElementById("total_horas").value
         };
         const id = document.getElementById("cargoId").value;

@@ -25,6 +25,7 @@
 - [ ] 3 listas independientes en `cursosHorariosComponent.js`
 - [ ] Botón "Copiar al portapapeles" (formato CCO/BCC)
 - [ ] Botón "Descargar TXT/CSV"
+- [ ] Solapa específica en Horarios con los profesores asignados al curso y sus correos
 
 ### Sidebar Dinámico por Permisos
 - [ ] `dashboard_script.js` — ocultar (no deshabilitar) ítems del menú sin permisos L o E
