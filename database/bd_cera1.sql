@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 14-05-2026 a las 21:18:44
+-- Tiempo de generación: 05-10-2026 a las 10:18:38
 -- Versión del servidor: 8.2.0
 -- Versión de PHP: 8.2.13
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `bd_ecn1`
+-- Base de datos: `bd_cera1`
 --
 
 -- --------------------------------------------------------
@@ -30,18 +30,39 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `alumnos`;
 CREATE TABLE IF NOT EXISTS `alumnos` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `apellido` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nombre` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dni` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dni` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `fecha_nacimiento` date NOT NULL,
-  `direccion` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `direccion` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `alumnos_dni_unique` (`dni`),
-  UNIQUE KEY `alumnos_email_unique` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `alumnos_email_unique` (`email`),
+  KEY `idx_alumnos_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `alumno_movimientos`
+--
+
+DROP TABLE IF EXISTS `alumno_movimientos`;
+CREATE TABLE IF NOT EXISTS `alumno_movimientos` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `alumno_id` bigint UNSIGNED NOT NULL,
+  `tipo_movimiento` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha` date NOT NULL,
+  `detalle` json DEFAULT NULL,
+  `usuario_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_movimiento_alumno` (`alumno_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -53,13 +74,59 @@ DROP TABLE IF EXISTS `auditoria`;
 CREATE TABLE IF NOT EXISTS `auditoria` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
-  `accion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `entidad` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `accion` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entidad` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `entidad_id` int DEFAULT NULL,
   `detalles` json DEFAULT NULL,
   `creado_el` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `auditoria`
+--
+
+INSERT INTO `auditoria` (`id`, `user_id`, `accion`, `entidad`, `entidad_id`, `detalles`, `creado_el`) VALUES
+(1, 2, 'CREATE', 'CARGO', 17, '{\"tipo_cargo\": \"TP 2 NAVEGACION\", \"total_horas\": 12, \"numero_puesto\": \"102431\"}', '2026-06-26 21:44:09'),
+(2, 2, 'ASSIGN_DOCENTE', 'CARGO', 17, '{\"rol\": 27, \"docente_id\": 30, \"reemplaza_a\": null, \"fecha_inicio\": \"2023-03-10\", \"expediente_alta\": \"EX-2023- MUGUIWARA-ONEPIECE\", \"situacion_revista\": \"titular\"}', '2026-06-26 21:49:35'),
+(3, 2, 'ADD_DISTRIBUCION', 'CARGO', 17, '{\"dia\": \"lunes\", \"curso_id\": 1, \"materia_id\": 49, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}', '2026-06-26 21:52:05'),
+(4, 2, 'CREATE', 'TIPO_HORA', NULL, '{\"nombre\": \"Visita\"}', '2026-06-26 21:53:58'),
+(5, 2, 'ADD_DISTRIBUCION', 'CARGO', 17, '{\"dia\": \"martes\", \"curso_id\": 6, \"materia_id\": 4, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 6, \"cantidad_horas\": 2}', '2026-06-26 21:54:10'),
+(6, 2, 'ADD_DISTRIBUCION', 'CARGO', 17, '{\"dia\": \"miércoles\", \"curso_id\": 17, \"materia_id\": 10, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}', '2026-06-26 21:56:34'),
+(7, 2, 'UPDATE_DISTRIBUCION', 'CARGO_DISTRIBUCION', 10, '{\"dia\": \"miércoles\", \"curso_id\": 17, \"materia_id\": 10, \"hora_egreso\": \"10:30\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 4}', '2026-06-26 21:57:16'),
+(8, 2, 'ADD_DISTRIBUCION', 'CARGO', 17, '{\"dia\": \"jueves\", \"curso_id\": null, \"materia_id\": 14, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 2, \"cantidad_horas\": 2}', '2026-06-26 22:01:33'),
+(9, 2, 'ADD_DISTRIBUCION', 'CARGO', 17, '{\"dia\": \"viernes\", \"curso_id\": null, \"materia_id\": 14, \"hora_egreso\": \"10:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 2, \"cantidad_horas\": 2}', '2026-06-26 22:04:37'),
+(10, 2, 'CREATE_USER_ADMIN', 'USUARIOS', 3, '{\"username\": \"Celes\", \"perfil_id\": 4}', '2026-06-26 22:10:31'),
+(11, 3, 'ASSIGN_DOCENTE', 'CARGO', 17, '{\"rol\": 28, \"docente_id\": 12, \"reemplaza_a\": 28, \"fecha_inicio\": \"2026-06-26\", \"expediente_alta\": \"EX-2026- MUGUIWARA-ONEPIECE\", \"situacion_revista\": \"suplente\"}', '2026-06-26 22:41:59'),
+(12, 2, 'BAJA_DOCENTE', 'CARGO', 16, '{\"fecha_fin\": \"2026-04-30\", \"cargoDocenteId\": \"27\", \"expediente_baja\": \"ex-2026-1534-cera1-26\", \"titular_regresa\": true}', '2026-07-22 12:28:21'),
+(13, 2, 'BAJA_DOCENTE', 'CARGO', 16, '{\"fecha_fin\": \"2026-04-30\", \"cargoDocenteId\": \"27\", \"expediente_baja\": \"ex-2026-1534-cera1-26\", \"titular_regresa\": true}', '2026-07-22 12:28:22'),
+(14, 2, 'CREATE', 'ALUMNOS', 1, '{\"dni\": \"13456789\", \"apellido\": \"Fuente\"}', '2026-07-29 12:12:03'),
+(15, 2, 'MATRICULAR', 'ALUMNOS', 1, '{\"curso_id\": 1, \"anio_lectivo\": 2026}', '2026-07-29 12:18:45'),
+(16, 2, 'UPDATE_DISTRIBUCION', 'CARGO_DISTRIBUCION', 1, '{\"dia\": \"martes\", \"curso_id\": 1, \"materia_id\": 45, \"hora_egreso\": \"09:45\", \"hora_ingreso\": \"07:45\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}', '2026-07-29 13:32:12'),
+(17, 2, 'UPDATE_DISTRIBUCION', 'CARGO_DISTRIBUCION', 6, '{\"dia\": \"miércoles\", \"curso_id\": 1, \"materia_id\": 9, \"hora_egreso\": \"10:30\", \"hora_ingreso\": \"08:00\", \"tipo_hora_id\": 1, \"cantidad_horas\": 4}', '2026-07-29 13:33:18'),
+(18, 2, 'TRASLADO_CURSO', 'ALUMNOS', 1, '{\"anio_lectivo\": 2026, \"curso_origen_id\": 1, \"curso_destino_id\": 2}', '2026-07-29 14:53:52'),
+(19, 2, 'ASSIGN_DOCENTE', 'CARGO', 10, '{\"rol\": 57, \"docente_id\": 28, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-08-04\", \"expediente_alta\": \"ex-2025-nojodas\", \"situacion_revista\": \"titular\"}', '2026-08-04 19:36:15'),
+(20, 2, 'ADD_DISTRIBUCION', 'CARGO', 10, '{\"dia\": \"lunes\", \"curso_id\": 2, \"materia_id\": 44, \"hora_egreso\": \"10:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}', '2026-08-04 19:38:45'),
+(21, 1, 'UPDATE_PERFIL', 'USUARIOS', 1, '{\"nuevo_perfil\": 2, \"perfil_anterior\": 2}', '2026-09-19 14:00:31'),
+(22, 2, 'UPDATE_PERFIL', 'USUARIOS', 4, '{\"nuevo_perfil\": 5, \"perfil_anterior\": null}', '2026-09-19 14:06:41'),
+(23, 2, 'UPDATE_STATUS', 'USUARIOS', 4, '{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"pendiente\"}', '2026-09-19 14:06:43'),
+(24, 2, 'UPDATE_PERFIL', 'USUARIOS', 4, '{\"nuevo_perfil\": 5, \"perfil_anterior\": 5}', '2026-09-19 14:06:44'),
+(25, 2, 'UPDATE_STATUS', 'USUARIOS', 4, '{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"activo\"}', '2026-09-19 14:06:46'),
+(26, 2, 'CREATE', 'ALUMNOS', 2, '{\"dni\": \"134567890\", \"apellido\": \"Arnau\"}', '2026-09-19 14:47:25'),
+(27, 2, 'MATRICULAR', 'ALUMNOS', 2, '{\"curso_id\": 1, \"anio_lectivo\": 2026}', '2026-09-19 14:48:42'),
+(28, 2, 'CREATE', 'TRAMITACIONES', 14, '{\"docente_id\": 20, \"codigo_tramite_id\": 1}', '2026-09-19 16:00:52'),
+(29, 2, 'ASSIGN_DOCENTE', 'CARGO', 3, '{\"rol\": 43, \"docente_id\": 20, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-09-19\", \"expediente_alta\": \"EX-2023- preceptoria-ecn1\", \"situacion_revista\": \"titular\"}', '2026-09-19 16:00:54'),
+(30, 2, 'UPDATE', 'TRAMITACIONES', 14, '{\"estado\": \"caratulado\"}', '2026-09-19 16:01:37'),
+(31, 2, 'UPDATE', 'TRAMITACIONES', 14, '{\"estado\": \"caratulado\"}', '2026-09-19 16:02:02'),
+(32, 2, 'ASSIGN_DOCENTE', 'CARGO', 3, '{\"rol\": 43, \"docente_id\": 20, \"reemplaza_a\": 6, \"fecha_inicio\": \"2026-09-19\", \"expediente_alta\": \"EX-2023- preceptoria-ecn1\", \"situacion_revista\": \"suplente\"}', '2026-09-19 16:02:04'),
+(33, 2, 'BAJA_DOCENTE', 'CARGO', 3, '{\"fecha_fin\": \"2026-09-19\", \"cargoDocenteId\": \"31\", \"expediente_baja\": \"\", \"titular_regresa\": false}', '2026-09-19 16:03:05'),
+(34, 2, 'CREATE', 'CARGO', 18, '{\"tipo_cargo\": \"PRECEPTOR\", \"total_horas\": 0, \"numero_puesto\": \"2727\"}', '2026-09-19 16:05:05'),
+(35, 2, 'UPDATE', 'CARGO', 18, '{\"tipo_cargo\": \"PRECEPTOR\", \"total_horas\": 0, \"numero_puesto\": \"2727\"}', '2026-10-05 09:45:52'),
+(36, 2, 'ASSIGN_DOCENTE', 'CARGO', 18, '{\"rol\": 15, \"docente_id\": 32, \"reemplaza_a\": null, \"fecha_inicio\": \"2025-01-06\", \"expediente_alta\": \"ex-2010-cer1-tatantatan\", \"situacion_revista\": \"titular\"}', '2026-10-05 09:47:41'),
+(37, 2, 'ASSIGN_DOCENTE', 'CARGO', 11, '{\"rol\": 15, \"docente_id\": 31, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-10-05\", \"expediente_alta\": \"ex-2012-cer1-lalalal\", \"situacion_revista\": \"interino\"}', '2026-10-05 09:49:04'),
+(38, 2, 'UPDATE_PERFIL', 'USUARIOS', 5, '{\"nuevo_perfil\": 6, \"perfil_anterior\": null}', '2026-10-05 09:58:14'),
+(39, 2, 'UPDATE_STATUS', 'USUARIOS', 5, '{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"activo\"}', '2026-10-05 09:58:14'),
+(40, 2, 'CREATE_USER_ADMIN', 'USUARIOS', 6, '{\"username\": \"Naty\", \"perfil_id\": 1}', '2026-10-05 10:16:16');
 
 -- --------------------------------------------------------
 
@@ -70,11 +137,11 @@ CREATE TABLE IF NOT EXISTS `auditoria` (
 DROP TABLE IF EXISTS `autorizados`;
 CREATE TABLE IF NOT EXISTS `autorizados` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `apellido` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nombre` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dni` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `telefono` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vinculo` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dni` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vinculo` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `alumno_id` bigint UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -86,44 +153,67 @@ CREATE TABLE IF NOT EXISTS `autorizados` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `bloques_horarios`
+--
+
+DROP TABLE IF EXISTS `bloques_horarios`;
+CREATE TABLE IF NOT EXISTS `bloques_horarios` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `turno` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hora_inicio` time NOT NULL,
+  `hora_fin` time NOT NULL,
+  `es_recreo` tinyint(1) NOT NULL DEFAULT '0',
+  `descripcion` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `bloques_horarios`
+--
+
+INSERT INTO `bloques_horarios` (`id`, `turno`, `hora_inicio`, `hora_fin`, `es_recreo`, `descripcion`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'mañana', '07:45:00', '08:25:00', 0, '1° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(2, 'mañana', '08:25:00', '09:05:00', 0, '2° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(3, 'mañana', '09:05:00', '09:10:00', 1, 'Recreo', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(4, 'mañana', '09:10:00', '09:50:00', 0, '3° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(5, 'mañana', '09:50:00', '10:30:00', 0, '4° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(6, 'mañana', '10:30:00', '10:40:00', 1, 'Recreo', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(7, 'mañana', '10:40:00', '11:20:00', 0, '5° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(8, 'mañana', '11:20:00', '12:00:00', 0, '6° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(9, 'mañana', '12:00:00', '12:40:00', 0, '7° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(10, 'tarde', '12:40:00', '13:20:00', 0, '1° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(11, 'tarde', '13:20:00', '14:00:00', 0, '2° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(12, 'tarde', '14:00:00', '14:10:00', 1, 'Recreo', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(13, 'tarde', '14:10:00', '14:50:00', 0, '3° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(14, 'tarde', '14:50:00', '15:30:00', 0, '4° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(15, 'tarde', '15:30:00', '15:40:00', 1, 'Recreo', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(16, 'tarde', '15:40:00', '16:20:00', 0, '5° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(17, 'tarde', '16:20:00', '17:00:00', 0, '6° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(18, 'tarde', '17:00:00', '17:40:00', 0, '7° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL),
+(19, 'tarde', '17:40:00', '18:20:00', 0, '8° Hora', '2026-07-29 11:48:51', '2026-07-29 11:48:51', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `cargos`
 --
 
 DROP TABLE IF EXISTS `cargos`;
 CREATE TABLE IF NOT EXISTS `cargos` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `numero_puesto` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tipo_cargo` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `numero_puesto` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_cargo` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_horas` int DEFAULT NULL,
-  `estado` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
+  `estado` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `cargos_numero_puesto_unique` (`numero_puesto`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `cargos`
---
-
-INSERT INTO `cargos` (`id`, `numero_puesto`, `tipo_cargo`, `total_horas`, `estado`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, '101', 'TP3 Matemática', 20, 'Activo', NULL, '2026-02-04 04:30:35', '2026-02-04 04:30:35'),
-(2, '102', 'TP2 Historia', 15, 'Activo', NULL, '2026-02-04 04:30:35', '2026-02-04 04:30:35'),
-(3, '103', 'PRECEPTOR', 18, 'Activo', NULL, '2026-02-04 04:30:35', '2026-02-04 04:30:35'),
-(4, '254797', 'Preceptor', 30, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(5, '345678', 'TP2', 12, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(6, '456789', 'TP3', 18, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(7, '567890', 'HC Matemática', 2, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(8, '678901', 'HC Lengua', 3, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(9, '789012', 'HC Historia', 2, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(10, '890123', 'HC Inglés', 3, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(11, '901234', 'HC Educación Física', 4, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(12, '112233', 'Jefe de área Matemática', 6, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(13, '223344', 'Coordinador pedagógico', 12, 'activo', NULL, '2026-02-19 22:04:46', '2026-02-19 22:04:46'),
-(14, '456781', 'TP1 LENGUA Y LITERATURA', 30, 'activo', NULL, '2026-04-03 15:14:00', '2026-04-03 15:32:12'),
-(15, '456787', 'TP1 ED.FISICA', 30, 'activo', NULL, '2026-04-03 15:31:35', NULL),
-(16, '31082013', 'TP Economia ', 12, 'activo', NULL, '2026-04-19 15:16:13', NULL);
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -137,42 +227,19 @@ CREATE TABLE IF NOT EXISTS `cargo_docente` (
   `docente_id` bigint UNSIGNED NOT NULL,
   `cargo_id` bigint UNSIGNED NOT NULL,
   `rol` int UNSIGNED NOT NULL,
-  `situacion_revista` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'interino',
+  `situacion_revista` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'interino',
   `fecha_inicio` date NOT NULL,
   `fecha_fin` date DEFAULT NULL,
-  `estado` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
+  `estado` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `reemplaza_a` bigint UNSIGNED DEFAULT NULL,
-  `expediente_alta` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `expediente_baja` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `expediente_alta` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `expediente_baja` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `cargo_docente_cargo_id_foreign` (`cargo_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `cargo_docente`
---
-
-INSERT INTO `cargo_docente` (`id`, `docente_id`, `cargo_id`, `rol`, `situacion_revista`, `fecha_inicio`, `fecha_fin`, `estado`, `created_at`, `updated_at`, `deleted_at`, `reemplaza_a`, `expediente_alta`, `expediente_baja`) VALUES
-(1, 6, 1, 1, 'titular', '2024-03-01', NULL, 'inactivo', '2026-02-19 22:07:30', '2026-02-19 22:07:30', '2026-03-01 13:30:10', NULL, NULL, NULL),
-(2, 7, 1, 23, 'suplente', '2024-03-10', '2024-03-15', 'inactivo', '2026-02-19 22:29:34', '2026-02-19 22:29:34', '2026-03-01 13:30:10', 1, NULL, NULL),
-(3, 8, 1, 0, 'suplente', '2026-03-01', NULL, 'inactivo', '2026-03-01 13:30:10', NULL, '2026-03-02 00:38:24', NULL, NULL, NULL),
-(6, 6, 3, 0, 'titular', '2026-03-01', NULL, 'licencia', '2026-03-01 13:39:33', NULL, NULL, NULL, NULL, NULL),
-(11, 9, 1, 0, 'titular', '2020-03-02', NULL, 'inactivo', '2026-03-02 00:45:44', NULL, '2026-03-02 00:45:48', NULL, NULL, NULL),
-(16, 9, 1, 0, 'titular', '2020-03-02', '2026-03-02', 'inactivo', '2026-03-02 01:07:16', NULL, NULL, NULL, NULL, NULL),
-(17, 6, 1, 0, 'suplente', '2026-03-02', '2026-03-01', 'inactivo', '2026-03-02 01:21:08', NULL, NULL, 16, NULL, NULL),
-(18, 6, 15, 13, 'interino', '2022-04-03', NULL, 'licencia', '2026-04-03 15:32:47', NULL, NULL, NULL, NULL, NULL),
-(19, 6, 2, 2, 'titular', '2026-04-03', NULL, 'licencia', '2026-04-03 18:02:13', NULL, NULL, NULL, NULL, NULL),
-(20, 16, 5, 15, 'titular', '2026-04-03', '2026-04-03', 'inactivo', '2026-04-03 18:04:24', NULL, NULL, NULL, NULL, NULL),
-(21, 16, 5, 15, 'titular', '2026-04-03', NULL, 'activo', '2026-04-03 18:14:28', NULL, NULL, NULL, 'EX-2025-1004125-GCABA-DGPDYNG', NULL),
-(22, 16, 2, 45, 'suplente', '2026-04-03', NULL, 'activo', '2026-04-03 18:30:33', NULL, NULL, 19, 'EX-2025-1000005-GCABA-DGPDYNG', NULL),
-(23, 21, 5, 27, 'suplente', '2026-04-03', '2026-04-03', 'inactivo', '2026-04-03 19:41:08', NULL, NULL, 21, 'EX-2025-100010-GCABA-DGPDYNG', 'EX-2025-100011-GCABA-DGPDYNG'),
-(24, 29, 16, 12, 'titular', '2024-08-12', '2024-08-12', 'inactivo', '2026-04-19 15:26:26', NULL, NULL, NULL, NULL, NULL),
-(25, 29, 16, 12, 'titular', '2024-08-12', '2024-08-12', 'inactivo', '2026-04-19 16:01:23', NULL, NULL, NULL, NULL, NULL),
-(26, 29, 16, 12, 'titular', '2024-08-12', NULL, 'licencia', '2026-04-19 16:02:11', NULL, NULL, NULL, 'EX-2025-100006-GCABA-DGPDYNG', NULL),
-(27, 20, 16, 35, 'suplente', '2026-04-19', NULL, 'activo', '2026-04-19 16:30:03', NULL, NULL, 26, 'EX-2025-222222-GCABA-DGPDYNG', NULL);
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -187,12 +254,12 @@ CREATE TABLE IF NOT EXISTS `cargo_docente_licencias` (
   `licencia_id` bigint UNSIGNED NOT NULL,
   `fecha_inicio` date NOT NULL,
   `fecha_fin` date DEFAULT NULL,
-  `observaciones` text COLLATE utf8mb4_unicode_ci,
+  `observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `cargo_docente_licencias`
@@ -210,15 +277,15 @@ INSERT INTO `cargo_docente_licencias` (`id`, `cargo_docente_id`, `licencia_id`, 
 DROP TABLE IF EXISTS `causales`;
 CREATE TABLE IF NOT EXISTS `causales` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
-  `tipo` enum('licencia','alta','baja','modificacion') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `tipo` enum('licencia','alta','baja','modificacion') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `activo` tinyint(1) DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `causales`
@@ -258,7 +325,7 @@ CREATE TABLE IF NOT EXISTS `codigo_tramites` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo_tramites_codigo_unique` (`codigo`),
   KEY `codigo_tramites_codigo_index` (`codigo`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `codigo_tramites`
@@ -269,7 +336,9 @@ INSERT INTO `codigo_tramites` (`id`, `codigo`, `descripcion_tramite`, `activo`, 
 (2, '212R', 'RENUNCIA TITULAR', 1, NULL, NULL, NULL),
 (3, '212S', 'ALTA SUPLENTE', 1, NULL, NULL, NULL),
 (4, '212F', 'FIN SUPLENCIA', 1, NULL, NULL, NULL),
-(5, '545F', 'RENUNCIA SUPLENTE', 1, NULL, NULL, NULL);
+(5, '545F', 'RENUNCIA SUPLENTE', 1, NULL, NULL, NULL),
+(6, '102B', 'CESE SUPLENTE', 1, NULL, NULL, NULL),
+(8, '102C', 'CAMBIO DE SR', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -280,11 +349,11 @@ INSERT INTO `codigo_tramites` (`id`, `codigo`, `descripcion_tramite`, `activo`, 
 DROP TABLE IF EXISTS `cod_lic`;
 CREATE TABLE IF NOT EXISTS `cod_lic` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `cod_licencia` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cod_licencia` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `activo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `cod_lic`
@@ -317,7 +386,7 @@ CREATE TABLE IF NOT EXISTS `cursos` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `curso_unico` (`anio`,`division`,`turno`,`modalidad`,`especialidad`)
-) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `cursos`
@@ -375,7 +444,26 @@ CREATE TABLE IF NOT EXISTS `curso_materia` (
   UNIQUE KEY `curso_materia_curso_id_materia_id_docente_id_unique` (`curso_id`,`materia_id`,`docente_id`),
   KEY `curso_materia_materia_id_foreign` (`materia_id`),
   KEY `curso_materia_docente_id_foreign` (`docente_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `curso_preceptor`
+--
+
+DROP TABLE IF EXISTS `curso_preceptor`;
+CREATE TABLE IF NOT EXISTS `curso_preceptor` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `curso_id` bigint UNSIGNED NOT NULL,
+  `docente_id` bigint UNSIGNED NOT NULL,
+  `anio_lectivo` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_curso_anio` (`curso_id`,`anio_lectivo`),
+  KEY `docente_id` (`docente_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -387,14 +475,14 @@ DROP TABLE IF EXISTS `distribucion_horas`;
 CREATE TABLE IF NOT EXISTS `distribucion_horas` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `cargo_id` bigint UNSIGNED NOT NULL,
-  `curso_id` bigint UNSIGNED NOT NULL,
+  `curso_id` bigint UNSIGNED DEFAULT NULL,
   `materia_id` bigint UNSIGNED NOT NULL,
   `cantidad_horas` int NOT NULL,
   `tipo_hora_id` int DEFAULT NULL,
-  `tipo` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dia` enum('lunes','martes','miércoles','jueves','viernes') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `hora_ingreso` time NOT NULL,
-  `hora_egreso` time NOT NULL,
+  `tipo` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dia` enum('lunes','martes','miércoles','jueves','viernes') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hora_ingreso` time DEFAULT NULL,
+  `hora_egreso` time DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -403,20 +491,26 @@ CREATE TABLE IF NOT EXISTS `distribucion_horas` (
   KEY `distribucion_horas_curso_id_foreign` (`curso_id`),
   KEY `distribucion_horas_materia_id_foreign` (`materia_id`),
   KEY `fk_tipo_hora` (`tipo_hora_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `distribucion_horas`
 --
 
 INSERT INTO `distribucion_horas` (`id`, `cargo_id`, `curso_id`, `materia_id`, `cantidad_horas`, `tipo_hora_id`, `tipo`, `dia`, `hora_ingreso`, `hora_egreso`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 1, 45, 2, NULL, 'clase', 'lunes', '07:45:00', '09:45:00', '2026-02-19 23:42:32', '2026-02-19 23:42:32', NULL),
+(1, 1, 1, 45, 2, 1, 'clase', 'martes', '07:45:00', '09:45:00', '2026-02-19 23:42:32', '2026-07-29 13:32:11', NULL),
 (2, 1, 1, 14, 1, NULL, 'extraclase', 'martes', '09:45:00', '10:25:00', '2026-02-19 23:42:32', '2026-02-19 23:42:32', NULL),
 (3, 1, 8, 45, 2, NULL, 'clase', 'miércoles', '09:45:00', '11:45:00', '2026-02-19 23:42:32', '2026-02-19 23:42:32', NULL),
 (4, 15, 9, 10, 2, NULL, 'clase', 'martes', '08:00:00', '10:00:00', '2026-04-03 15:33:42', NULL, NULL),
 (5, 16, 2, 9, 4, 1, 'materia', 'martes', '08:00:00', '10:30:00', '2026-04-19 16:04:25', '2026-04-19 16:12:19', NULL),
-(6, 16, 1, 9, 4, 1, 'materia', 'lunes', '08:00:00', '10:30:00', '2026-04-19 16:16:15', '2026-04-19 16:44:40', NULL),
-(7, 16, 0, 14, 4, 2, 'materia', 'miércoles', '10:30:00', '12:00:00', '2026-04-19 16:17:59', '2026-04-19 16:20:38', NULL);
+(6, 16, 1, 9, 4, 1, 'materia', 'miércoles', '08:00:00', '10:30:00', '2026-04-19 16:16:15', '2026-07-29 13:33:17', NULL),
+(7, 16, 0, 14, 4, 2, 'materia', 'miércoles', '10:30:00', '12:00:00', '2026-04-19 16:17:59', '2026-04-19 16:20:38', NULL),
+(8, 17, 1, 49, 2, 1, 'materia', 'lunes', '07:40:00', '09:00:00', '2026-06-26 21:52:05', NULL, NULL),
+(9, 17, 6, 4, 2, 6, 'materia', 'martes', '07:40:00', '09:00:00', '2026-06-26 21:54:10', NULL, NULL),
+(10, 17, 17, 10, 4, 1, 'materia', 'miércoles', '07:40:00', '10:30:00', '2026-06-26 21:56:33', '2026-06-26 21:57:16', NULL),
+(11, 17, NULL, 14, 2, 2, 'materia', 'jueves', '07:40:00', '09:00:00', '2026-06-26 22:01:32', NULL, NULL),
+(12, 17, NULL, 14, 2, 2, 'materia', 'viernes', '07:40:00', '10:00:00', '2026-06-26 22:04:37', NULL, NULL),
+(13, 10, 2, 44, 2, 1, 'materia', 'lunes', '07:40:00', '10:00:00', '2026-08-04 19:38:45', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -427,18 +521,18 @@ INSERT INTO `distribucion_horas` (`id`, `cargo_id`, `curso_id`, `materia_id`, `c
 DROP TABLE IF EXISTS `docentes`;
 CREATE TABLE IF NOT EXISTS `docentes` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `rrhh_id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `apellido` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nombre` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rrhh_id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `fechaNac` date NOT NULL,
-  `dni` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cuil` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fichaCensal` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `direccion` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `telefono` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dni` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cuil` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fichaCensal` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `direccion` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `telefono` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha_ingreso` date DEFAULT NULL,
-  `estado` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
+  `estado` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -451,37 +545,15 @@ CREATE TABLE IF NOT EXISTS `docentes` (
   UNIQUE KEY `docentes_email_unique` (`email`),
   KEY `docentes_apellido_index` (`apellido`),
   KEY `docentes_dni_index` (`dni`)
-) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `docentes`
 --
 
 INSERT INTO `docentes` (`id`, `rrhh_id`, `apellido`, `nombre`, `fechaNac`, `dni`, `cuil`, `fichaCensal`, `email`, `direccion`, `telefono`, `fecha_ingreso`, `estado`, `created_at`, `updated_at`, `deleted_at`, `deleted_by`) VALUES
-(9, '1004', 'Gómez', 'Ana', '1990-01-30', '29876543', '27-29876543-2', 'FC1004', 'agomez@mail.com', 'San Juan 555', '1167891234', '2019-03-10', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(8, '1003', 'Pérez', 'Carlos', '1979-11-10', '27456789', '20-27456789-5', 'FC1003', 'cperez@mail.com', 'Belgrano 890', '1133344455', '2010-07-01', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(7, '1002', 'Juárez', 'Laura', '1988-09-22', '28987654', '27-28987654-1', 'FC1002', 'ljuarez@mail.com', 'Mitre 456', '1123456789', '2018-02-15', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(6, '1001', 'Arnau', 'Matías', '1985-06-12', '30123456', '20-30123456-3', 'FC1001', 'marnau@mail.com', 'Av. Rivadavia 1234', '1134567890', '2015-03-01', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(10, '1005', 'López', 'María', '1984-04-18', '29222333', '27-29222333-7', 'FC1005', 'mlopez@mail.com', 'Lavalle 321', '1145671234', '2012-08-01', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(11, '1006', 'Fernández', 'Diego', '1982-12-05', '28111222', '20-28111222-4', 'FC1006', 'dfernandez@mail.com', 'Corrientes 999', '1156782345', '2011-05-15', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(12, '1007', 'Martínez', 'Sofía', '1993-03-25', '30333444', '27-30333444-8', 'FC1007', 'smartinez@mail.com', 'Callao 123', '1165432211', '2020-04-01', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(13, '1008', 'Sánchez', 'Pedro', '1975-07-14', '26123456', '20-26123456-9', 'FC1008', 'psanchez@mail.com', 'Santa Fe 567', '1143219876', '2005-06-20', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(14, '1009', 'Ramírez', 'Lucía', '1987-10-08', '29555666', '27-29555666-0', 'FC1009', 'lramirez@mail.com', 'Alvear 345', '1132198765', '2017-09-01', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(15, '1010', 'Torres', 'Javier', '1981-02-17', '27999888', '20-27999888-2', 'FC1010', 'jtorres@mail.com', 'Moreno 765', '1167895432', '2009-11-15', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(16, '1011', 'Díaz', 'Carolina', '1992-06-05', '30444555', '27-30444555-3', 'FC1011', 'cdiaz@mail.com', 'Entre Ríos 444', '1145674321', '2021-03-01', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(17, '1012', 'Vega', 'Andrés', '1986-01-11', '29111234', '20-29111234-6', 'FC1012', 'avega@mail.com', 'Suipacha 234', '1134567777', '2014-02-10', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(18, '1013', 'Morales', 'Natalia', '1994-08-19', '30555123', '27-30555123-1', 'FC1013', 'nmorales@mail.com', 'Perú 678', '1155556666', '2022-05-05', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(19, '1014', 'Castro', 'Fernando', '1978-03-03', '27000999', '20-27000999-8', 'FC1014', 'fcastro@mail.com', 'Independencia 890', '1122334455', '2007-04-18', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(20, '1015', 'Rojas', 'Elena', '1989-12-12', '29777111', '27-29777111-4', 'FC1015', 'erojas@mail.com', 'México 345', '1144445555', '2016-08-20', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(21, '1016', 'Ortega', 'Luis', '1983-05-27', '28222444', '20-28222444-1', 'FC1016', 'lortega@mail.com', 'Bolívar 111', '1133322111', '2013-03-15', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(22, '1017', 'Silva', 'Patricia', '1991-09-09', '30222111', '27-30222111-9', 'FC1017', 'psilva@mail.com', 'Lima 222', '1166667777', '2019-07-01', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(23, '1018', 'Navarro', 'Roberto', '1976-10-01', '26555444', '20-26555444-7', 'FC1018', 'rnavarro@mail.com', 'Chacabuco 456', '1155558888', '2006-09-10', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(24, '1019', 'Acosta', 'Gabriela', '1988-04-14', '29000987', '27-29000987-5', 'FC1019', 'gacosta@mail.com', 'Defensa 333', '1133377788', '2018-11-12', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(25, '1020', 'Herrera', 'Tomás', '1995-02-21', '30666123', '20-30666123-6', 'FC1020', 'therrera@mail.com', 'Paseo Colón 999', '1144412345', '2023-02-01', 'activo', '2026-02-19 22:02:35', '2026-02-19 22:02:35', NULL, NULL),
-(26, '154873', 'al', 'lk', '1789-04-12', '12454541', '20123456987', '759468', 'alk@gmail.com', NULL, '115506981', '2026-02-22', 'activo', NULL, NULL, NULL, NULL),
-(27, '12', 'Boca', 'juniors ', '1979-03-12', '12345656', '20123456565', '123345', 'boca@gmail.com', 'bransen 405', '1212121212', '2026-03-01', 'inactivo', NULL, NULL, '2026-04-19 15:05:00', 1),
-(28, '00012', 'boca ', 'juniors', '1984-03-12', '11111111', '22111111112', '001', '12bjs@gmail.com', 'Avenida Oca 5115', '01155069845', '2010-10-15', 'activo', '2026-04-03 14:49:45', '2026-04-03 14:50:03', NULL, NULL),
-(29, '31082013', 'Arnau D´Aloy', 'Celeste', '1997-08-31', '53418187', '20234733716', '0011010', 'arnauceles@gmail.com', 'Montes de Oca 600', '0115504015', '2014-08-03', 'activo', '2026-04-19 15:04:32', '2026-04-19 15:04:50', NULL, NULL);
+(31, '030', 'Arnau', 'Matias Ezequiel', '2026-04-28', '2774958', '20277749583', '4469041', 'arnaumatias@gmail.com', 'Montes de Oca 511', '01155069327', '2026-05-07', 'activo', '2026-05-15 00:54:02', NULL, NULL, NULL),
+(32, '2787', 'Roronoa', 'Soro', '1979-02-15', '74589632', '20745896321', '456789', 'ronoop@ecn1.com.ar', 'eastblue', '15478965', '2010-04-12', 'activo', '2026-10-05 09:43:28', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -492,18 +564,19 @@ INSERT INTO `docentes` (`id`, `rrhh_id`, `apellido`, `nombre`, `fechaNac`, `dni`
 DROP TABLE IF EXISTS `familiares`;
 CREATE TABLE IF NOT EXISTS `familiares` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `apellido` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dni` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `telefono` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nombre` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dni` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `parentesco` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `alumno_id` bigint UNSIGNED NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `familiares_dni_unique` (`dni`),
   KEY `familiares_alumno_id_foreign` (`alumno_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -522,7 +595,7 @@ CREATE TABLE IF NOT EXISTS `inscripciones` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `inscripciones_alumno_id_curso_id_anio_lectivo_unique` (`alumno_id`,`curso_id`,`anio_lectivo`),
   KEY `inscripciones_curso_id_foreign` (`curso_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -538,28 +611,16 @@ CREATE TABLE IF NOT EXISTS `licencias` (
   `tramitacion_id` bigint UNSIGNED DEFAULT NULL,
   `fecha_inicio` date NOT NULL,
   `fecha_fin` date DEFAULT NULL,
-  `tipo_licencia` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_licencia` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `corresponde_expediente` tinyint(1) DEFAULT '0',
-  `expediente` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `observaciones` text COLLATE utf8mb4_unicode_ci,
+  `expediente` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_licencias_tramitacion` (`tramitacion_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `licencias`
---
-
-INSERT INTO `licencias` (`id`, `docente_id`, `cargo_id`, `tramitacion_id`, `fecha_inicio`, `fecha_fin`, `tipo_licencia`, `corresponde_expediente`, `expediente`, `observaciones`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 6, 3, NULL, '2026-04-04', '2026-04-04', '70.j', 0, NULL, NULL, '2026-04-04 02:30:27', '2026-04-04 19:55:33', '2026-04-04 19:55:33'),
-(2, 6, 15, NULL, '2026-04-04', NULL, '70.j', 0, NULL, NULL, '2026-04-04 02:30:27', '2026-04-04 19:55:31', '2026-04-04 19:55:31'),
-(3, 6, 3, NULL, '2026-04-04', '2026-04-04', '70 T', 0, NULL, NULL, '2026-04-04 19:56:49', '2026-04-19 16:39:39', NULL),
-(4, 6, 15, NULL, '2026-04-04', '2026-04-04', '70 T', 0, NULL, NULL, '2026-04-04 19:56:49', '2026-05-04 12:00:59', NULL),
-(5, 6, 2, NULL, '2026-04-04', '2026-04-04', '70 T', 0, NULL, NULL, '2026-04-04 19:56:49', '2026-04-19 16:40:04', NULL),
-(6, 29, 16, NULL, '2026-04-17', '2026-04-30', '70a', 0, NULL, NULL, '2026-04-19 16:26:11', '2026-04-19 16:27:24', NULL);
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -570,13 +631,13 @@ INSERT INTO `licencias` (`id`, `docente_id`, `cargo_id`, `tramitacion_id`, `fech
 DROP TABLE IF EXISTS `materias`;
 CREATE TABLE IF NOT EXISTS `materias` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `materias_nombre_index` (`nombre`)
-) ENGINE=MyISAM AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `materias`
@@ -626,13 +687,13 @@ CREATE TABLE IF NOT EXISTS `materias_adeudadas` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `alumno_id` bigint UNSIGNED NOT NULL,
   `materia_id` bigint UNSIGNED NOT NULL,
-  `estado` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `materias_adeudadas_alumno_id_materia_id_unique` (`alumno_id`,`materia_id`),
   KEY `materias_adeudadas_materia_id_foreign` (`materia_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -643,11 +704,11 @@ CREATE TABLE IF NOT EXISTS `materias_adeudadas` (
 DROP TABLE IF EXISTS `modulos`;
 CREATE TABLE IF NOT EXISTS `modulos` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre` (`nombre`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `modulos`
@@ -674,7 +735,7 @@ INSERT INTO `modulos` (`id`, `nombre`, `descripcion`) VALUES
 DROP TABLE IF EXISTS `perfiles`;
 CREATE TABLE IF NOT EXISTS `perfiles` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre` (`nombre`)
@@ -706,10 +767,10 @@ CREATE TABLE IF NOT EXISTS `perfil_modulo` (
   `id` int NOT NULL AUTO_INCREMENT,
   `perfil_id` int NOT NULL,
   `modulo_id` int NOT NULL,
-  `permiso` enum('lectura','edicion','ninguno') COLLATE utf8mb4_unicode_ci DEFAULT 'ninguno',
+  `permiso` enum('lectura','edicion','ninguno') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'ninguno',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_perfil_modulo` (`perfil_id`,`modulo_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `perfil_modulo`
@@ -736,7 +797,21 @@ INSERT INTO `perfil_modulo` (`id`, `perfil_id`, `modulo_id`, `permiso`) VALUES
 (18, 2, 9, 'edicion'),
 (19, 1, 10, 'edicion'),
 (20, 2, 10, 'edicion'),
-(21, 4, 1, 'lectura');
+(21, 4, 1, 'edicion'),
+(23, 6, 2, 'lectura'),
+(24, 3, 1, 'lectura'),
+(25, 3, 2, 'edicion'),
+(26, 4, 7, 'edicion'),
+(27, 4, 8, 'edicion'),
+(28, 4, 10, 'lectura'),
+(30, 4, 4, 'edicion'),
+(31, 7, 2, 'lectura'),
+(32, 9, 2, 'lectura'),
+(33, 5, 2, 'edicion'),
+(34, 5, 1, 'lectura'),
+(35, 5, 6, 'lectura'),
+(36, 4, 6, 'edicion'),
+(37, 6, 7, 'lectura');
 
 -- --------------------------------------------------------
 
@@ -750,7 +825,7 @@ CREATE TABLE IF NOT EXISTS `situaciones_revista` (
   `cargo_id` bigint UNSIGNED NOT NULL,
   `docente_id` bigint UNSIGNED NOT NULL,
   `tipo` enum('TITULAR','INTERINO','SUPLENTE') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `observaciones` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observaciones` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `causal_id` bigint UNSIGNED NOT NULL,
   `fecha_inicio` date NOT NULL,
   `fecha_fin` date DEFAULT NULL,
@@ -761,7 +836,7 @@ CREATE TABLE IF NOT EXISTS `situaciones_revista` (
   UNIQUE KEY `situaciones_revista_cargo_id_docente_id_fecha_inicio_unique` (`cargo_id`,`docente_id`,`fecha_inicio`),
   KEY `situaciones_revista_docente_id_foreign` (`docente_id`),
   KEY `situaciones_revista_causal_id_foreign` (`causal_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `situaciones_revista`
@@ -781,12 +856,12 @@ INSERT INTO `situaciones_revista` (`id`, `cargo_id`, `docente_id`, `tipo`, `obse
 DROP TABLE IF EXISTS `tipos_hora`;
 CREATE TABLE IF NOT EXISTS `tipos_hora` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tipos_hora`
@@ -797,7 +872,8 @@ INSERT INTO `tipos_hora` (`id`, `nombre`, `descripcion`, `created_at`, `deleted_
 (2, 'Extraclase', NULL, '2026-04-06 00:14:27', NULL),
 (3, 'Cargo', NULL, '2026-04-06 00:14:27', NULL),
 (4, 'No docente', NULL, '2026-04-06 00:14:27', NULL),
-(5, 'Especiales', NULL, '2026-04-06 00:14:27', NULL);
+(5, 'Especiales', NULL, '2026-04-06 00:14:27', NULL),
+(6, 'Visita', NULL, '2026-06-26 21:53:58', NULL);
 
 -- --------------------------------------------------------
 
@@ -809,14 +885,14 @@ DROP TABLE IF EXISTS `tramitaciones`;
 CREATE TABLE IF NOT EXISTS `tramitaciones` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `fecha` date NOT NULL,
-  `tipo_tramite` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_tramite` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `codigo_tramite_id` int DEFAULT NULL,
   `docente_id` bigint UNSIGNED DEFAULT NULL,
   `rol` int DEFAULT NULL,
-  `expediente` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `expediente` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `cargo_id` bigint UNSIGNED DEFAULT NULL,
-  `estado` enum('caratulado','en_tramitacion','espera_documentacion','urgente','realizado') COLLATE utf8mb4_unicode_ci DEFAULT 'caratulado',
-  `observaciones` text COLLATE utf8mb4_unicode_ci,
+  `estado` enum('caratulado','en_tramitacion','espera_documentacion','urgente','realizado') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'caratulado',
+  `observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -824,21 +900,26 @@ CREATE TABLE IF NOT EXISTS `tramitaciones` (
   PRIMARY KEY (`id`),
   KEY `fk_tramitaciones_cargo` (`cargo_id`),
   KEY `fk_tramitaciones_codigo` (`codigo_tramite_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tramitaciones`
 --
 
 INSERT INTO `tramitaciones` (`id`, `fecha`, `tipo_tramite`, `codigo_tramite_id`, `docente_id`, `rol`, `expediente`, `cargo_id`, `estado`, `observaciones`, `created_at`, `updated_at`, `deleted_at`, `created_by`) VALUES
-(1, '2026-04-03', '', 1, 6, 2, 'EX-2025-14544125-GCABA-DGPDYNG', 2, 'caratulado', NULL, '2026-04-03 17:34:27', '2026-05-09 14:19:55', NULL, 1),
+(1, '2026-04-03', '', 1, 6, 2, 'EX-2025-14544125-GCABA-DGPDYNG', 2, 'realizado', NULL, '2026-04-03 17:34:27', '2026-05-15 17:54:14', NULL, 1),
 (2, '2026-04-03', '', 1, 16, 15, 'EX-2025-1004125-GCABA-DGPDYNG', 5, 'caratulado', NULL, '2026-04-03 18:04:24', '2026-04-03 18:14:28', NULL, 1),
 (3, '2026-04-03', '', 3, 16, 45, 'EX-2025-1000005-GCABA-DGPDYNG', 2, 'caratulado', NULL, '2026-04-03 18:30:33', NULL, NULL, 1),
 (4, '2026-04-03', '', 4, 16, 45, 'EX-2025-100006-GCABA-DGPDYNG', 2, 'realizado', 'FALTA QR', '2026-04-03 18:34:54', '2026-04-03 18:47:05', NULL, 1),
 (5, '2026-04-03', '', 3, 21, 27, 'EX-2025-100010-GCABA-DGPDYNG', 5, 'caratulado', NULL, '2026-04-03 19:41:08', NULL, NULL, 1),
 (6, '2026-04-03', '', 4, 21, 27, 'EX-2025-100011-GCABA-DGPDYNG', 5, 'caratulado', NULL, '2026-04-03 19:42:42', NULL, NULL, 1),
 (7, '2024-08-12', '', 1, 29, 12, 'EX-2025-100006-GCABA-DGPDYNG', 16, 'caratulado', NULL, '2026-04-19 15:26:26', '2026-04-19 16:02:11', NULL, 1),
-(8, '2026-04-19', '', 3, 20, 35, 'EX-2025-222222-GCABA-DGPDYNG', 16, 'realizado', NULL, '2026-04-19 16:30:03', '2026-05-09 14:20:41', NULL, 1);
+(8, '2026-04-19', '', 3, 20, 35, 'EX-2025-222222-GCABA-DGPDYNG', 16, 'realizado', NULL, '2026-04-19 16:30:03', '2026-05-09 14:20:41', NULL, 1),
+(9, '2023-03-10', '', 1, 30, 27, 'EX-2023- MUGUIWARA-ONEPIECE', 17, 'caratulado', NULL, '2026-06-26 21:49:32', NULL, NULL, 2),
+(10, '2026-06-26', '', 3, 12, 28, 'EX-2026- MUGUIWARA-ONEPIECE', 17, 'caratulado', NULL, '2026-06-26 22:41:56', NULL, NULL, 3),
+(11, '2026-07-22', '', 6, 12, 28, 'Exp: EX-2026- MUGUIWARA-ONEPIECE-CESE', 17, 'caratulado', NULL, '2026-07-22 12:04:07', NULL, NULL, 2),
+(13, '2026-08-04', '', 1, 28, 57, 'ex-2025-nojodas', 10, 'caratulado', NULL, '2026-08-04 19:36:11', NULL, NULL, 2),
+(14, '2026-09-19', '', 1, 20, 43, 'EX-2023- preceptoria-ecn1', 3, 'caratulado', NULL, '2026-09-19 16:00:52', '2026-09-19 16:02:01', NULL, 2);
 
 -- --------------------------------------------------------
 
@@ -850,14 +931,14 @@ DROP TABLE IF EXISTS `tramitaciones_legacy`;
 CREATE TABLE IF NOT EXISTS `tramitaciones_legacy` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `fecha` date NOT NULL,
-  `estado` enum('urgente','realizado','en_tramitacion','espera_documentacion','caratulado','a_la_guarda') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en_tramitacion',
+  `estado` enum('urgente','realizado','en_tramitacion','espera_documentacion','caratulado','a_la_guarda') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en_tramitacion',
   `cargo_docente_id` bigint UNSIGNED NOT NULL,
-  `abm` enum('alta','baja','modificacion') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `expediente` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abm` enum('alta','baja','modificacion') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expediente` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `codigo_tramite_id` bigint UNSIGNED NOT NULL,
   `causal_id` bigint UNSIGNED DEFAULT NULL,
   `licencia_id` bigint UNSIGNED DEFAULT NULL,
-  `observaciones` text COLLATE utf8mb4_unicode_ci,
+  `observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -868,7 +949,7 @@ CREATE TABLE IF NOT EXISTS `tramitaciones_legacy` (
   KEY `tramitaciones_causal_id_foreign` (`causal_id`),
   KEY `tramitaciones_estado_index` (`estado`),
   KEY `tramitaciones_abm_index` (`abm`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tramitaciones_legacy`
@@ -889,25 +970,26 @@ INSERT INTO `tramitaciones_legacy` (`id`, `fecha`, `estado`, `cargo_docente_id`,
 DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `estado` enum('pendiente','activo','rechazado') COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `estado` enum('pendiente','activo','rechazado') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
   `activo` tinyint DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `perfil` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `perfil` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `perfil_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
 INSERT INTO `usuarios` (`id`, `username`, `password`, `nombre`, `estado`, `activo`, `created_at`, `perfil`, `perfil_id`) VALUES
-(1, 'sergio', '$2b$10$v7Jg0c.3OAGtRis7N3oW2OPZ2Bt14YEQNouxO8bnLCHUSDxbRk7Gu', 'Sergio', 'activo', 1, '2026-02-21 18:18:59', 'SECRETARIO', 2),
-(2, '7u7e', '$2b$10$CgllvOsABzYhsN5zNekoluZMKpUMuYCRJAzDrWRZ82sjcHKaVxBPK', '7u7e', 'activo', 1, '2026-05-09 13:27:43', 'ADMINISTRADOR', 1);
+(1, 'sergio', '$2b$10$MHbhT8eCj9TSp2EHIdimgOhZT58mMiEWlN9wEP9nyjGNchK39RXjG', 'Sergio', 'activo', 1, '2026-02-21 18:18:59', 'SECRETARIO', 2),
+(2, '7u7e', '$2b$10$mMTNd5OEUGgP5r539.hQn.s/vkolckQ8lVp8AKXwnJ17OMx6Vt22W', '7u7e', 'activo', 1, '2026-05-09 13:27:43', 'ADMINISTRADOR', 1),
+(6, 'Naty', '$2b$10$nc2TpHDQCksHmAe5TqTrVe/7cFJWZM219eZKe.7KDOoA7r/LpBKZu', 'Natalia Blanco', 'activo', 1, '2026-10-05 10:16:16', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -923,7 +1005,7 @@ CREATE TABLE IF NOT EXISTS `usuario_curso` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   KEY `curso_id` (`curso_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -936,11 +1018,11 @@ CREATE TABLE IF NOT EXISTS `usuario_modulo` (
   `id` int NOT NULL AUTO_INCREMENT,
   `usuario_id` int DEFAULT NULL,
   `modulo_id` int DEFAULT NULL,
-  `permiso` enum('lectura','edicion') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `permiso` enum('lectura','edicion') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `usuario_id` (`usuario_id`,`modulo_id`),
   KEY `modulo_id` (`modulo_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `usuario_modulo`
@@ -961,6 +1043,19 @@ INSERT INTO `usuario_modulo` (`id`, `usuario_id`, `modulo_id`, `permiso`) VALUES
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `alumno_movimientos`
+--
+ALTER TABLE `alumno_movimientos`
+  ADD CONSTRAINT `fk_movimiento_alumno_aiven` FOREIGN KEY (`alumno_id`) REFERENCES `alumnos` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `curso_preceptor`
+--
+ALTER TABLE `curso_preceptor`
+  ADD CONSTRAINT `curso_preceptor_ibfk_1` FOREIGN KEY (`curso_id`) REFERENCES `cursos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `curso_preceptor_ibfk_2` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `licencias`

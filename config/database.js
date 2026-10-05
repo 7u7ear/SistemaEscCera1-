@@ -6,13 +6,10 @@ const dbConfig = {
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASS || '',
-    database: process.env.DB_NAME || 'bd_ecn1',
+    database: process.env.DB_NAME || 'bd_cera1',
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    queueLimit: 0
 };
 
 const pool = mysql.createPool(dbConfig);
