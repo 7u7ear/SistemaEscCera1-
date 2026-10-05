@@ -12,18 +12,28 @@ function fmtOrdinal(val) {
 }
 
 async function cargarAlumnosData() {
-    const res = await api.get("/api/v1/alumnos");
-    if (res.ok) {
-        alumnosGlobal = await res.json();
-    } else {
-        return false;
+    try {
+        const res = await api.get("/api/v1/alumnos");
+        if (res.ok) {
+            alumnosGlobal = await res.json();
+            return { ok: true };
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            return { ok: false, status: res.status, message: api.getErrorMessage(errData) };
+        }
+    } catch (err) {
+        return { ok: false, status: 0, message: err.message };
     }
-    return true;
 }
 
 async function verAlumnos() {
-    const success = await cargarAlumnosData();
-    if (!success) return alert("No tiene permiso para ver alumnos");
+    const result = await cargarAlumnosData();
+    if (!result.ok) {
+        if (result.status === 403) {
+            return alert("No tiene permiso para ver alumnos");
+        }
+        return alert(result.message || "Error al cargar alumnos");
+    }
     renderTablaAlumnos(alumnosGlobal);
 }
 
