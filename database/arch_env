@@ -1,0 +1,9 @@
+PORT=3000
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASS=
+DB_NAME=bd_cera1
+SESSION_SECRET=ceramica_secret_dev_2024
+NODE_ENV=development
+JWT_SECRET=ceramica_jwt_token_secret_2024
