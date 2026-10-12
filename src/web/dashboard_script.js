@@ -27,6 +27,8 @@ let modalAlumno;
 let modalMatricular;
 let modalTrasladar;
 let modalMateriaAdeudada;
+let modalRegistrarExamen;
+let modalHistorialExamenes;
 let modalHistorialReemplazos;
 
 // ============================
@@ -51,6 +53,8 @@ window.addEventListener("DOMContentLoaded", () => {
     modalMatricular = new bootstrap.Modal(document.getElementById('modalMatricular'));
     modalTrasladar = new bootstrap.Modal(document.getElementById('modalTrasladar'));
     modalMateriaAdeudada = new bootstrap.Modal(document.getElementById('modalMateriaAdeudada'));
+    modalRegistrarExamen = new bootstrap.Modal(document.getElementById('modalRegistrarExamen'));
+    modalHistorialExamenes = new bootstrap.Modal(document.getElementById('modalHistorialExamenes'));
     // Reusar el modal de historial de reemplazos para movimientos y cadena de suplentes
     modalHistorialReemplazos = new bootstrap.Modal(document.getElementById('modalHistorialGenerico'));
 });

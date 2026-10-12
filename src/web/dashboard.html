@@ -645,20 +645,131 @@
       </div>
       <div class="modal-body p-4">
         <div class="mb-3">
-            <label class="form-label text-muted small fw-bold">Materia</label>
+            <label class="form-label text-muted small fw-bold">Materia <span class="text-danger">*</span></label>
             <select id="materiaAdeudadaId" class="form-select"></select>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Año de la Materia</label>
+            <select id="materiaAdeudadaAnio" class="form-select">
+                <option value="1">1° Año</option>
+                <option value="2">2° Año</option>
+                <option value="3">3° Año</option>
+                <option value="4">4° Año</option>
+                <option value="5">5° Año</option>
+                <option value="6">6° Año</option>
+                <option value="7">7° Año</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Ciclo Lectivo (Deuda)</label>
+            <input type="number" id="materiaAdeudadaCicloLectivo" class="form-control" min="2000" max="2100" placeholder="Ej: 2024">
+          </div>
         </div>
         <div class="mb-3">
             <label class="form-label text-muted small fw-bold">Estado Inicial</label>
             <select id="materiaAdeudadaEstado" class="form-select">
-                <option value="pendiente">Pendiente</option>
+                <option value="pendiente" selected>Pendiente</option>
                 <option value="aprobada">Aprobada</option>
             </select>
         </div>
       </div>
       <div class="modal-footer border-0">
-        <button class="btn btn-danger px-4 fw-bold shadow-sm" onclick="guardarMateriaAdeudada()">Guardar Registro</button>
+        <button class="btn btn-primary px-4 fw-bold shadow-sm" onclick="guardarMateriaAdeudada()">Guardar Registro</button>
         <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REGISTRAR EXAMEN PREVIA -->
+<div class="modal fade" id="modalRegistrarExamen" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-success text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square"></i> Registrar Examen de Materia Adeudada</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="alert alert-light border d-flex align-items-center mb-3">
+          <i class="bi bi-journal-bookmark-fill text-primary fs-3 me-3"></i>
+          <div>
+            <div class="fw-bold fs-6" id="regExamenMateriaNombre">-</div>
+            <div class="text-muted small" id="regExamenInfoAlumno">-</div>
+          </div>
+        </div>
+        <input type="hidden" id="regExamenMateriaAdeudadaId">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Fecha de Examen <span class="text-danger">*</span></label>
+            <input type="date" id="regExamenFecha" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Calificación / Nota <span class="text-danger">*</span></label>
+            <input type="number" id="regExamenNota" class="form-control" min="1" max="10" step="0.5" placeholder="1 a 10" required>
+            <div class="form-text small text-muted">Nota ≥ 6 aprueba automáticamente</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Libro</label>
+            <input type="text" id="regExamenLibro" class="form-control" placeholder="Ej: 14 o L-02">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold">Folio</label>
+            <input type="text" id="regExamenFolio" class="form-control" placeholder="Ej: 85 o F-12">
+          </div>
+          <div class="col-12">
+            <label class="form-label text-muted small fw-bold">Observaciones (Opcional)</label>
+            <input type="text" id="regExamenObs" class="form-control" placeholder="Mesa regular, comisión previa, etc.">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-success px-4 fw-bold shadow-sm" onclick="guardarExamenMateria()"><i class="bi bi-check-lg"></i> Guardar Examen</button>
+        <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HISTORIAL EXÁMENES PREVIA -->
+<div class="modal fade" id="modalHistorialExamenes" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 bg-dark text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-clock-history"></i> Historial de Exámenes y Rendiciones</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded border">
+          <div>
+            <div class="fw-bold fs-5 text-primary" id="historialExamenMateriaNombre">-</div>
+            <div class="text-muted small" id="historialExamenDetalle">-</div>
+          </div>
+          <button class="btn btn-sm btn-success fw-bold" onclick="abrirRegistrarExamenDesdeHistorial()">
+            <i class="bi bi-plus-lg"></i> Registrar Nueva Rendición
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha Examen</th>
+                <th>Nota</th>
+                <th>Libro</th>
+                <th>Folio</th>
+                <th>Resultado</th>
+                <th>Observaciones</th>
+                <th class="text-end">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="historialExamenesTbody">
+              <tr><td colspan="7" class="text-center text-muted p-3">Cargando historial...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>

@@ -47,10 +47,16 @@ class AlumnoService {
 
         // Obtener materias adeudadas
         const [materias] = await db.query(`
-            SELECT ma.*, m.nombre as materia_nombre
+            SELECT ma.*, m.nombre as materia_nombre,
+                   (SELECT COUNT(*) FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id) as total_examenes,
+                   (SELECT me.nota FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id ORDER BY me.fecha_examen DESC, me.id DESC LIMIT 1) as ultima_nota,
+                   (SELECT me.fecha_examen FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id ORDER BY me.fecha_examen DESC, me.id DESC LIMIT 1) as ultima_fecha_examen,
+                   (SELECT me.libro FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id ORDER BY me.fecha_examen DESC, me.id DESC LIMIT 1) as ultimo_libro,
+                   (SELECT me.folio FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id ORDER BY me.fecha_examen DESC, me.id DESC LIMIT 1) as ultimo_folio
             FROM materias_adeudadas ma
             JOIN materias m ON ma.materia_id = m.id
             WHERE ma.alumno_id = ?
+            ORDER BY ma.created_at DESC
         `, [id]);
         alumno.materias_adeudadas = materias;
 
@@ -323,10 +329,16 @@ class AlumnoService {
     // --- Materias Adeudadas ---
     async getMateriasAdeudadas(alumnoId) {
         const [rows] = await db.query(`
-            SELECT ma.*, m.nombre as materia_nombre
+            SELECT ma.*, m.nombre as materia_nombre,
+                   (SELECT COUNT(*) FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id) as total_examenes,
+                   (SELECT me.nota FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id ORDER BY me.fecha_examen DESC, me.id DESC LIMIT 1) as ultima_nota,
+                   (SELECT me.fecha_examen FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id ORDER BY me.fecha_examen DESC, me.id DESC LIMIT 1) as ultima_fecha_examen,
+                   (SELECT me.libro FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id ORDER BY me.fecha_examen DESC, me.id DESC LIMIT 1) as ultimo_libro,
+                   (SELECT me.folio FROM materia_adeudada_examenes me WHERE me.materia_adeudada_id = ma.id ORDER BY me.fecha_examen DESC, me.id DESC LIMIT 1) as ultimo_folio
             FROM materias_adeudadas ma
             JOIN materias m ON ma.materia_id = m.id
             WHERE ma.alumno_id = ?
+            ORDER BY ma.created_at DESC
         `, [alumnoId]);
         return rows;
     }
@@ -341,12 +353,16 @@ class AlumnoService {
         }
 
         const [result] = await db.query(
-            `INSERT INTO materias_adeudadas (alumno_id, materia_id, estado, created_at, updated_at) 
-             VALUES (?, ?, ?, NOW(), NOW())`,
-            [data.alumno_id, data.materia_id, data.estado || 'pendiente']
+            `INSERT INTO materias_adeudadas (alumno_id, materia_id, anio_materia, ciclo_lectivo, estado, created_at, updated_at) 
+             VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+            [data.alumno_id, data.materia_id, data.anio_materia || null, data.ciclo_lectivo || null, data.estado || 'pendiente']
         );
 
-        await AuditoriaService.registrar(userId, 'CREATE_MATERIA_ADEUDADA', 'ALUMNOS', data.alumno_id, { materia_id: data.materia_id });
+        await AuditoriaService.registrar(userId, 'CREATE_MATERIA_ADEUDADA', 'ALUMNOS', data.alumno_id, {
+            materia_id: data.materia_id,
+            anio_materia: data.anio_materia,
+            ciclo_lectivo: data.ciclo_lectivo
+        });
         return result.insertId;
     }
 
@@ -368,6 +384,91 @@ class AlumnoService {
 
         await db.query("DELETE FROM materias_adeudadas WHERE id = ?", [id]);
         await AuditoriaService.registrar(userId, 'DELETE_MATERIA_ADEUDADA', 'ALUMNOS', rows[0].alumno_id, { materia_id: rows[0].materia_id });
+    }
+
+    // --- Historial de Exámenes de Materias Adeudadas ---
+    async getExamenesMateriaAdeudada(materiaAdeudadaId) {
+        const [rows] = await db.query(
+            "SELECT * FROM materia_adeudada_examenes WHERE materia_adeudada_id = ? ORDER BY fecha_examen DESC, id DESC",
+            [materiaAdeudadaId]
+        );
+        return rows;
+    }
+
+    async registrarExamenMateriaAdeudada(materiaAdeudadaId, data, userId) {
+        const [rows] = await db.query(
+            `SELECT ma.*, m.nombre as materia_nombre 
+             FROM materias_adeudadas ma 
+             JOIN materias m ON ma.materia_id = m.id 
+             WHERE ma.id = ?`,
+            [materiaAdeudadaId]
+        );
+        if (rows.length === 0) throw new AppError('Materia adeudada no encontrada', 404);
+
+        const materiaAdeudada = rows[0];
+        const nota = parseFloat(data.nota);
+
+        const [result] = await db.query(
+            `INSERT INTO materia_adeudada_examenes (materia_adeudada_id, fecha_examen, nota, libro, folio, observaciones, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+            [materiaAdeudadaId, data.fecha_examen, nota, data.libro || null, data.folio || null, data.observaciones || null]
+        );
+
+        // Si la nota es 6 o más, el estado de la materia pasa a 'aprobada'
+        const nuevoEstado = nota >= 6 ? 'aprobada' : 'pendiente';
+        await db.query(
+            "UPDATE materias_adeudadas SET estado = ?, updated_at = NOW() WHERE id = ?",
+            [nuevoEstado, materiaAdeudadaId]
+        );
+
+        await AuditoriaService.registrar(userId, 'REGISTRAR_EXAMEN_PREVIA', 'ALUMNOS', materiaAdeudada.alumno_id, {
+            materia_adeudada_id: materiaAdeudadaId,
+            materia: materiaAdeudada.materia_nombre,
+            nota,
+            libro: data.libro,
+            folio: data.folio,
+            fecha_examen: data.fecha_examen,
+            estado_resultante: nuevoEstado
+        });
+
+        return {
+            id: result.insertId,
+            nuevoEstado
+        };
+    }
+
+    async deleteExamenMateriaAdeudada(examenId, userId) {
+        const [examenes] = await db.query(
+            "SELECT * FROM materia_adeudada_examenes WHERE id = ?",
+            [examenId]
+        );
+        if (examenes.length === 0) throw new AppError('Registro de examen no encontrado', 404);
+
+        const examen = examenes[0];
+        const [adeudadas] = await db.query(
+            "SELECT * FROM materias_adeudadas WHERE id = ?",
+            [examen.materia_adeudada_id]
+        );
+
+        await db.query("DELETE FROM materia_adeudada_examenes WHERE id = ?", [examenId]);
+
+        // Si la materia adeudada existe, recalcular si tiene algún otro examen con nota >= 6
+        if (adeudadas.length > 0) {
+            const [aprobados] = await db.query(
+                "SELECT id FROM materia_adeudada_examenes WHERE materia_adeudada_id = ? AND nota >= 6",
+                [examen.materia_adeudada_id]
+            );
+            const nuevoEstado = aprobados.length > 0 ? 'aprobada' : 'pendiente';
+            await db.query(
+                "UPDATE materias_adeudadas SET estado = ?, updated_at = NOW() WHERE id = ?",
+                [nuevoEstado, examen.materia_adeudada_id]
+            );
+
+            await AuditoriaService.registrar(userId, 'DELETE_EXAMEN_PREVIA', 'ALUMNOS', adeudadas[0].alumno_id, {
+                examen_id: examenId,
+                materia_adeudada_id: examen.materia_adeudada_id
+            });
+        }
     }
 }
 

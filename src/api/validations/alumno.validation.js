@@ -47,7 +47,17 @@ const paseCursoSchema = z.object({
 const materiasAdeudadasSchema = z.object({
     alumno_id: z.union([z.string(), z.number()]),
     materia_id: z.union([z.string(), z.number()]),
+    anio_materia: z.coerce.number().int().min(1).max(7).optional().nullable(),
+    ciclo_lectivo: z.coerce.number().int().min(2000).max(2100).optional().nullable(),
     estado: z.enum(['pendiente', 'aprobada'])
+});
+
+const registrarExamenSchema = z.object({
+    fecha_examen: z.string().min(1, 'La fecha de examen es obligatoria'),
+    nota: z.coerce.number().min(1, 'La nota mínima es 1').max(10, 'La nota máxima es 10'),
+    libro: z.string().max(50).optional().nullable(),
+    folio: z.string().max(50).optional().nullable(),
+    observaciones: z.string().max(255).optional().nullable()
 });
 
 module.exports = {
@@ -55,5 +65,6 @@ module.exports = {
     updateAlumnoSchema,
     inscribirAlumnoSchema,
     paseCursoSchema,
-    materiasAdeudadasSchema
+    materiasAdeudadasSchema,
+    registrarExamenSchema
 };

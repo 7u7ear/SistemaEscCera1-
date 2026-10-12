@@ -27,4 +27,9 @@ router.post('/materias-adeudadas', permisoModulo('estudiantes', 'edicion'), Alum
 router.put('/materias-adeudadas/:id', permisoModulo('estudiantes', 'edicion'), AlumnoController.updateMateriaAdeudada);
 router.delete('/materias-adeudadas/:id', permisoModulo('estudiantes', 'edicion'), AlumnoController.deleteMateriaAdeudada);
 
+// Exámenes de materias adeudadas (historial y registro de notas/libros/folios)
+router.get('/materias-adeudadas/:id/examenes', permisoModulo('estudiantes', 'lectura'), AlumnoController.getExamenesMateriaAdeudada);
+router.post('/materias-adeudadas/:id/examenes', permisoModulo('estudiantes', 'edicion'), AlumnoController.registrarExamenMateriaAdeudada);
+router.delete('/materias-adeudadas/examenes/:examenId', permisoModulo('estudiantes', 'edicion'), AlumnoController.deleteExamenMateriaAdeudada);
+
 module.exports = router;

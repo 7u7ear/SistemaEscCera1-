@@ -346,24 +346,51 @@ function renderFichaLayout(a) {
     }
 
     let adeudadasHtml = '';
-    if (a.materias_adeudadas.length === 0) {
-        adeudadasHtml = '<tr><td colspan="4" class="text-center text-muted p-3">No tiene materias adeudadas.</td></tr>';
+    if (!a.materias_adeudadas || a.materias_adeudadas.length === 0) {
+        adeudadasHtml = '<tr><td colspan="6" class="text-center text-muted p-3">No tiene materias adeudadas registradas.</td></tr>';
     } else {
         a.materias_adeudadas.forEach(ma => {
             const isPendiente = ma.estado === 'pendiente';
+            const anioTxt = ma.anio_materia ? `${ma.anio_materia}° Año` : '<span class="text-muted">-</span>';
+            const cicloTxt = ma.ciclo_lectivo ? ma.ciclo_lectivo : '<span class="text-muted">-</span>';
+            
+            let califHtml = '<span class="badge bg-light text-muted border">Sin rendir</span>';
+            if (ma.ultima_nota !== null && ma.ultima_nota !== undefined) {
+                const notaNum = parseFloat(ma.ultima_nota);
+                const notaColor = notaNum >= 6 ? 'bg-success' : 'bg-danger';
+                const fechaTxt = ma.ultima_fecha_examen ? new Date(ma.ultima_fecha_examen).toLocaleDateString() : '';
+                califHtml = `
+                    <div>
+                        <span class="badge ${notaColor}">Nota: ${notaNum}</span>
+                        <div class="small text-muted mt-1">
+                            ${ma.ultimo_libro ? `<span class="me-1">Libro: <strong>${ma.ultimo_libro}</strong></span>` : ''}
+                            ${ma.ultimo_folio ? `<span>Folio: <strong>${ma.ultimo_folio}</strong></span>` : ''}
+                            ${fechaTxt ? `<br><i class="bi bi-calendar-event"></i> ${fechaTxt}` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
             adeudadasHtml += `
                 <tr>
-                    <td><strong>${ma.materia_nombre}</strong></td>
+                    <td>
+                        <strong class="text-dark">${ma.materia_nombre}</strong>
+                    </td>
+                    <td><span class="badge bg-light text-dark border">${anioTxt}</span></td>
+                    <td><span class="fw-semibold text-secondary">${cicloTxt}</span></td>
                     <td>
                         <span class="badge ${isPendiente ? 'bg-danger' : 'bg-success'}">${ma.estado.toUpperCase()}</span>
                     </td>
-                    <td>${new Date(ma.created_at).toLocaleDateString()}</td>
-                    <td>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="cambiarEstadoMateria(${ma.id}, '${isPendiente ? 'aprobada' : 'pendiente'}')">
-                                <i class="bi ${isPendiente ? 'bi-check-circle' : 'bi-x-circle'}"></i> Marcar ${isPendiente ? 'Aprobada' : 'Pendiente'}
+                    <td>${califHtml}</td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-success fw-bold" onclick="abrirModalRegistrarExamen(${ma.id})" title="Registrar Nota, Libro, Folio y Fecha">
+                                <i class="bi bi-pencil-square"></i> Rendir
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="eliminarMateriaAdeudada(${ma.id})">
+                            <button class="btn btn-outline-dark" onclick="verHistorialExamenes(${ma.id})" title="Ver Historial de Exámenes">
+                                <i class="bi bi-clock-history"></i> Historial (${ma.total_examenes || 0})
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="eliminarMateriaAdeudada(${ma.id})" title="Eliminar Materia Adeudada">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -441,16 +468,18 @@ function renderFichaLayout(a) {
                 <div class="card p-4 shadow-sm border-0 bg-white">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-exclamation-triangle-fill"></i> Materias Adeudadas (Previas)</h5>
-                        <button class="btn btn-sm btn-danger fw-bold" onclick="abrirModalCargarMateria()"><i class="bi bi-plus-lg"></i> Cargar Previa</button>
+                        <button class="btn btn-sm btn-primary fw-bold shadow-sm" onclick="abrirModalCargarMateria()"><i class="bi bi-plus-lg"></i> Cargar Previa</button>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-sm align-middle table-hover">
-                            <thead>
+                            <thead class="table-light">
                                 <tr>
                                     <th>Materia</th>
+                                    <th>Año Materia</th>
+                                    <th>Ciclo Lectivo</th>
                                     <th>Estado</th>
-                                    <th>Fecha Registro</th>
-                                    <th>Acciones</th>
+                                    <th>Última Calificación</th>
+                                    <th class="text-end">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -777,9 +806,11 @@ async function verBitacoraAlumno(id) {
     modalHistorialReemplazos.show();
 }
 
-// --- MATERIAS ADEUDADAS ACCIONES ---
+// --- MATERIAS ADEUDADAS & HISTORIAL DE EXÁMENES ---
+let materiaAdeudadaActiva = null;
+
 async function abrirModalCargarMateria() {
-    // Cargar materias
+    // Cargar materias si aún no se obtuvieron
     const res = await api.get("/api/v1/materias");
     if (!res.ok) return alert("Error al cargar materias");
     const materias = await res.json();
@@ -789,27 +820,198 @@ async function abrirModalCargarMateria() {
         options += `<option value="${m.id}">${m.nombre}</option>`;
     });
     document.getElementById("materiaAdeudadaId").innerHTML = options;
+    document.getElementById("materiaAdeudadaAnio").value = "1";
+    document.getElementById("materiaAdeudadaCicloLectivo").value = new Date().getFullYear();
     document.getElementById("materiaAdeudadaEstado").value = "pendiente";
 
     modalMateriaAdeudada.show();
 }
 
 async function guardarMateriaAdeudada() {
+    const materiaIdVal = document.getElementById("materiaAdeudadaId").value;
+    const anioVal = document.getElementById("materiaAdeudadaAnio").value;
+    const cicloVal = document.getElementById("materiaAdeudadaCicloLectivo").value;
+
+    if (!materiaIdVal) return alert("Seleccione una materia");
+
     const data = {
         alumno_id: alumnoDataActivo.id,
-        materia_id: parseInt(document.getElementById("materiaAdeudadaId").value),
+        materia_id: parseInt(materiaIdVal),
+        anio_materia: anioVal ? parseInt(anioVal) : null,
+        ciclo_lectivo: cicloVal ? parseInt(cicloVal) : null,
         estado: document.getElementById("materiaAdeudadaEstado").value
     };
 
-    if (!data.materia_id) return alert("Seleccione una materia");
+    try {
+        const res = await api.post("/api/v1/alumnos/materias-adeudadas", data);
+        if (res.ok) {
+            modalMateriaAdeudada.hide();
+            await verFichaAlumno(alumnoDataActivo.id);
+        } else {
+            const err = await res.json();
+            alert(`Error: ${api.getErrorMessage(err)}`);
+        }
+    } catch (e) {
+        alert(`Error de conexión: ${api.getErrorMessage(e)}`);
+    }
+}
 
-    const res = await api.post("/api/v1/alumnos/materias-adeudadas", data);
-    if (res.ok) {
-        modalMateriaAdeudada.hide();
-        verFichaAlumno(alumnoDataActivo.id);
-    } else {
-        const err = await res.json();
-        alert(`Error: ${api.getErrorMessage(err)}`);
+function abrirModalRegistrarExamen(materiaAdeudadaId) {
+    const ma = (alumnoDataActivo.materias_adeudadas || []).find(m => m.id === materiaAdeudadaId);
+    if (!ma) return;
+    materiaAdeudadaActiva = ma;
+
+    document.getElementById("regExamenMateriaAdeudadaId").value = ma.id;
+    const anioTxt = ma.anio_materia ? `${ma.anio_materia}° Año` : '';
+    const cicloTxt = ma.ciclo_lectivo ? `Ciclo ${ma.ciclo_lectivo}` : '';
+    const sub = [anioTxt, cicloTxt].filter(Boolean).join(' - ');
+    document.getElementById("regExamenMateriaNombre").innerText = `${ma.materia_nombre} ${sub ? `(${sub})` : ''}`;
+    document.getElementById("regExamenInfoAlumno").innerText = `Estudiante: ${alumnoDataActivo.apellido}, ${alumnoDataActivo.nombre} (DNI ${alumnoDataActivo.dni})`;
+
+    // Fecha hoy por defecto
+    const hoy = new Date().toISOString().split('T')[0];
+    document.getElementById("regExamenFecha").value = hoy;
+    document.getElementById("regExamenNota").value = "";
+    document.getElementById("regExamenLibro").value = "";
+    document.getElementById("regExamenFolio").value = "";
+    document.getElementById("regExamenObs").value = "";
+
+    modalRegistrarExamen.show();
+}
+
+function abrirRegistrarExamenDesdeHistorial() {
+    if (!materiaAdeudadaActiva) return;
+    abrirModalRegistrarExamen(materiaAdeudadaActiva.id);
+}
+
+async function guardarExamenMateria() {
+    const id = document.getElementById("regExamenMateriaAdeudadaId").value;
+    const fecha = document.getElementById("regExamenFecha").value;
+    const notaVal = document.getElementById("regExamenNota").value;
+    const libro = document.getElementById("regExamenLibro").value.trim();
+    const folio = document.getElementById("regExamenFolio").value.trim();
+    const obs = document.getElementById("regExamenObs").value.trim();
+
+    if (!fecha) return alert("Ingrese la fecha del examen");
+    if (notaVal === "" || isNaN(notaVal)) return alert("Ingrese una calificación válida (1 al 10)");
+
+    const nota = parseFloat(notaVal);
+    if (nota < 1 || nota > 10) return alert("La nota debe estar entre 1 y 10");
+
+    const payload = {
+        fecha_examen: fecha,
+        nota: nota,
+        libro: libro || null,
+        folio: folio || null,
+        observaciones: obs || null
+    };
+
+    try {
+        const res = await api.post(`/api/v1/alumnos/materias-adeudadas/${id}/examenes`, payload);
+        if (res.ok) {
+            modalRegistrarExamen.hide();
+            await verFichaAlumno(alumnoDataActivo.id);
+            // Si el modal de historial estaba abierto, actualizarlo también
+            const modalHistEl = document.getElementById('modalHistorialExamenes');
+            if (modalHistEl.classList.contains('show')) {
+                await verHistorialExamenes(parseInt(id));
+            }
+        } else {
+            const err = await res.json();
+            alert(`Error: ${api.getErrorMessage(err)}`);
+        }
+    } catch (e) {
+        alert(`Error al guardar examen: ${api.getErrorMessage(e)}`);
+    }
+}
+
+async function verHistorialExamenes(materiaAdeudadaId) {
+    const ma = (alumnoDataActivo.materias_adeudadas || []).find(m => m.id === materiaAdeudadaId);
+    if (!ma) return;
+    materiaAdeudadaActiva = ma;
+
+    const anioTxt = ma.anio_materia ? `${ma.anio_materia}° Año` : '';
+    const cicloTxt = ma.ciclo_lectivo ? `Ciclo ${ma.ciclo_lectivo}` : '';
+    const sub = [anioTxt, cicloTxt].filter(Boolean).join(' - ');
+    document.getElementById("historialExamenMateriaNombre").innerText = `${ma.materia_nombre} ${sub ? `(${sub})` : ''}`;
+    document.getElementById("historialExamenDetalle").innerText = `Estudiante: ${alumnoDataActivo.apellido}, ${alumnoDataActivo.nombre} (DNI ${alumnoDataActivo.dni}) | Estado actual: ${ma.estado.toUpperCase()}`;
+
+    const tbody = document.getElementById("historialExamenesTbody");
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted p-3"><span class="spinner-border spinner-border-sm me-2"></span>Cargando historial...</td></tr>';
+
+    modalHistorialExamenes.show();
+
+    try {
+        const res = await api.get(`/api/v1/alumnos/materias-adeudadas/${materiaAdeudadaId}/examenes`);
+        if (!res.ok) {
+            const err = await res.json();
+            tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center p-3">Error al cargar: ${api.getErrorMessage(err)}</td></tr>`;
+            return;
+        }
+
+        const examenes = await res.json();
+        if (!examenes || examenes.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center text-muted p-4">
+                        <i class="bi bi-info-circle fs-4 d-block mb-2 text-primary"></i>
+                        No hay exámenes registrados para esta materia adeudada.<br>
+                        <button class="btn btn-sm btn-outline-success mt-2" onclick="abrirRegistrarExamenDesdeHistorial()">
+                            <i class="bi bi-pencil-square"></i> Registrar Primer Examen
+                        </button>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        let filasHtml = '';
+        examenes.forEach((ex, idx) => {
+            const notaNum = parseFloat(ex.nota);
+            const aprobado = notaNum >= 6;
+            const badgeColor = aprobado ? 'bg-success' : 'bg-danger';
+            const estadoTexto = aprobado ? 'APROBADA' : 'DESAPROBADA';
+            const fechaStr = new Date(ex.fecha_examen).toLocaleDateString();
+
+            filasHtml += `
+                <tr>
+                    <td><strong>${fechaStr}</strong></td>
+                    <td><span class="badge ${badgeColor} fs-6">${notaNum}</span></td>
+                    <td>${ex.libro ? `<strong>${ex.libro}</strong>` : '<span class="text-muted">-</span>'}</td>
+                    <td>${ex.folio ? `<strong>${ex.folio}</strong>` : '<span class="text-muted">-</span>'}</td>
+                    <td><span class="badge ${badgeColor}">${estadoTexto}</span></td>
+                    <td><small class="text-muted">${ex.observaciones || '-'}</small></td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger" onclick="eliminarExamenPrevia(${ex.id}, ${materiaAdeudadaId})" title="Eliminar registro de examen">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = filasHtml;
+    } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center p-3">Error: ${api.getErrorMessage(e)}</td></tr>`;
+    }
+}
+
+async function eliminarExamenPrevia(examenId, materiaAdeudadaId) {
+    if (!confirm("¿Está seguro de eliminar este registro de examen? Si la materia estaba aprobada y ya no quedan notas aprobadas, volverá a estado pendiente.")) {
+        return;
+    }
+
+    try {
+        const res = await api.delete(`/api/v1/alumnos/materias-adeudadas/examenes/${examenId}`);
+        if (res.ok) {
+            await verFichaAlumno(alumnoDataActivo.id);
+            await verHistorialExamenes(materiaAdeudadaId);
+        } else {
+            const err = await res.json();
+            alert(`Error: ${api.getErrorMessage(err)}`);
+        }
+    } catch (e) {
+        alert(`Error al eliminar examen: ${api.getErrorMessage(e)}`);
     }
 }
 
@@ -824,7 +1026,7 @@ async function cambiarEstadoMateria(id, nuevoEstado) {
 }
 
 async function eliminarMateriaAdeudada(id) {
-    if (!confirm("¿Está seguro de eliminar este registro de materia adeudada?")) return;
+    if (!confirm("¿Está seguro de eliminar este registro de materia adeudada y todo su historial de exámenes?")) return;
 
     const res = await api.delete(`/api/v1/alumnos/materias-adeudadas/${id}`);
     if (res.ok) {

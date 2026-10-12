@@ -37,7 +37,7 @@
   - [ ] `src/api/controllers/permiso.controller.js`
   - [ ] Modificar `src/api/routes/v1/permisos.routes.js`
 - [ ] Aplicar Zod en controllers: `usuario`, `cargo`, `tramitacion`, `codigo_tramite`
-- [ ] Campo `anio_materia` en materias adeudadas del alumno (BD + frontend ficha)
+- [x] Campo `anio_materia` y `ciclo_lectivo` en materias adeudadas + historial de exámenes (nota, libro, folio, fecha) (2026-10-12)
 - [ ] Revisión visual botones negros→azules en modales: tramitaciones, licencias, docentes, cargos
 
 ---

@@ -611,6 +611,8 @@ CREATE TABLE `materias_adeudadas` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `alumno_id` bigint unsigned NOT NULL,
   `materia_id` bigint unsigned NOT NULL,
+  `anio_materia` int DEFAULT NULL,
+  `ciclo_lectivo` int DEFAULT NULL,
   `estado` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -627,6 +629,34 @@ CREATE TABLE `materias_adeudadas` (
 LOCK TABLES `materias_adeudadas` WRITE;
 /*!40000 ALTER TABLE `materias_adeudadas` DISABLE KEYS */;
 /*!40000 ALTER TABLE `materias_adeudadas` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `materia_adeudada_examenes`
+--
+
+DROP TABLE IF EXISTS `materia_adeudada_examenes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `materia_adeudada_examenes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `materia_adeudada_id` bigint unsigned NOT NULL,
+  `fecha_examen` date NOT NULL,
+  `nota` decimal(4,2) NOT NULL,
+  `libro` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `folio` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observaciones` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `materia_adeudada_examenes_adeudada_id_idx` (`materia_adeudada_id`),
+  CONSTRAINT `fk_materia_adeudada_examenes` FOREIGN KEY (`materia_adeudada_id`) REFERENCES `materias_adeudadas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `materia_adeudada_examenes` WRITE;
+/*!40000 ALTER TABLE `materia_adeudada_examenes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `materia_adeudada_examenes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

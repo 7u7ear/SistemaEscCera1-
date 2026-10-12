@@ -4,7 +4,8 @@ const {
     updateAlumnoSchema,
     inscribirAlumnoSchema,
     paseCursoSchema,
-    materiasAdeudadasSchema
+    materiasAdeudadasSchema,
+    registrarExamenSchema
 } = require('../validations/alumno.validation');
 
 class AlumnoController {
@@ -155,6 +156,38 @@ class AlumnoController {
             const { id } = req.params;
             await AlumnoService.deleteMateriaAdeudada(id, req.user.id);
             res.json({ message: 'Materia adeudada eliminada correctamente' });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    // --- Exámenes de Materias Adeudadas ---
+    async getExamenesMateriaAdeudada(req, res, next) {
+        try {
+            const { id } = req.params;
+            const data = await AlumnoService.getExamenesMateriaAdeudada(id);
+            res.json(data);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async registrarExamenMateriaAdeudada(req, res, next) {
+        try {
+            const { id } = req.params;
+            const validated = registrarExamenSchema.parse(req.body);
+            const resultado = await AlumnoService.registrarExamenMateriaAdeudada(id, validated, req.user.id);
+            res.status(201).json({ message: 'Examen registrado correctamente', data: resultado });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async deleteExamenMateriaAdeudada(req, res, next) {
+        try {
+            const { examenId } = req.params;
+            await AlumnoService.deleteExamenMateriaAdeudada(examenId, req.user.id);
+            res.json({ message: 'Examen eliminado correctamente' });
         } catch (err) {
             next(err);
         }
