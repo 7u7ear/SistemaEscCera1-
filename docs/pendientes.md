@@ -7,14 +7,7 @@
 
 ## 🔴 ALTA PRIORIDAD — Próximos Desarrollos
 
-### Módulo Mails por Curso (Siguiente paso recomendado)
-- [ ] Endpoints para extraer mails: Estudiantes / Tutores / Docentes del curso
-- [ ] 3 listas independientes en `cursosHorariosComponent.js`
-- [ ] Botón "Copiar al portapapeles" (formato CCO/BCC)
-- [ ] Botón "Descargar TXT/CSV"
-- [ ] Solapa específica en Horarios con los profesores asignados al curso y sus correos
-
-### Sidebar Dinámico por Permisos
+### Sidebar Dinámico por Permisos (Siguiente paso recomendado)
 - [ ] `dashboard_script.js` — ocultar (no deshabilitar) ítems del menú sin permisos L o E
 
 ### Visualizador de Auditoría
@@ -95,3 +88,10 @@
   - Modal interactivo de "¿Olvidaste tu contraseña?" y formulario de cambio de clave en `login.html`
   - Icono "ojo" (ver/ocultar contraseña) en inputs de login y registro
   - Campo email en registro de usuarios y columna `email` en tabla `usuarios`
+- [x] **Módulo Mails y Planta Docente por Curso** (2026-10-12):
+  - Endpoints `/api/v1/cursos/:id/emails` y `/api/v1/cursos/:id/docentes`
+  - Nueva pestaña "Docentes Asignados" con planta docente del curso, materias, cargos, puestos, situación de revista, correos, teléfonos e impresión
+  - Nueva pestaña "Mails del Curso" con 3 listas independientes: Estudiantes, Tutores y Docentes
+  - Botón "Copiar CCO / BCC" para pegado directo en clientes de correo
+  - Exportación y descarga directa en formatos TXT y CSV para cada una de las listas
+  - Métricas de cobertura de correos en tiempo real y buscador/filtro interactivo

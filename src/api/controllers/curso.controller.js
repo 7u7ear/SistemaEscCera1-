@@ -75,6 +75,29 @@ class CursoController {
             next(err);
         }
     }
+
+    async getEmails(req, res, next) {
+        try {
+            const { id } = req.params;
+            const anioLectivo = parseInt(req.query.anio_lectivo || req.query.anioLectivo || new Date().getFullYear());
+            const data = await CursoService.getEmailsDelCurso(id, anioLectivo);
+            res.json(data);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async getDocentes(req, res, next) {
+        try {
+            const { id } = req.params;
+            const anioLectivo = parseInt(req.query.anio_lectivo || req.query.anioLectivo || new Date().getFullYear());
+            const data = await CursoService.getDocentesDelCurso(id, anioLectivo);
+            res.json(data);
+        } catch (err) {
+            next(err);
+        }
+    }
 }
 
 module.exports = new CursoController();
+

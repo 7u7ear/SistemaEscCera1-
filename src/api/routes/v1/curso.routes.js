@@ -12,4 +12,8 @@ router.get('/:id/horario', CursoController.getHorario);
 router.get('/:id/preceptor', CursoController.getPreceptor);
 router.post('/:id/preceptor', CursoController.assignPreceptor);
 
+router.get('/:id/emails', CursoController.getEmails);
+router.get('/:id/docentes', CursoController.getDocentes);
+
 module.exports = router;
+

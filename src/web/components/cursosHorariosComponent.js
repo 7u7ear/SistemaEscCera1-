@@ -5,6 +5,8 @@
 let cursoActivoId = null;
 let cursosListGlobal = [];
 let cursoPreceptorActualId = null;
+let dataEmailsCursoGlobal = null;
+let dataDocentesCursoGlobal = null;
 
 // Sanitiza el año/división: evita duplicación de símbolos ordinales (ej: 1º° -> 1º)
 function fmtOrdinal(val) {
@@ -63,6 +65,16 @@ async function verCursosHorarios() {
                                 <i class="bi bi-calendar3 me-1"></i> Horario Semanal
                             </button>
                         </li>
+                        <li class="nav-item">
+                            <button class="nav-link fw-bold" id="tab-docentes-curso" data-bs-toggle="tab" data-bs-target="#panel-docentes-curso" type="button">
+                                <i class="bi bi-person-badge me-1"></i> Docentes Asignados
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link fw-bold" id="tab-emails-curso" data-bs-toggle="tab" data-bs-target="#panel-emails-curso" type="button">
+                                <i class="bi bi-envelope-at me-1"></i> Mails del Curso
+                            </button>
+                        </li>
                     </ul>
 
                     <!-- Contenido de las Pestañas -->
@@ -104,6 +116,161 @@ async function verCursosHorarios() {
                             </div>
                             <div class="table-responsive" id="grillaHorariaContainer">
                                 <div class="text-center p-5"><div class="spinner-border text-primary"></div></div>
+                            </div>
+                        </div>
+
+                        <!-- Panel Docentes Asignados -->
+                        <div class="tab-pane fade" id="panel-docentes-curso" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3 no-print bg-light p-3 rounded flex-wrap gap-2">
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-person-badge text-primary me-2"></i>Planta Docente y Asignaturas</h6>
+                                    <span class="text-muted small">Profesores asignados a las materias y preceptor/a a cargo</span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="window.imprimirDocentesCurso()">
+                                    <i class="bi bi-printer me-1"></i> Imprimir Lista Docente
+                                </button>
+                            </div>
+                            <div class="table-responsive" id="listaDocentesCursoContainer">
+                                <div class="text-center p-5"><div class="spinner-border text-primary"></div></div>
+                            </div>
+                        </div>
+
+                        <!-- Panel Correos del Curso -->
+                        <div class="tab-pane fade" id="panel-emails-curso" role="tabpanel">
+                            <!-- Métricas resumen de correos -->
+                            <div class="row g-3 mb-4 no-print" id="resumenMailsCards">
+                                <div class="col-md-4">
+                                    <div class="card border-0 bg-primary bg-opacity-10 p-3 rounded-3 shadow-none">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <span class="text-muted small fw-bold text-uppercase">Estudiantes</span>
+                                                <h4 class="fw-bold text-primary mb-0 mt-1" id="badgeTotalEstudiantes">0 / 0</h4>
+                                                <small class="text-muted" id="badgeSubEstudiantes">con correo electrónico</small>
+                                            </div>
+                                            <i class="bi bi-mortarboard fs-1 text-primary opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card border-0 bg-info bg-opacity-10 p-3 rounded-3 shadow-none">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <span class="text-muted small fw-bold text-uppercase">Padres / Tutores</span>
+                                                <h4 class="fw-bold text-info mb-0 mt-1" id="badgeTotalTutores">0 / 0</h4>
+                                                <small class="text-muted" id="badgeSubTutores">con correo electrónico</small>
+                                            </div>
+                                            <i class="bi bi-people fs-1 text-info opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card border-0 bg-success bg-opacity-10 p-3 rounded-3 shadow-none">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <span class="text-muted small fw-bold text-uppercase">Docentes</span>
+                                                <h4 class="fw-bold text-success mb-0 mt-1" id="badgeTotalDocentes">0 / 0</h4>
+                                                <small class="text-muted" id="badgeSubDocentes">con correo electrónico</small>
+                                            </div>
+                                            <i class="bi bi-person-video3 fs-1 text-success opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navegación de 3 listas independientes -->
+                            <ul class="nav nav-pills mb-3 no-print bg-light p-2 rounded gap-2" id="pillsMailsTipo" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active fw-bold btn-sm" id="pill-mails-estudiantes" data-bs-toggle="pill" data-bs-target="#subpanel-mails-estudiantes" type="button">
+                                        <i class="bi bi-mortarboard me-1"></i> Estudiantes <span class="badge bg-white text-primary ms-1" id="pillCountEstudiantes">0</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link fw-bold btn-sm" id="pill-mails-tutores" data-bs-toggle="pill" data-bs-target="#subpanel-mails-tutores" type="button">
+                                        <i class="bi bi-people me-1"></i> Padres / Tutores <span class="badge bg-white text-info ms-1" id="pillCountTutores">0</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link fw-bold btn-sm" id="pill-mails-docentes" data-bs-toggle="pill" data-bs-target="#subpanel-mails-docentes" type="button">
+                                        <i class="bi bi-person-badge me-1"></i> Docentes <span class="badge bg-white text-success ms-1" id="pillCountDocentes">0</span>
+                                    </button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" id="pillsMailsContent">
+                                <!-- Subpanel Estudiantes -->
+                                <div class="tab-pane fade show active" id="subpanel-mails-estudiantes" role="tabpanel">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 p-2 bg-light rounded no-print">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-bold small text-muted">Acciones:</span>
+                                            <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" id="btnCopiarEstudiantes" onclick="copiarMails('estudiantes')">
+                                                <i class="bi bi-clipboard me-1"></i> Copiar CCO / BCC
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold" onclick="descargarMails('estudiantes', 'txt')">
+                                                <i class="bi bi-file-earmark-text me-1"></i> Descargar TXT
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-success fw-semibold" onclick="descargarMails('estudiantes', 'csv')">
+                                                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Descargar CSV
+                                            </button>
+                                        </div>
+                                        <div class="input-group input-group-sm" style="max-width: 250px;">
+                                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                            <input type="text" class="form-control" id="filtroMailsEstudiantes" placeholder="Buscar estudiante..." onkeyup="filtrarTablaMails('estudiantes')">
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive" id="tablaMailsEstudiantesContainer">
+                                        <div class="text-center p-4"><div class="spinner-border text-primary"></div></div>
+                                    </div>
+                                </div>
+
+                                <!-- Subpanel Tutores -->
+                                <div class="tab-pane fade" id="subpanel-mails-tutores" role="tabpanel">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 p-2 bg-light rounded no-print">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-bold small text-muted">Acciones:</span>
+                                            <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" id="btnCopiarTutores" onclick="copiarMails('tutores')">
+                                                <i class="bi bi-clipboard me-1"></i> Copiar CCO / BCC
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold" onclick="descargarMails('tutores', 'txt')">
+                                                <i class="bi bi-file-earmark-text me-1"></i> Descargar TXT
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-success fw-semibold" onclick="descargarMails('tutores', 'csv')">
+                                                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Descargar CSV
+                                            </button>
+                                        </div>
+                                        <div class="input-group input-group-sm" style="max-width: 250px;">
+                                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                            <input type="text" class="form-control" id="filtroMailsTutores" placeholder="Buscar tutor o alumno..." onkeyup="filtrarTablaMails('tutores')">
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive" id="tablaMailsTutoresContainer">
+                                        <div class="text-center p-4"><div class="spinner-border text-primary"></div></div>
+                                    </div>
+                                </div>
+
+                                <!-- Subpanel Docentes -->
+                                <div class="tab-pane fade" id="subpanel-mails-docentes" role="tabpanel">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 p-2 bg-light rounded no-print">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-bold small text-muted">Acciones:</span>
+                                            <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" id="btnCopiarDocentes" onclick="copiarMails('docentes')">
+                                                <i class="bi bi-clipboard me-1"></i> Copiar CCO / BCC
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold" onclick="descargarMails('docentes', 'txt')">
+                                                <i class="bi bi-file-earmark-text me-1"></i> Descargar TXT
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-success fw-semibold" onclick="descargarMails('docentes', 'csv')">
+                                                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Descargar CSV
+                                            </button>
+                                        </div>
+                                        <div class="input-group input-group-sm" style="max-width: 250px;">
+                                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                            <input type="text" class="form-control" id="filtroMailsDocentes" placeholder="Buscar docente o materia..." onkeyup="filtrarTablaMails('docentes')">
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive" id="tablaMailsDocentesContainer">
+                                        <div class="text-center p-4"><div class="spinner-border text-primary"></div></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -157,11 +324,35 @@ async function verCursosHorarios() {
                 .view-section.active { display: block !important; width: 100% !important; }
                 
                 /* Comportamiento según el elemento a imprimir */
-                body.imprimir-solo-horario #panel-alumnos { display: none !important; }
+                body.imprimir-solo-horario #panel-alumnos,
+                body.imprimir-solo-horario #panel-docentes-curso,
+                body.imprimir-solo-horario #panel-emails-curso { display: none !important; }
                 body.imprimir-solo-horario #panel-horario { display: block !important; width: 100% !important; opacity: 1 !important; visibility: visible !important; }
                 
-                body.imprimir-solo-alumnos #panel-horario { display: none !important; }
+                body.imprimir-solo-alumnos #panel-horario,
+                body.imprimir-solo-alumnos #panel-docentes-curso,
+                body.imprimir-solo-alumnos #panel-emails-curso { display: none !important; }
                 body.imprimir-solo-alumnos #panel-alumnos { display: block !important; width: 100% !important; opacity: 1 !important; visibility: visible !important; }
+                
+                body.imprimir-solo-docentes #panel-alumnos,
+                body.imprimir-solo-docentes #panel-horario,
+                body.imprimir-solo-docentes #panel-emails-curso { display: none !important; }
+                body.imprimir-solo-docentes #panel-docentes-curso { display: block !important; width: 100% !important; opacity: 1 !important; visibility: visible !important; }
+
+                /* Formato de la Lista de Docentes en Impresión */
+                table.tabla-docentes-print {
+                    width: 100% !important;
+                    border-collapse: collapse !important;
+                }
+                table.tabla-docentes-print th, table.tabla-docentes-print td {
+                    border: 1px solid #000 !important;
+                    padding: 8px 6px !important;
+                    font-size: 8.5pt !important;
+                }
+                table.tabla-docentes-print th {
+                    background-color: #f0f0f0 !important;
+                    -webkit-print-color-adjust: exact;
+                }
                 
                 /* Formato del Horario Semanal en Impresión */
                 table.tabla-horario-print {
@@ -205,6 +396,8 @@ async function verCursosHorarios() {
     // Escuchar cambios de pestaña para actualizar menú de impresión dinámicamente
     const tabAlumnos = document.getElementById("tab-alumnos");
     const tabHorario = document.getElementById("tab-horario");
+    const tabDocentes = document.getElementById("tab-docentes-curso");
+    const tabEmails = document.getElementById("tab-emails-curso");
 
     if (tabAlumnos) {
         tabAlumnos.addEventListener("click", () => actualizarMenuImpresion('alumnos'));
@@ -213,6 +406,26 @@ async function verCursosHorarios() {
     if (tabHorario) {
         tabHorario.addEventListener("click", () => actualizarMenuImpresion('horario'));
         tabHorario.addEventListener("shown.bs.tab", () => actualizarMenuImpresion('horario'));
+    }
+    if (tabDocentes) {
+        tabDocentes.addEventListener("click", () => {
+            actualizarMenuImpresion('docentes');
+            cargarDocentesDelCursoActivo();
+        });
+        tabDocentes.addEventListener("shown.bs.tab", () => {
+            actualizarMenuImpresion('docentes');
+            cargarDocentesDelCursoActivo();
+        });
+    }
+    if (tabEmails) {
+        tabEmails.addEventListener("click", () => {
+            actualizarMenuImpresion('emails');
+            cargarEmailsDelCursoActivo();
+        });
+        tabEmails.addEventListener("shown.bs.tab", () => {
+            actualizarMenuImpresion('emails');
+            cargarEmailsDelCursoActivo();
+        });
     }
 
     actualizarMenuImpresion('alumnos');
@@ -234,6 +447,36 @@ function actualizarMenuImpresion(pestaña) {
             e.preventDefault();
             lanzarImpresionConRetardo('horario');
         });
+    } else if (pestaña === 'docentes') {
+        menu.innerHTML = `
+            <li>
+                <button type="button" class="dropdown-item fw-bold text-dark py-2" id="btnImpDocentes">
+                    <i class="bi bi-person-badge text-primary me-2"></i> Imprimir Planta Docente
+                </button>
+            </li>
+        `;
+        document.getElementById("btnImpDocentes")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.imprimirDocentesCurso();
+        });
+    } else if (pestaña === 'emails') {
+        menu.innerHTML = `
+            <li>
+                <button type="button" class="dropdown-item fw-bold text-dark py-2" onclick="descargarMails('estudiantes', 'csv')">
+                    <i class="bi bi-file-earmark-spreadsheet text-success me-2"></i> Exportar Estudiantes (CSV)
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item fw-bold text-dark py-2" onclick="descargarMails('tutores', 'csv')">
+                    <i class="bi bi-file-earmark-spreadsheet text-info me-2"></i> Exportar Tutores (CSV)
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item fw-bold text-dark py-2" onclick="descargarMails('docentes', 'csv')">
+                    <i class="bi bi-file-earmark-spreadsheet text-primary me-2"></i> Exportar Docentes (CSV)
+                </button>
+            </li>
+        `;
     } else {
         menu.innerHTML = `
             <li>
@@ -466,11 +709,13 @@ function seleccionarCurso(id) {
     document.getElementById("cursoDetalleTitulo").innerText = `${fmtOrdinal(curso.anio)}${divStr} ${curso.especialidad.toUpperCase()}`;
     document.getElementById("cursoDetalleSubtitulo").innerText = `Especialidad: ${curso.especialidad} (${curso.modalidad}) | Turno: ${curso.turno.toUpperCase()}`;
 
-    // Cargar horario, alumnos y preceptor
+    // Cargar horario, alumnos, preceptor, docentes y emails
     actualizarMenuImpresion('alumnos');
     cargarHorarioDelCurso();
     cargarAlumnosDelCursoActivo();
     cargarPreceptorDelCurso();
+    cargarDocentesDelCursoActivo();
+    cargarEmailsDelCursoActivo();
 }
 
 async function cargarHorarioDelCurso() {
@@ -807,6 +1052,8 @@ window.imprimirListaAlumnos = function(modo) {
 function onCambioAnioLectivoCurso() {
     cargarAlumnosDelCursoActivo();
     cargarPreceptorDelCurso();
+    cargarDocentesDelCursoActivo();
+    cargarEmailsDelCursoActivo();
 }
 
 async function cargarPreceptorDelCurso() {
@@ -931,4 +1178,529 @@ async function guardarAsignacionPreceptor() {
 window.onCambioAnioLectivoCurso = onCambioAnioLectivoCurso;
 window.abrirModalAsignarPreceptor = abrirModalAsignarPreceptor;
 window.guardarAsignacionPreceptor = guardarAsignacionPreceptor;
+
+// ============================
+// LOGICA DE DOCENTES Y MAILS POR CURSO
+// ============================
+
+async function cargarDocentesDelCursoActivo() {
+    const container = document.getElementById("listaDocentesCursoContainer");
+    if (!container || !cursoActivoId) return;
+
+    container.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
+    const anioSelect = document.getElementById("selectAnioLectivoCurso");
+    const anio = anioSelect ? anioSelect.value : new Date().getFullYear();
+
+    try {
+        const res = await api.get(`/api/v1/cursos/${cursoActivoId}/docentes?anio_lectivo=${anio}`);
+        if (!res.ok) throw new Error("Error al obtener docentes del curso");
+        dataDocentesCursoGlobal = await res.json();
+
+        if (!dataDocentesCursoGlobal || dataDocentesCursoGlobal.length === 0) {
+            container.innerHTML = '<div class="alert alert-info text-center my-3"><i class="bi bi-info-circle me-1"></i> No hay materias ni docentes asignados a este curso.</div>';
+            return;
+        }
+
+        const curso = cursosListGlobal.find(c => c.id === cursoActivoId);
+        const divStr = curso.division ? ` ${fmtOrdinal(curso.division)}` : '';
+        const cursoNombre = `${fmtOrdinal(curso.anio)}${divStr} ${curso.especialidad ? curso.especialidad.toUpperCase() : ''}`;
+
+        let html = `
+            <!-- Encabezado para impresión -->
+            <div class="d-none d-print-block text-center mb-4">
+                <h3 class="fw-bold mb-1">E.S.E.A en Ceramica Nº1 D.E II</h3>
+                <h4 class="mb-0">PLANTA DOCENTE Y MATERIAS: ${cursoNombre}</h4>
+                <p class="text-muted small">Ciclo Lectivo: ${anio} | Turno: ${curso.turno.toUpperCase()}</p>
+                <hr style="border-top: 2px solid #000; margin: 15px 0;">
+            </div>
+
+            <table class="table table-hover align-middle mb-0 tabla-docentes-print border">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 40px;" class="text-center">#</th>
+                        <th>Función / Materia</th>
+                        <th>Docente a Cargo</th>
+                        <th>Rol</th>
+                        <th>Puesto</th>
+                        <th>Sit. Revista</th>
+                        <th>Correo Electrónico</th>
+                        <th>Teléfono</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        dataDocentesCursoGlobal.forEach((d, idx) => {
+            const esPreceptor = d.rol && d.rol.includes('Preceptor');
+            const rowClass = esPreceptor ? 'table-primary bg-opacity-25' : '';
+            const rolBadge = esPreceptor
+                ? '<span class="badge bg-primary">Preceptor/a</span>'
+                : '<span class="badge bg-secondary">Profesor/a</span>';
+            const situacionBadge = d.situacion_revista
+                ? `<span class="badge bg-light text-dark border">${d.situacion_revista.toUpperCase()}</span>`
+                : '-';
+            const puestoText = d.numero_puesto ? `Puesto ${d.numero_puesto}` : '-';
+
+            const emailHtml = d.email
+                ? `<div class="d-flex align-items-center gap-1">
+                     <a href="mailto:${d.email}" class="text-primary text-decoration-none fw-semibold small" title="Enviar correo">
+                       <i class="bi bi-envelope me-1"></i>${d.email}
+                     </a>
+                     <button type="button" class="btn btn-sm btn-link text-muted p-0 no-print" onclick="copiarTextoIndividual('${d.email}', this)" title="Copiar correo">
+                       <i class="bi bi-clipboard"></i>
+                     </button>
+                   </div>`
+                : `<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i>Sin correo</span>`;
+
+            const telHtml = d.telefono ? `<span class="small text-muted"><i class="bi bi-telephone me-1"></i>${d.telefono}</span>` : '-';
+
+            html += `
+                <tr class="${rowClass}">
+                    <td class="text-center text-muted fw-bold small">${idx + 1}</td>
+                    <td class="fw-bold text-dark">${d.materia_nombre}</td>
+                    <td>
+                        <span class="fw-semibold ${d.docente_completo === 'VACANTE' ? 'text-danger fst-italic' : 'text-dark'}">
+                            ${d.docente_completo}
+                        </span>
+                    </td>
+                    <td>${rolBadge}</td>
+                    <td class="small">${puestoText}</td>
+                    <td>${situacionBadge}</td>
+                    <td>${emailHtml}</td>
+                    <td>${telHtml}</td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    } catch (err) {
+        container.innerHTML = `<div class="alert alert-danger my-3">Error al cargar docentes: ${api.getErrorMessage(err)}</div>`;
+    }
+}
+
+async function cargarEmailsDelCursoActivo() {
+    if (!cursoActivoId) return;
+    const anioSelect = document.getElementById("selectAnioLectivoCurso");
+    const anio = anioSelect ? anioSelect.value : new Date().getFullYear();
+
+    const cEstudiantes = document.getElementById("tablaMailsEstudiantesContainer");
+    const cTutores = document.getElementById("tablaMailsTutoresContainer");
+    const cDocentes = document.getElementById("tablaMailsDocentesContainer");
+
+    if (cEstudiantes) cEstudiantes.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+    if (cTutores) cTutores.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+    if (cDocentes) cDocentes.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>';
+
+    try {
+        const res = await api.get(`/api/v1/cursos/${cursoActivoId}/emails?anio_lectivo=${anio}`);
+        if (!res.ok) throw new Error("Error al obtener correos del curso");
+        dataEmailsCursoGlobal = await res.json();
+
+        const stats = dataEmailsCursoGlobal.stats || {
+            estudiantes_total: 0, estudiantes_con_email: 0,
+            tutores_total: 0, tutores_con_email: 0,
+            docentes_total: 0, docentes_con_email: 0
+        };
+
+        const elBadgeEst = document.getElementById("badgeTotalEstudiantes");
+        const elBadgeTut = document.getElementById("badgeTotalTutores");
+        const elBadgeDoc = document.getElementById("badgeTotalDocentes");
+        if (elBadgeEst) elBadgeEst.innerText = `${stats.estudiantes_con_email} / ${stats.estudiantes_total}`;
+        if (elBadgeTut) elBadgeTut.innerText = `${stats.tutores_con_email} / ${stats.tutores_total}`;
+        if (elBadgeDoc) elBadgeDoc.innerText = `${stats.docentes_con_email} / ${stats.docentes_total}`;
+
+        const elPillEst = document.getElementById("pillCountEstudiantes");
+        const elPillTut = document.getElementById("pillCountTutores");
+        const elPillDoc = document.getElementById("pillCountDocentes");
+        if (elPillEst) elPillEst.innerText = stats.estudiantes_con_email;
+        if (elPillTut) elPillTut.innerText = stats.tutores_con_email;
+        if (elPillDoc) elPillDoc.innerText = stats.docentes_con_email;
+
+        renderTablaMailsEstudiantes(dataEmailsCursoGlobal.estudiantes || []);
+        renderTablaMailsTutores(dataEmailsCursoGlobal.tutores || []);
+        renderTablaMailsDocentes(dataEmailsCursoGlobal.docentes || []);
+
+    } catch (err) {
+        const errHtml = `<div class="alert alert-danger my-3">Error al cargar correos: ${api.getErrorMessage(err)}</div>`;
+        if (cEstudiantes) cEstudiantes.innerHTML = errHtml;
+        if (cTutores) cTutores.innerHTML = errHtml;
+        if (cDocentes) cDocentes.innerHTML = errHtml;
+    }
+}
+
+function renderTablaMailsEstudiantes(estudiantes) {
+    const container = document.getElementById("tablaMailsEstudiantesContainer");
+    if (!container) return;
+
+    if (estudiantes.length === 0) {
+        container.innerHTML = '<div class="alert alert-light text-center border p-4 text-muted">No hay estudiantes inscriptos en este ciclo lectivo.</div>';
+        return;
+    }
+
+    let html = `
+        <table class="table table-hover align-middle border mb-0" id="tabla-raw-estudiantes">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 40px;" class="text-center">#</th>
+                    <th>Estudiante</th>
+                    <th>DNI</th>
+                    <th>Correo Electrónico</th>
+                    <th style="width: 100px;" class="text-center">Estado</th>
+                    <th style="width: 60px;" class="text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    estudiantes.forEach((e, idx) => {
+        const estadoBadge = e.has_email
+            ? '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Válido</span>'
+            : '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-exclamation-triangle me-1"></i>Sin mail</span>';
+
+        const emailText = e.has_email
+            ? `<a href="mailto:${e.email}" class="fw-semibold text-primary text-decoration-none">${e.email}</a>`
+            : '<span class="text-muted fst-italic">No registrado</span>';
+
+        const copyBtn = e.has_email
+            ? `<button type="button" class="btn btn-sm btn-outline-secondary" onclick="copiarTextoIndividual('${e.email}', this)" title="Copiar"><i class="bi bi-clipboard"></i></button>`
+            : '-';
+
+        html += `
+            <tr class="fila-mail-estudiante" data-nombre="${(e.apellido + ' ' + e.nombre).toLowerCase()}" data-email="${(e.email || '').toLowerCase()}" data-dni="${e.dni || ''}">
+                <td class="text-center text-muted small">${idx + 1}</td>
+                <td class="fw-bold text-dark">${e.apellido}, ${e.nombre}</td>
+                <td>${e.dni || '-'}</td>
+                <td>${emailText}</td>
+                <td class="text-center">${estadoBadge}</td>
+                <td class="text-center">${copyBtn}</td>
+            </tr>
+        `;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function renderTablaMailsTutores(tutores) {
+    const container = document.getElementById("tablaMailsTutoresContainer");
+    if (!container) return;
+
+    if (tutores.length === 0) {
+        container.innerHTML = '<div class="alert alert-light text-center border p-4 text-muted">No hay datos de padres o tutores cargados para los alumnos del curso.</div>';
+        return;
+    }
+
+    let html = `
+        <table class="table table-hover align-middle border mb-0" id="tabla-raw-tutores">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 40px;" class="text-center">#</th>
+                    <th>Tutor / Familiar</th>
+                    <th>Parentesco</th>
+                    <th>Estudiante a Cargo</th>
+                    <th>Teléfono</th>
+                    <th>Correo Electrónico</th>
+                    <th style="width: 100px;" class="text-center">Estado</th>
+                    <th style="width: 60px;" class="text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    tutores.forEach((t, idx) => {
+        const estadoBadge = t.has_email
+            ? '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Válido</span>'
+            : '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-exclamation-triangle me-1"></i>Sin mail</span>';
+
+        const emailText = t.has_email
+            ? `<a href="mailto:${t.email}" class="fw-semibold text-primary text-decoration-none">${t.email}</a>`
+            : '<span class="text-muted fst-italic">No registrado</span>';
+
+        const copyBtn = t.has_email
+            ? `<button type="button" class="btn btn-sm btn-outline-secondary" onclick="copiarTextoIndividual('${t.email}', this)" title="Copiar"><i class="bi bi-clipboard"></i></button>`
+            : '-';
+
+        html += `
+            <tr class="fila-mail-tutor" data-nombre="${(t.apellido + ' ' + t.nombre).toLowerCase()}" data-alumno="${(t.alumno_nombre_completo || '').toLowerCase()}" data-email="${(t.email || '').toLowerCase()}">
+                <td class="text-center text-muted small">${idx + 1}</td>
+                <td class="fw-bold text-dark">${t.apellido}, ${t.nombre}</td>
+                <td><span class="badge bg-light text-dark border">${t.parentesco}</span></td>
+                <td class="small text-secondary fw-semibold">${t.alumno_nombre_completo}</td>
+                <td class="small">${t.telefono ? `<i class="bi bi-telephone me-1"></i>${t.telefono}` : '-'}</td>
+                <td>${emailText}</td>
+                <td class="text-center">${estadoBadge}</td>
+                <td class="text-center">${copyBtn}</td>
+            </tr>
+        `;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function renderTablaMailsDocentes(docentes) {
+    const container = document.getElementById("tablaMailsDocentesContainer");
+    if (!container) return;
+
+    if (docentes.length === 0) {
+        container.innerHTML = '<div class="alert alert-light text-center border p-4 text-muted">No hay docentes vinculados con correo a este curso.</div>';
+        return;
+    }
+
+    let html = `
+        <table class="table table-hover align-middle border mb-0" id="tabla-raw-docentes">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 40px;" class="text-center">#</th>
+                    <th>Docente</th>
+                    <th>Rol Institucional</th>
+                    <th>Materias / Áreas</th>
+                    <th>Teléfono</th>
+                    <th>Correo Electrónico</th>
+                    <th style="width: 100px;" class="text-center">Estado</th>
+                    <th style="width: 60px;" class="text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    docentes.forEach((d, idx) => {
+        const estadoBadge = d.has_email
+            ? '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Válido</span>'
+            : '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-exclamation-triangle me-1"></i>Sin mail</span>';
+
+        const emailText = d.has_email
+            ? `<a href="mailto:${d.email}" class="fw-semibold text-primary text-decoration-none">${d.email}</a>`
+            : '<span class="text-muted fst-italic">No registrado</span>';
+
+        const copyBtn = d.has_email
+            ? `<button type="button" class="btn btn-sm btn-outline-secondary" onclick="copiarTextoIndividual('${d.email}', this)" title="Copiar"><i class="bi bi-clipboard"></i></button>`
+            : '-';
+
+        html += `
+            <tr class="fila-mail-docente" data-nombre="${(d.nombre_completo || '').toLowerCase()}" data-materia="${(d.materias || '').toLowerCase()}" data-email="${(d.email || '').toLowerCase()}">
+                <td class="text-center text-muted small">${idx + 1}</td>
+                <td class="fw-bold text-dark">${d.nombre_completo}</td>
+                <td><span class="badge bg-primary bg-opacity-75">${d.rol}</span></td>
+                <td class="small text-secondary">${d.materias || '-'}</td>
+                <td class="small">${d.telefono ? `<i class="bi bi-telephone me-1"></i>${d.telefono}` : '-'}</td>
+                <td>${emailText}</td>
+                <td class="text-center">${estadoBadge}</td>
+                <td class="text-center">${copyBtn}</td>
+            </tr>
+        `;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// ============================
+// ACCIONES: COPIAR AL PORTAPAPELES Y DESCARGAR
+// ============================
+
+function copiarMails(tipo) {
+    if (!dataEmailsCursoGlobal || !dataEmailsCursoGlobal[tipo]) {
+        alert("Los datos de correos aún no están disponibles.");
+        return;
+    }
+
+    const items = dataEmailsCursoGlobal[tipo];
+    const emailsValidos = items.filter(i => i.has_email && i.email).map(i => i.email.trim());
+
+    if (emailsValidos.length === 0) {
+        alert(`No hay correos registrados para ${tipo}.`);
+        return;
+    }
+
+    // Formato estándar CCO/BCC: separados por coma
+    const textoParaCopiar = emailsValidos.join(", ");
+    const btnId = tipo === 'estudiantes' ? 'btnCopiarEstudiantes' : (tipo === 'tutores' ? 'btnCopiarTutores' : 'btnCopiarDocentes');
+    const btn = document.getElementById(btnId);
+
+    copiarTextoAlPortapapeles(textoParaCopiar, btn, `¡${emailsValidos.length} correos copiados (formato CCO)!`);
+}
+
+function copiarTextoIndividual(texto, btn) {
+    if (!texto) return;
+    copiarTextoAlPortapapeles(texto, btn, '¡Copiado!');
+}
+
+function copiarTextoAlPortapapeles(texto, btnElement, mensajeExito) {
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(texto).then(() => {
+            feedbackBotonCopia(btnElement, mensajeExito);
+        }).catch(() => fallbackCopiarTexto(texto, btnElement, mensajeExito));
+    } else {
+        fallbackCopiarTexto(texto, btnElement, mensajeExito);
+    }
+}
+
+function fallbackCopiarTexto(texto, btnElement, mensajeExito) {
+    const textArea = document.createElement("textarea");
+    textArea.value = texto;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        feedbackBotonCopia(btnElement, mensajeExito);
+    } catch (err) {
+        alert("No se pudo copiar automáticamente. Por favor seleccione y copie manualmente.");
+    }
+    document.body.removeChild(textArea);
+}
+
+function feedbackBotonCopia(btn, mensaje) {
+    if (!btn) {
+        alert(mensaje);
+        return;
+    }
+    const htmlOriginal = btn.innerHTML;
+    btn.classList.add('btn-success');
+    btn.classList.remove('btn-outline-primary', 'btn-outline-secondary');
+    btn.innerHTML = `<i class="bi bi-check2 me-1"></i> ${mensaje}`;
+    setTimeout(() => {
+        btn.innerHTML = htmlOriginal;
+        btn.classList.remove('btn-success');
+        if (btn.id && btn.id.includes('btnCopiar')) {
+            btn.classList.add('btn-outline-primary');
+        } else {
+            btn.classList.add('btn-outline-secondary');
+        }
+    }, 2200);
+}
+
+function descargarMails(tipo, formato) {
+    if (!dataEmailsCursoGlobal || !dataEmailsCursoGlobal[tipo]) {
+        alert("Los datos de correos aún no están disponibles.");
+        return;
+    }
+
+    const items = dataEmailsCursoGlobal[tipo];
+    const curso = cursosListGlobal.find(c => c.id === cursoActivoId);
+    const divStr = curso.division ? `_${curso.division}` : '';
+    const cursoTag = `${curso.anio}${divStr}_${(curso.especialidad || 'gral').toLowerCase()}`.replace(/[^a-zA-Z0-9_-]/g, '');
+    const anio = dataEmailsCursoGlobal.anio_lectivo || new Date().getFullYear();
+
+    if (formato === 'txt') {
+        const emailsValidos = items.filter(i => i.has_email && i.email).map(i => i.email.trim());
+        let contenido = `SISTEMA ESCOLAR ECN Nº1 CERAMICA (CERA 1)\n`;
+        contenido += `LISTA DE CORREOS: ${tipo.toUpperCase()}\n`;
+        contenido += `CURSO: ${fmtOrdinal(curso.anio)} ${curso.division ? fmtOrdinal(curso.division) : ''} ${curso.especialidad.toUpperCase()} | CICLO: ${anio}\n`;
+        contenido += `FECHA DE GENERACION: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n`;
+        contenido += `TOTAL CON CORREO: ${emailsValidos.length} de ${items.length}\n`;
+        contenido += `--------------------------------------------------------\n\n`;
+        contenido += `# LISTA PARA CCO / BCC (COPIAR Y PEGAR):\n`;
+        contenido += `${emailsValidos.join(', ')}\n\n`;
+        contenido += `--------------------------------------------------------\n`;
+        contenido += `# DETALLE INDIVIDUAL:\n`;
+        items.forEach(it => {
+            const nom = it.nombre_completo || `${it.apellido}, ${it.nombre}`;
+            const mail = it.email ? it.email : '(Sin correo)';
+            contenido += `${nom} <${mail}>\n`;
+        });
+
+        descargarArchivo(contenido, `correos_${tipo}_curso_${cursoTag}_${anio}.txt`, 'text/plain');
+
+    } else if (formato === 'csv') {
+        let csvContent = "";
+        if (tipo === 'estudiantes') {
+            csvContent += "Apellido,Nombre,DNI,Email,Tiene_Email\n";
+            items.forEach(e => {
+                csvContent += `"${e.apellido || ''}","${e.nombre || ''}","${e.dni || ''}","${e.email || ''}","${e.has_email ? 'SI' : 'NO'}"\n`;
+            });
+        } else if (tipo === 'tutores') {
+            csvContent += "Apellido,Nombre,Parentesco,Estudiante_A_Cargo,Telefono,Email,Tiene_Email\n";
+            items.forEach(t => {
+                csvContent += `"${t.apellido || ''}","${t.nombre || ''}","${t.parentesco || ''}","${t.alumno_nombre_completo || ''}","${t.telefono || ''}","${t.email || ''}","${t.has_email ? 'SI' : 'NO'}"\n`;
+            });
+        } else if (tipo === 'docentes') {
+            csvContent += "Docente,Rol,Materias,Telefono,Email,Tiene_Email\n";
+            items.forEach(d => {
+                csvContent += `"${d.nombre_completo || ''}","${d.rol || ''}","${d.materias || ''}","${d.telefono || ''}","${d.email || ''}","${d.has_email ? 'SI' : 'NO'}"\n`;
+            });
+        }
+
+        descargarArchivo(csvContent, `correos_${tipo}_curso_${cursoTag}_${anio}.csv`, 'text/csv');
+    }
+}
+
+function descargarArchivo(contenido, nombreArchivo, mimeType) {
+    const blob = new Blob(["\ufeff" + contenido], { type: mimeType + ';charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", nombreArchivo);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function filtrarTablaMails(tipo) {
+    const inputId = tipo === 'estudiantes' ? 'filtroMailsEstudiantes' : (tipo === 'tutores' ? 'filtroMailsTutores' : 'filtroMailsDocentes');
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const q = input.value.toLowerCase().trim();
+
+    const filas = document.querySelectorAll(tipo === 'estudiantes' ? '.fila-mail-estudiante' : (tipo === 'tutores' ? '.fila-mail-tutor' : '.fila-mail-docente'));
+    filas.forEach(f => {
+        const texto = f.innerText.toLowerCase();
+        if (!q || texto.includes(q)) {
+            f.style.display = '';
+        } else {
+            f.style.display = 'none';
+        }
+    });
+}
+
+window.imprimirDocentesCurso = function() {
+    const el = document.getElementById("listaDocentesCursoContainer");
+    if (!el || el.querySelector(".spinner-border")) {
+        alert("La lista de docentes aún no está cargada.");
+        return;
+    }
+    const clon = el.cloneNode(true);
+    clon.querySelectorAll('.no-print').forEach(e => e.style.display = 'none');
+    clon.querySelectorAll('.d-none').forEach(e => e.style.display = 'block');
+    clon.querySelectorAll('.d-print-block').forEach(e => e.style.display = 'block');
+
+    const area = document.createElement('div');
+    area.id = 'areaPrintTemp';
+    area.appendChild(clon);
+    document.body.appendChild(area);
+
+    const style = document.createElement('style');
+    style.id = 'stylePrintTemp';
+    style.innerHTML = `
+        @media screen { #areaPrintTemp { display: none !important; } }
+        @media print {
+            body > *:not(#areaPrintTemp) { display: none !important; }
+            #areaPrintTemp { display: block !important; padding: 15px; }
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #000 !important; padding: 6px 8px !important; font-size: 8.5pt !important; text-align: left !important; vertical-align: middle !important; }
+            th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; text-align: center !important; }
+            .text-center { text-align: center !important; }
+            @page { margin: 1cm; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    window.print();
+
+    setTimeout(() => {
+        area.remove();
+        style.remove();
+    }, 1000);
+};
+
+window.copiarMails = copiarMails;
+window.copiarTextoIndividual = copiarTextoIndividual;
+window.descargarMails = descargarMails;
+window.filtrarTablaMails = filtrarTablaMails;
+
 
