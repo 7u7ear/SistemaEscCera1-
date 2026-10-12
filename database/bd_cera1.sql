@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.2.0, for Win64 (x86_64)
+﻿-- MySQL dump 10.13  Distrib 8.2.0, for Win64 (x86_64)
 --
 -- Host: localhost    Database: bd_cera1
 -- ------------------------------------------------------
@@ -32,7 +32,7 @@ CREATE TABLE `alumno_movimientos` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `fk_movimiento_alumno` (`alumno_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,6 +41,7 @@ CREATE TABLE `alumno_movimientos` (
 
 LOCK TABLES `alumno_movimientos` WRITE;
 /*!40000 ALTER TABLE `alumno_movimientos` DISABLE KEYS */;
+INSERT INTO `alumno_movimientos` VALUES (6,3,'alta','2026-10-12','{\"detalle\": \"Alta de alumno en el sistema\"}',2,'2026-10-12 11:05:20'),(7,3,'matriculacion','2026-10-12','{\"curso_id\": 1, \"anio_lectivo\": 2026, \"curso_nombre\": \"1┬║┬░1┬║\"}',2,'2026-10-12 11:05:40');
 /*!40000 ALTER TABLE `alumno_movimientos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -66,7 +67,7 @@ CREATE TABLE `alumnos` (
   UNIQUE KEY `alumnos_dni_unique` (`dni`),
   UNIQUE KEY `alumnos_email_unique` (`email`),
   KEY `idx_alumnos_deleted_at` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,6 +76,7 @@ CREATE TABLE `alumnos` (
 
 LOCK TABLES `alumnos` WRITE;
 /*!40000 ALTER TABLE `alumnos` DISABLE KEYS */;
+INSERT INTO `alumnos` VALUES (3,'Arnau','Matias Ezequiel','13456789','1981-08-10','Av. Montes de Oca  511 piso 11 dto C','matias.arnau@bue.edu.ar','2026-10-12 11:05:20','2026-10-12 11:05:20',NULL);
 /*!40000 ALTER TABLE `alumnos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -94,7 +96,7 @@ CREATE TABLE `auditoria` (
   `detalles` json DEFAULT NULL,
   `creado_el` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -103,7 +105,7 @@ CREATE TABLE `auditoria` (
 
 LOCK TABLES `auditoria` WRITE;
 /*!40000 ALTER TABLE `auditoria` DISABLE KEYS */;
-INSERT INTO `auditoria` VALUES (1,2,'CREATE','CARGO',17,'{\"tipo_cargo\": \"TP 2 NAVEGACION\", \"total_horas\": 12, \"numero_puesto\": \"102431\"}','2026-06-26 21:44:09'),(2,2,'ASSIGN_DOCENTE','CARGO',17,'{\"rol\": 27, \"docente_id\": 30, \"reemplaza_a\": null, \"fecha_inicio\": \"2023-03-10\", \"expediente_alta\": \"EX-2023- MUGUIWARA-ONEPIECE\", \"situacion_revista\": \"titular\"}','2026-06-26 21:49:35'),(3,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"lunes\", \"curso_id\": 1, \"materia_id\": 49, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}','2026-06-26 21:52:05'),(4,2,'CREATE','TIPO_HORA',NULL,'{\"nombre\": \"Visita\"}','2026-06-26 21:53:58'),(5,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"martes\", \"curso_id\": 6, \"materia_id\": 4, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 6, \"cantidad_horas\": 2}','2026-06-26 21:54:10'),(6,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"miércoles\", \"curso_id\": 17, \"materia_id\": 10, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}','2026-06-26 21:56:34'),(7,2,'UPDATE_DISTRIBUCION','CARGO_DISTRIBUCION',10,'{\"dia\": \"miércoles\", \"curso_id\": 17, \"materia_id\": 10, \"hora_egreso\": \"10:30\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 4}','2026-06-26 21:57:16'),(8,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"jueves\", \"curso_id\": null, \"materia_id\": 14, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 2, \"cantidad_horas\": 2}','2026-06-26 22:01:33'),(9,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"viernes\", \"curso_id\": null, \"materia_id\": 14, \"hora_egreso\": \"10:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 2, \"cantidad_horas\": 2}','2026-06-26 22:04:37'),(10,2,'CREATE_USER_ADMIN','USUARIOS',3,'{\"username\": \"Celes\", \"perfil_id\": 4}','2026-06-26 22:10:31'),(11,3,'ASSIGN_DOCENTE','CARGO',17,'{\"rol\": 28, \"docente_id\": 12, \"reemplaza_a\": 28, \"fecha_inicio\": \"2026-06-26\", \"expediente_alta\": \"EX-2026- MUGUIWARA-ONEPIECE\", \"situacion_revista\": \"suplente\"}','2026-06-26 22:41:59'),(12,2,'BAJA_DOCENTE','CARGO',16,'{\"fecha_fin\": \"2026-04-30\", \"cargoDocenteId\": \"27\", \"expediente_baja\": \"ex-2026-1534-cera1-26\", \"titular_regresa\": true}','2026-07-22 12:28:21'),(13,2,'BAJA_DOCENTE','CARGO',16,'{\"fecha_fin\": \"2026-04-30\", \"cargoDocenteId\": \"27\", \"expediente_baja\": \"ex-2026-1534-cera1-26\", \"titular_regresa\": true}','2026-07-22 12:28:22'),(14,2,'CREATE','ALUMNOS',1,'{\"dni\": \"13456789\", \"apellido\": \"Fuente\"}','2026-07-29 12:12:03'),(15,2,'MATRICULAR','ALUMNOS',1,'{\"curso_id\": 1, \"anio_lectivo\": 2026}','2026-07-29 12:18:45'),(16,2,'UPDATE_DISTRIBUCION','CARGO_DISTRIBUCION',1,'{\"dia\": \"martes\", \"curso_id\": 1, \"materia_id\": 45, \"hora_egreso\": \"09:45\", \"hora_ingreso\": \"07:45\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}','2026-07-29 13:32:12'),(17,2,'UPDATE_DISTRIBUCION','CARGO_DISTRIBUCION',6,'{\"dia\": \"miércoles\", \"curso_id\": 1, \"materia_id\": 9, \"hora_egreso\": \"10:30\", \"hora_ingreso\": \"08:00\", \"tipo_hora_id\": 1, \"cantidad_horas\": 4}','2026-07-29 13:33:18'),(18,2,'TRASLADO_CURSO','ALUMNOS',1,'{\"anio_lectivo\": 2026, \"curso_origen_id\": 1, \"curso_destino_id\": 2}','2026-07-29 14:53:52'),(19,2,'ASSIGN_DOCENTE','CARGO',10,'{\"rol\": 57, \"docente_id\": 28, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-08-04\", \"expediente_alta\": \"ex-2025-nojodas\", \"situacion_revista\": \"titular\"}','2026-08-04 19:36:15'),(20,2,'ADD_DISTRIBUCION','CARGO',10,'{\"dia\": \"lunes\", \"curso_id\": 2, \"materia_id\": 44, \"hora_egreso\": \"10:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}','2026-08-04 19:38:45'),(21,1,'UPDATE_PERFIL','USUARIOS',1,'{\"nuevo_perfil\": 2, \"perfil_anterior\": 2}','2026-09-19 14:00:31'),(22,2,'UPDATE_PERFIL','USUARIOS',4,'{\"nuevo_perfil\": 5, \"perfil_anterior\": null}','2026-09-19 14:06:41'),(23,2,'UPDATE_STATUS','USUARIOS',4,'{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"pendiente\"}','2026-09-19 14:06:43'),(24,2,'UPDATE_PERFIL','USUARIOS',4,'{\"nuevo_perfil\": 5, \"perfil_anterior\": 5}','2026-09-19 14:06:44'),(25,2,'UPDATE_STATUS','USUARIOS',4,'{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"activo\"}','2026-09-19 14:06:46'),(26,2,'CREATE','ALUMNOS',2,'{\"dni\": \"134567890\", \"apellido\": \"Arnau\"}','2026-09-19 14:47:25'),(27,2,'MATRICULAR','ALUMNOS',2,'{\"curso_id\": 1, \"anio_lectivo\": 2026}','2026-09-19 14:48:42'),(28,2,'CREATE','TRAMITACIONES',14,'{\"docente_id\": 20, \"codigo_tramite_id\": 1}','2026-09-19 16:00:52'),(29,2,'ASSIGN_DOCENTE','CARGO',3,'{\"rol\": 43, \"docente_id\": 20, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-09-19\", \"expediente_alta\": \"EX-2023- preceptoria-ecn1\", \"situacion_revista\": \"titular\"}','2026-09-19 16:00:54'),(30,2,'UPDATE','TRAMITACIONES',14,'{\"estado\": \"caratulado\"}','2026-09-19 16:01:37'),(31,2,'UPDATE','TRAMITACIONES',14,'{\"estado\": \"caratulado\"}','2026-09-19 16:02:02'),(32,2,'ASSIGN_DOCENTE','CARGO',3,'{\"rol\": 43, \"docente_id\": 20, \"reemplaza_a\": 6, \"fecha_inicio\": \"2026-09-19\", \"expediente_alta\": \"EX-2023- preceptoria-ecn1\", \"situacion_revista\": \"suplente\"}','2026-09-19 16:02:04'),(33,2,'BAJA_DOCENTE','CARGO',3,'{\"fecha_fin\": \"2026-09-19\", \"cargoDocenteId\": \"31\", \"expediente_baja\": \"\", \"titular_regresa\": false}','2026-09-19 16:03:05'),(34,2,'CREATE','CARGO',18,'{\"tipo_cargo\": \"PRECEPTOR\", \"total_horas\": 0, \"numero_puesto\": \"2727\"}','2026-09-19 16:05:05'),(35,2,'UPDATE','CARGO',18,'{\"tipo_cargo\": \"PRECEPTOR\", \"total_horas\": 0, \"numero_puesto\": \"2727\"}','2026-10-05 09:45:52'),(36,2,'ASSIGN_DOCENTE','CARGO',18,'{\"rol\": 15, \"docente_id\": 32, \"reemplaza_a\": null, \"fecha_inicio\": \"2025-01-06\", \"expediente_alta\": \"ex-2010-cer1-tatantatan\", \"situacion_revista\": \"titular\"}','2026-10-05 09:47:41'),(37,2,'ASSIGN_DOCENTE','CARGO',11,'{\"rol\": 15, \"docente_id\": 31, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-10-05\", \"expediente_alta\": \"ex-2012-cer1-lalalal\", \"situacion_revista\": \"interino\"}','2026-10-05 09:49:04'),(38,2,'UPDATE_PERFIL','USUARIOS',5,'{\"nuevo_perfil\": 6, \"perfil_anterior\": null}','2026-10-05 09:58:14'),(39,2,'UPDATE_STATUS','USUARIOS',5,'{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"activo\"}','2026-10-05 09:58:14'),(40,2,'CREATE_USER_ADMIN','USUARIOS',6,'{\"username\": \"Naty\", \"perfil_id\": 1}','2026-10-05 10:16:16'),(41,6,'CREATE','TRAMITACIONES',15,'{\"docente_id\": 31, \"codigo_tramite_id\": 6}','2026-10-05 13:24:57'),(42,6,'CREATE','CARGO',19,'{\"tipo_cargo\": \"TP2 HISTORIA\", \"total_horas\": 12, \"numero_puesto\": \"2727\"}','2026-10-05 13:25:58'),(43,6,'UPDATE','TRAMITACIONES',15,'{\"estado\": \"caratulado\"}','2026-10-05 13:26:15'),(44,6,'ASSIGN_DOCENTE','CARGO',19,'{\"rol\": 2, \"docente_id\": 31, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-10-05\", \"expediente_alta\": \"EX-2023- MUGUIWARA-ONEPIECE\", \"situacion_revista\": \"titular\"}','2026-10-05 13:26:15');
+INSERT INTO `auditoria` VALUES (1,2,'CREATE','CARGO',17,'{\"tipo_cargo\": \"TP 2 NAVEGACION\", \"total_horas\": 12, \"numero_puesto\": \"102431\"}','2026-06-26 21:44:09'),(2,2,'ASSIGN_DOCENTE','CARGO',17,'{\"rol\": 27, \"docente_id\": 30, \"reemplaza_a\": null, \"fecha_inicio\": \"2023-03-10\", \"expediente_alta\": \"EX-2023- MUGUIWARA-ONEPIECE\", \"situacion_revista\": \"titular\"}','2026-06-26 21:49:35'),(3,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"lunes\", \"curso_id\": 1, \"materia_id\": 49, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}','2026-06-26 21:52:05'),(4,2,'CREATE','TIPO_HORA',NULL,'{\"nombre\": \"Visita\"}','2026-06-26 21:53:58'),(5,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"martes\", \"curso_id\": 6, \"materia_id\": 4, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 6, \"cantidad_horas\": 2}','2026-06-26 21:54:10'),(6,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"mi├®rcoles\", \"curso_id\": 17, \"materia_id\": 10, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}','2026-06-26 21:56:34'),(7,2,'UPDATE_DISTRIBUCION','CARGO_DISTRIBUCION',10,'{\"dia\": \"mi├®rcoles\", \"curso_id\": 17, \"materia_id\": 10, \"hora_egreso\": \"10:30\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 4}','2026-06-26 21:57:16'),(8,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"jueves\", \"curso_id\": null, \"materia_id\": 14, \"hora_egreso\": \"09:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 2, \"cantidad_horas\": 2}','2026-06-26 22:01:33'),(9,2,'ADD_DISTRIBUCION','CARGO',17,'{\"dia\": \"viernes\", \"curso_id\": null, \"materia_id\": 14, \"hora_egreso\": \"10:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 2, \"cantidad_horas\": 2}','2026-06-26 22:04:37'),(10,2,'CREATE_USER_ADMIN','USUARIOS',3,'{\"username\": \"Celes\", \"perfil_id\": 4}','2026-06-26 22:10:31'),(11,3,'ASSIGN_DOCENTE','CARGO',17,'{\"rol\": 28, \"docente_id\": 12, \"reemplaza_a\": 28, \"fecha_inicio\": \"2026-06-26\", \"expediente_alta\": \"EX-2026- MUGUIWARA-ONEPIECE\", \"situacion_revista\": \"suplente\"}','2026-06-26 22:41:59'),(12,2,'BAJA_DOCENTE','CARGO',16,'{\"fecha_fin\": \"2026-04-30\", \"cargoDocenteId\": \"27\", \"expediente_baja\": \"ex-2026-1534-cera1-26\", \"titular_regresa\": true}','2026-07-22 12:28:21'),(13,2,'BAJA_DOCENTE','CARGO',16,'{\"fecha_fin\": \"2026-04-30\", \"cargoDocenteId\": \"27\", \"expediente_baja\": \"ex-2026-1534-cera1-26\", \"titular_regresa\": true}','2026-07-22 12:28:22'),(14,2,'CREATE','ALUMNOS',1,'{\"dni\": \"13456789\", \"apellido\": \"Fuente\"}','2026-07-29 12:12:03'),(15,2,'MATRICULAR','ALUMNOS',1,'{\"curso_id\": 1, \"anio_lectivo\": 2026}','2026-07-29 12:18:45'),(16,2,'UPDATE_DISTRIBUCION','CARGO_DISTRIBUCION',1,'{\"dia\": \"martes\", \"curso_id\": 1, \"materia_id\": 45, \"hora_egreso\": \"09:45\", \"hora_ingreso\": \"07:45\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}','2026-07-29 13:32:12'),(17,2,'UPDATE_DISTRIBUCION','CARGO_DISTRIBUCION',6,'{\"dia\": \"mi├®rcoles\", \"curso_id\": 1, \"materia_id\": 9, \"hora_egreso\": \"10:30\", \"hora_ingreso\": \"08:00\", \"tipo_hora_id\": 1, \"cantidad_horas\": 4}','2026-07-29 13:33:18'),(18,2,'TRASLADO_CURSO','ALUMNOS',1,'{\"anio_lectivo\": 2026, \"curso_origen_id\": 1, \"curso_destino_id\": 2}','2026-07-29 14:53:52'),(19,2,'ASSIGN_DOCENTE','CARGO',10,'{\"rol\": 57, \"docente_id\": 28, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-08-04\", \"expediente_alta\": \"ex-2025-nojodas\", \"situacion_revista\": \"titular\"}','2026-08-04 19:36:15'),(20,2,'ADD_DISTRIBUCION','CARGO',10,'{\"dia\": \"lunes\", \"curso_id\": 2, \"materia_id\": 44, \"hora_egreso\": \"10:00\", \"hora_ingreso\": \"07:40\", \"tipo_hora_id\": 1, \"cantidad_horas\": 2}','2026-08-04 19:38:45'),(21,1,'UPDATE_PERFIL','USUARIOS',1,'{\"nuevo_perfil\": 2, \"perfil_anterior\": 2}','2026-09-19 14:00:31'),(22,2,'UPDATE_PERFIL','USUARIOS',4,'{\"nuevo_perfil\": 5, \"perfil_anterior\": null}','2026-09-19 14:06:41'),(23,2,'UPDATE_STATUS','USUARIOS',4,'{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"pendiente\"}','2026-09-19 14:06:43'),(24,2,'UPDATE_PERFIL','USUARIOS',4,'{\"nuevo_perfil\": 5, \"perfil_anterior\": 5}','2026-09-19 14:06:44'),(25,2,'UPDATE_STATUS','USUARIOS',4,'{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"activo\"}','2026-09-19 14:06:46'),(26,2,'CREATE','ALUMNOS',2,'{\"dni\": \"134567890\", \"apellido\": \"Arnau\"}','2026-09-19 14:47:25'),(27,2,'MATRICULAR','ALUMNOS',2,'{\"curso_id\": 1, \"anio_lectivo\": 2026}','2026-09-19 14:48:42'),(28,2,'CREATE','TRAMITACIONES',14,'{\"docente_id\": 20, \"codigo_tramite_id\": 1}','2026-09-19 16:00:52'),(29,2,'ASSIGN_DOCENTE','CARGO',3,'{\"rol\": 43, \"docente_id\": 20, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-09-19\", \"expediente_alta\": \"EX-2023- preceptoria-ecn1\", \"situacion_revista\": \"titular\"}','2026-09-19 16:00:54'),(30,2,'UPDATE','TRAMITACIONES',14,'{\"estado\": \"caratulado\"}','2026-09-19 16:01:37'),(31,2,'UPDATE','TRAMITACIONES',14,'{\"estado\": \"caratulado\"}','2026-09-19 16:02:02'),(32,2,'ASSIGN_DOCENTE','CARGO',3,'{\"rol\": 43, \"docente_id\": 20, \"reemplaza_a\": 6, \"fecha_inicio\": \"2026-09-19\", \"expediente_alta\": \"EX-2023- preceptoria-ecn1\", \"situacion_revista\": \"suplente\"}','2026-09-19 16:02:04'),(33,2,'BAJA_DOCENTE','CARGO',3,'{\"fecha_fin\": \"2026-09-19\", \"cargoDocenteId\": \"31\", \"expediente_baja\": \"\", \"titular_regresa\": false}','2026-09-19 16:03:05'),(34,2,'CREATE','CARGO',18,'{\"tipo_cargo\": \"PRECEPTOR\", \"total_horas\": 0, \"numero_puesto\": \"2727\"}','2026-09-19 16:05:05'),(35,2,'UPDATE','CARGO',18,'{\"tipo_cargo\": \"PRECEPTOR\", \"total_horas\": 0, \"numero_puesto\": \"2727\"}','2026-10-05 09:45:52'),(36,2,'ASSIGN_DOCENTE','CARGO',18,'{\"rol\": 15, \"docente_id\": 32, \"reemplaza_a\": null, \"fecha_inicio\": \"2025-01-06\", \"expediente_alta\": \"ex-2010-cer1-tatantatan\", \"situacion_revista\": \"titular\"}','2026-10-05 09:47:41'),(37,2,'ASSIGN_DOCENTE','CARGO',11,'{\"rol\": 15, \"docente_id\": 31, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-10-05\", \"expediente_alta\": \"ex-2012-cer1-lalalal\", \"situacion_revista\": \"interino\"}','2026-10-05 09:49:04'),(38,2,'UPDATE_PERFIL','USUARIOS',5,'{\"nuevo_perfil\": 6, \"perfil_anterior\": null}','2026-10-05 09:58:14'),(39,2,'UPDATE_STATUS','USUARIOS',5,'{\"nuevo_estado\": \"activo\", \"estado_anterior\": \"activo\"}','2026-10-05 09:58:14'),(40,2,'CREATE_USER_ADMIN','USUARIOS',6,'{\"username\": \"Naty\", \"perfil_id\": 1}','2026-10-05 10:16:16'),(41,6,'CREATE','TRAMITACIONES',15,'{\"docente_id\": 31, \"codigo_tramite_id\": 6}','2026-10-05 13:24:57'),(42,6,'CREATE','CARGO',19,'{\"tipo_cargo\": \"TP2 HISTORIA\", \"total_horas\": 12, \"numero_puesto\": \"2727\"}','2026-10-05 13:25:58'),(43,6,'UPDATE','TRAMITACIONES',15,'{\"estado\": \"caratulado\"}','2026-10-05 13:26:15'),(44,6,'ASSIGN_DOCENTE','CARGO',19,'{\"rol\": 2, \"docente_id\": 31, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-10-05\", \"expediente_alta\": \"EX-2023- MUGUIWARA-ONEPIECE\", \"situacion_revista\": \"titular\"}','2026-10-05 13:26:15'),(45,6,'DELETE','TRAMITACIONES',14,'{\"docente_id\": 20}','2026-10-05 13:51:04'),(46,6,'DELETE','TRAMITACIONES',13,'{\"docente_id\": 28}','2026-10-05 13:51:06'),(47,6,'DELETE','TRAMITACIONES',11,'{\"docente_id\": 12}','2026-10-05 13:51:15'),(48,6,'DELETE','TRAMITACIONES',10,'{\"docente_id\": 12}','2026-10-05 13:51:17'),(49,6,'DELETE','TRAMITACIONES',2,'{\"docente_id\": 16}','2026-10-05 13:51:20'),(50,6,'DELETE','TRAMITACIONES',3,'{\"docente_id\": 16}','2026-10-05 13:51:22'),(51,6,'DELETE','TRAMITACIONES',5,'{\"docente_id\": 21}','2026-10-05 13:51:25'),(52,6,'DELETE','TRAMITACIONES',6,'{\"docente_id\": 21}','2026-10-05 13:51:27'),(53,6,'DELETE','TRAMITACIONES',7,'{\"docente_id\": 29}','2026-10-05 13:51:30'),(54,6,'DELETE','TRAMITACIONES',9,'{\"docente_id\": 30}','2026-10-05 13:51:32'),(55,6,'DELETE','TRAMITACIONES',8,'{\"docente_id\": 20}','2026-10-05 13:52:00'),(56,6,'DELETE','TRAMITACIONES',1,'{\"docente_id\": 6}','2026-10-05 13:52:12'),(57,6,'DELETE','TRAMITACIONES',4,'{\"docente_id\": 16}','2026-10-05 13:52:22'),(58,2,'CREATE','CARGO',20,'{\"tipo_cargo\": \"PRECEPTOR\", \"total_horas\": 0, \"numero_puesto\": \"001\"}','2026-10-12 11:03:00'),(59,2,'ASSIGN_DOCENTE','CARGO',20,'{\"rol\": 1, \"docente_id\": 32, \"reemplaza_a\": null, \"fecha_inicio\": \"2026-10-12\", \"expediente_alta\": \"ex-2012-cer1-lalalal\", \"situacion_revista\": \"titular\"}','2026-10-12 11:03:47'),(60,2,'CREATE','ALUMNOS',3,'{\"dni\": \"13456789\", \"apellido\": \"Arnau\"}','2026-10-12 11:05:20'),(61,2,'MATRICULAR','ALUMNOS',3,'{\"curso_id\": 1, \"anio_lectivo\": 2026}','2026-10-12 11:05:40');
 /*!40000 ALTER TABLE `auditoria` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -134,7 +136,7 @@ CREATE TABLE `bloques_horarios` (
 
 LOCK TABLES `bloques_horarios` WRITE;
 /*!40000 ALTER TABLE `bloques_horarios` DISABLE KEYS */;
-INSERT INTO `bloques_horarios` VALUES (1,'mañana','07:45:00','08:25:00',0,'1° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(2,'mañana','08:25:00','09:05:00',0,'2° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(3,'mañana','09:05:00','09:10:00',1,'Recreo','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(4,'mañana','09:10:00','09:50:00',0,'3° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(5,'mañana','09:50:00','10:30:00',0,'4° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(6,'mañana','10:30:00','10:40:00',1,'Recreo','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(7,'mañana','10:40:00','11:20:00',0,'5° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(8,'mañana','11:20:00','12:00:00',0,'6° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(9,'mañana','12:00:00','12:40:00',0,'7° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(10,'tarde','12:40:00','13:20:00',0,'1° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(11,'tarde','13:20:00','14:00:00',0,'2° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(12,'tarde','14:00:00','14:10:00',1,'Recreo','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(13,'tarde','14:10:00','14:50:00',0,'3° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(14,'tarde','14:50:00','15:30:00',0,'4° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(15,'tarde','15:30:00','15:40:00',1,'Recreo','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(16,'tarde','15:40:00','16:20:00',0,'5° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(17,'tarde','16:20:00','17:00:00',0,'6° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(18,'tarde','17:00:00','17:40:00',0,'7° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(19,'tarde','17:40:00','18:20:00',0,'8° Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL);
+INSERT INTO `bloques_horarios` VALUES (1,'ma├▒ana','07:45:00','08:25:00',0,'1┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(2,'ma├▒ana','08:25:00','09:05:00',0,'2┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(3,'ma├▒ana','09:05:00','09:10:00',1,'Recreo','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(4,'ma├▒ana','09:10:00','09:50:00',0,'3┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(5,'ma├▒ana','09:50:00','10:30:00',0,'4┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(6,'ma├▒ana','10:30:00','10:40:00',1,'Recreo','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(7,'ma├▒ana','10:40:00','11:20:00',0,'5┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(8,'ma├▒ana','11:20:00','12:00:00',0,'6┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(9,'ma├▒ana','12:00:00','12:40:00',0,'7┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(10,'tarde','12:40:00','13:20:00',0,'1┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(11,'tarde','13:20:00','14:00:00',0,'2┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(12,'tarde','14:00:00','14:10:00',1,'Recreo','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(13,'tarde','14:10:00','14:50:00',0,'3┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(14,'tarde','14:50:00','15:30:00',0,'4┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(15,'tarde','15:30:00','15:40:00',1,'Recreo','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(16,'tarde','15:40:00','16:20:00',0,'5┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(17,'tarde','16:20:00','17:00:00',0,'6┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(18,'tarde','17:00:00','17:40:00',0,'7┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL),(19,'tarde','17:40:00','18:20:00',0,'8┬░ Hora','2026-07-29 11:48:51','2026-07-29 11:48:51',NULL);
 /*!40000 ALTER TABLE `bloques_horarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -162,7 +164,7 @@ CREATE TABLE `cargo_docente` (
   `expediente_baja` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `cargo_docente_cargo_id_foreign` (`cargo_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -171,7 +173,7 @@ CREATE TABLE `cargo_docente` (
 
 LOCK TABLES `cargo_docente` WRITE;
 /*!40000 ALTER TABLE `cargo_docente` DISABLE KEYS */;
-INSERT INTO `cargo_docente` VALUES (35,31,19,2,'titular','2026-10-05',NULL,'activo','2026-10-05 13:26:15',NULL,NULL,NULL,'EX-2023- MUGUIWARA-ONEPIECE',NULL);
+INSERT INTO `cargo_docente` VALUES (35,31,19,2,'titular','2026-10-05',NULL,'activo','2026-10-05 13:26:15',NULL,NULL,NULL,'EX-2023- MUGUIWARA-ONEPIECE',NULL),(36,32,20,1,'titular','2026-10-12',NULL,'activo','2026-10-12 11:03:47',NULL,NULL,NULL,'ex-2012-cer1-lalalal',NULL);
 /*!40000 ALTER TABLE `cargo_docente` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -224,7 +226,7 @@ CREATE TABLE `cargos` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `cargos_numero_puesto_unique` (`numero_puesto`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -233,7 +235,7 @@ CREATE TABLE `cargos` (
 
 LOCK TABLES `cargos` WRITE;
 /*!40000 ALTER TABLE `cargos` DISABLE KEYS */;
-INSERT INTO `cargos` VALUES (19,'2727','TP2 HISTORIA',12,'activo',NULL,'2026-10-05 13:25:58',NULL);
+INSERT INTO `cargos` VALUES (19,'2727','TP2 HISTORIA',12,'activo',NULL,'2026-10-05 13:25:58',NULL),(20,'001','PRECEPTOR',NULL,'activo',NULL,'2026-10-12 11:03:00',NULL);
 /*!40000 ALTER TABLE `cargos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -263,7 +265,7 @@ CREATE TABLE `causales` (
 
 LOCK TABLES `causales` WRITE;
 /*!40000 ALTER TABLE `causales` DISABLE KEYS */;
-INSERT INTO `causales` VALUES (1,'Alta titular',NULL,'alta',1,NULL,NULL,NULL),(2,'Alta interino',NULL,'alta',1,NULL,NULL,NULL),(3,'Alta suplente',NULL,'alta',1,NULL,NULL,NULL),(4,'Renuncia',NULL,'baja',1,NULL,NULL,NULL),(5,'Jubilación',NULL,'baja',1,NULL,NULL,NULL),(6,'Fallecimiento',NULL,'baja',1,NULL,NULL,NULL),(7,'Fin suplencia',NULL,'baja',1,NULL,NULL,NULL),(8,'Cambio situación revista',NULL,'modificacion',1,NULL,NULL,NULL),(9,'Regreso titular',NULL,'modificacion',1,NULL,NULL,NULL),(10,'Corrimiento a interino',NULL,'modificacion',1,NULL,NULL,NULL),(11,'Licencia médica',NULL,'licencia',1,NULL,NULL,NULL),(12,'Licencia maternidad',NULL,'licencia',1,NULL,NULL,NULL),(13,'Licencia estudio',NULL,'licencia',1,NULL,NULL,NULL),(14,'Comisión servicio',NULL,'licencia',1,NULL,NULL,NULL);
+INSERT INTO `causales` VALUES (1,'Alta titular',NULL,'alta',1,NULL,NULL,NULL),(2,'Alta interino',NULL,'alta',1,NULL,NULL,NULL),(3,'Alta suplente',NULL,'alta',1,NULL,NULL,NULL),(4,'Renuncia',NULL,'baja',1,NULL,NULL,NULL),(5,'Jubilaci├│n',NULL,'baja',1,NULL,NULL,NULL),(6,'Fallecimiento',NULL,'baja',1,NULL,NULL,NULL),(7,'Fin suplencia',NULL,'baja',1,NULL,NULL,NULL),(8,'Cambio situaci├│n revista',NULL,'modificacion',1,NULL,NULL,NULL),(9,'Regreso titular',NULL,'modificacion',1,NULL,NULL,NULL),(10,'Corrimiento a interino',NULL,'modificacion',1,NULL,NULL,NULL),(11,'Licencia m├®dica',NULL,'licencia',1,NULL,NULL,NULL),(12,'Licencia maternidad',NULL,'licencia',1,NULL,NULL,NULL),(13,'Licencia estudio',NULL,'licencia',1,NULL,NULL,NULL),(14,'Comisi├│n servicio',NULL,'licencia',1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `causales` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -289,7 +291,7 @@ CREATE TABLE `cod_lic` (
 
 LOCK TABLES `cod_lic` WRITE;
 /*!40000 ALTER TABLE `cod_lic` DISABLE KEYS */;
-INSERT INTO `cod_lic` VALUES (1,'70.j','Licencia Médica',1),(2,'70.a','Vacaciones / Anual Ordinaria',1),(3,'Art 6','Capacitación / Examen',1),(4,'70.t','Atención Familiar',1),(5,'70 T','Razones Particulares',1),(6,'70a','afeccion comun',1);
+INSERT INTO `cod_lic` VALUES (1,'70.j','Licencia M├®dica',1),(2,'70.a','Vacaciones / Anual Ordinaria',1),(3,'Art 6','Capacitaci├│n / Examen',1),(4,'70.t','Atenci├│n Familiar',1),(5,'70 T','Razones Particulares',1),(6,'70a','afeccion comun',1);
 /*!40000 ALTER TABLE `cod_lic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -341,7 +343,7 @@ CREATE TABLE `curso_preceptor` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_curso_anio` (`curso_id`,`anio_lectivo`),
   KEY `docente_id` (`docente_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -350,6 +352,7 @@ CREATE TABLE `curso_preceptor` (
 
 LOCK TABLES `curso_preceptor` WRITE;
 /*!40000 ALTER TABLE `curso_preceptor` DISABLE KEYS */;
+INSERT INTO `curso_preceptor` VALUES (1,1,32,2026,'2026-10-12 11:04:20','2026-10-12 11:04:20');
 /*!40000 ALTER TABLE `curso_preceptor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -381,7 +384,7 @@ CREATE TABLE `cursos` (
 
 LOCK TABLES `cursos` WRITE;
 /*!40000 ALTER TABLE `cursos` DISABLE KEYS */;
-INSERT INTO `cursos` VALUES (1,'1º','1º','B.E.C','','COMPLETO',NULL,NULL,NULL),(2,'1º','2º','B.E.C','','COMPLETO',NULL,NULL,NULL),(3,'1º','3º','B.E.C','','COMPLETO',NULL,NULL,NULL),(4,'1º','4º','B.E.C','','COMPLETO',NULL,NULL,NULL),(5,'2º','1º','B.E.C','','COMPLETO',NULL,NULL,NULL),(6,'2º','2º','B.E.C','','COMPLETO',NULL,NULL,NULL),(7,'2º','3º','B.E.C','','COMPLETO',NULL,NULL,NULL),(8,'2º','4º','B.E.C','','COMPLETO',NULL,NULL,NULL),(9,'3º','1º','B.E.C','','COMPLETO',NULL,NULL,NULL),(10,'3º','2º','B.E.C','','COMPLETO',NULL,NULL,NULL),(11,'3º','3º','B.E.C','','COMPLETO',NULL,NULL,NULL),(12,'4º','1º','B.E.C','','COMPLETO',NULL,NULL,NULL),(13,'4º','2º','B.E.C','','COMPLETO',NULL,NULL,NULL),(14,'4º','3º','B.E.C','','COMPLETO',NULL,NULL,NULL),(15,'5º','1º','B.E.C','','COMPLETO',NULL,NULL,NULL),(16,'5º','2º','B.E.C','','COMPLETO',NULL,NULL,NULL),(17,'5º','3º','B.E.C','','COMPLETO',NULL,NULL,NULL),(18,'1º','1º','T.C.A','','MAÑANA',NULL,NULL,NULL),(19,'1º','2º','T.C.A','','MAÑANA',NULL,NULL,NULL),(20,'2º',NULL,'T.C.A','','MAÑANA',NULL,NULL,NULL),(21,'3º',NULL,'T.C.A','','MAÑANA',NULL,NULL,NULL),(22,'1º',NULL,'T.C.A','','TARDE',NULL,NULL,NULL),(23,'2º',NULL,'T.C.A','','TARDE',NULL,NULL,NULL),(24,'3º',NULL,'T.C.A','','TARDE',NULL,NULL,NULL),(25,'1º','1º','T.C.A','','NOCHE',NULL,NULL,NULL),(26,'1º','2º','T.C.A','','NOCHE',NULL,NULL,NULL),(27,'2º',NULL,'T.C.A','','NOCHE',NULL,NULL,NULL),(28,'3º',NULL,'T.C.A','','NOCHE',NULL,NULL,NULL),(29,'1º',NULL,'AUX','VITRAL','MAÑANA',NULL,NULL,NULL),(30,'2º',NULL,'AUX','VITRAL','MAÑANA',NULL,NULL,NULL);
+INSERT INTO `cursos` VALUES (1,'1┬║','1┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(2,'1┬║','2┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(3,'1┬║','3┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(4,'1┬║','4┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(5,'2┬║','1┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(6,'2┬║','2┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(7,'2┬║','3┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(8,'2┬║','4┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(9,'3┬║','1┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(10,'3┬║','2┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(11,'3┬║','3┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(12,'4┬║','1┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(13,'4┬║','2┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(14,'4┬║','3┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(15,'5┬║','1┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(16,'5┬║','2┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(17,'5┬║','3┬║','B.E.C','','COMPLETO',NULL,NULL,NULL),(18,'1┬║','1┬║','T.C.A','','MA├æANA',NULL,NULL,NULL),(19,'1┬║','2┬║','T.C.A','','MA├æANA',NULL,NULL,NULL),(20,'2┬║',NULL,'T.C.A','','MA├æANA',NULL,NULL,NULL),(21,'3┬║',NULL,'T.C.A','','MA├æANA',NULL,NULL,NULL),(22,'1┬║',NULL,'T.C.A','','TARDE',NULL,NULL,NULL),(23,'2┬║',NULL,'T.C.A','','TARDE',NULL,NULL,NULL),(24,'3┬║',NULL,'T.C.A','','TARDE',NULL,NULL,NULL),(25,'1┬║','1┬║','T.C.A','','NOCHE',NULL,NULL,NULL),(26,'1┬║','2┬║','T.C.A','','NOCHE',NULL,NULL,NULL),(27,'2┬║',NULL,'T.C.A','','NOCHE',NULL,NULL,NULL),(28,'3┬║',NULL,'T.C.A','','NOCHE',NULL,NULL,NULL),(29,'1┬║',NULL,'AUX','VITRAL','MA├æANA',NULL,NULL,NULL),(30,'2┬║',NULL,'AUX','VITRAL','MA├æANA',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `cursos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -400,7 +403,7 @@ CREATE TABLE `distribucion_horas` (
   `cantidad_horas` int NOT NULL,
   `tipo_hora_id` int DEFAULT NULL,
   `tipo` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dia` enum('lunes','martes','miércoles','jueves','viernes') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dia` enum('lunes','martes','mi├®rcoles','jueves','viernes') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `hora_ingreso` time DEFAULT NULL,
   `hora_egreso` time DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -420,7 +423,7 @@ CREATE TABLE `distribucion_horas` (
 
 LOCK TABLES `distribucion_horas` WRITE;
 /*!40000 ALTER TABLE `distribucion_horas` DISABLE KEYS */;
-INSERT INTO `distribucion_horas` VALUES (1,1,1,45,2,1,'clase','martes','07:45:00','09:45:00','2026-02-19 23:42:32','2026-07-29 13:32:11',NULL),(2,1,1,14,1,NULL,'extraclase','martes','09:45:00','10:25:00','2026-02-19 23:42:32','2026-02-19 23:42:32',NULL),(3,1,8,45,2,NULL,'clase','miércoles','09:45:00','11:45:00','2026-02-19 23:42:32','2026-02-19 23:42:32',NULL),(4,15,9,10,2,NULL,'clase','martes','08:00:00','10:00:00','2026-04-03 15:33:42',NULL,NULL),(5,16,2,9,4,1,'materia','martes','08:00:00','10:30:00','2026-04-19 16:04:25','2026-04-19 16:12:19',NULL),(6,16,1,9,4,1,'materia','miércoles','08:00:00','10:30:00','2026-04-19 16:16:15','2026-07-29 13:33:17',NULL),(7,16,0,14,4,2,'materia','miércoles','10:30:00','12:00:00','2026-04-19 16:17:59','2026-04-19 16:20:38',NULL),(8,17,1,49,2,1,'materia','lunes','07:40:00','09:00:00','2026-06-26 21:52:05',NULL,NULL),(9,17,6,4,2,6,'materia','martes','07:40:00','09:00:00','2026-06-26 21:54:10',NULL,NULL),(10,17,17,10,4,1,'materia','miércoles','07:40:00','10:30:00','2026-06-26 21:56:33','2026-06-26 21:57:16',NULL),(11,17,NULL,14,2,2,'materia','jueves','07:40:00','09:00:00','2026-06-26 22:01:32',NULL,NULL),(12,17,NULL,14,2,2,'materia','viernes','07:40:00','10:00:00','2026-06-26 22:04:37',NULL,NULL),(13,10,2,44,2,1,'materia','lunes','07:40:00','10:00:00','2026-08-04 19:38:45',NULL,NULL);
+INSERT INTO `distribucion_horas` VALUES (1,1,1,45,2,1,'clase','martes','07:45:00','09:45:00','2026-02-19 23:42:32','2026-07-29 13:32:11',NULL),(2,1,1,14,1,NULL,'extraclase','martes','09:45:00','10:25:00','2026-02-19 23:42:32','2026-02-19 23:42:32',NULL),(3,1,8,45,2,NULL,'clase','mi├®rcoles','09:45:00','11:45:00','2026-02-19 23:42:32','2026-02-19 23:42:32',NULL),(4,15,9,10,2,NULL,'clase','martes','08:00:00','10:00:00','2026-04-03 15:33:42',NULL,NULL),(5,16,2,9,4,1,'materia','martes','08:00:00','10:30:00','2026-04-19 16:04:25','2026-04-19 16:12:19',NULL),(6,16,1,9,4,1,'materia','mi├®rcoles','08:00:00','10:30:00','2026-04-19 16:16:15','2026-07-29 13:33:17',NULL),(7,16,0,14,4,2,'materia','mi├®rcoles','10:30:00','12:00:00','2026-04-19 16:17:59','2026-04-19 16:20:38',NULL),(8,17,1,49,2,1,'materia','lunes','07:40:00','09:00:00','2026-06-26 21:52:05',NULL,NULL),(9,17,6,4,2,6,'materia','martes','07:40:00','09:00:00','2026-06-26 21:54:10',NULL,NULL),(10,17,17,10,4,1,'materia','mi├®rcoles','07:40:00','10:30:00','2026-06-26 21:56:33','2026-06-26 21:57:16',NULL),(11,17,NULL,14,2,2,'materia','jueves','07:40:00','09:00:00','2026-06-26 22:01:32',NULL,NULL),(12,17,NULL,14,2,2,'materia','viernes','07:40:00','10:00:00','2026-06-26 22:04:37',NULL,NULL),(13,10,2,44,2,1,'materia','lunes','07:40:00','10:00:00','2026-08-04 19:38:45',NULL,NULL);
 /*!40000 ALTER TABLE `distribucion_horas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -520,7 +523,7 @@ CREATE TABLE `inscripciones` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `inscripciones_alumno_id_curso_id_anio_lectivo_unique` (`alumno_id`,`curso_id`,`anio_lectivo`),
   KEY `inscripciones_curso_id_foreign` (`curso_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -529,6 +532,7 @@ CREATE TABLE `inscripciones` (
 
 LOCK TABLES `inscripciones` WRITE;
 /*!40000 ALTER TABLE `inscripciones` DISABLE KEYS */;
+INSERT INTO `inscripciones` VALUES (1,3,1,2026,'2026-10-12 11:05:40','2026-10-12 11:05:40');
 /*!40000 ALTER TABLE `inscripciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -647,8 +651,38 @@ CREATE TABLE `modulos` (
 
 LOCK TABLES `modulos` WRITE;
 /*!40000 ALTER TABLE `modulos` DISABLE KEYS */;
-INSERT INTO `modulos` VALUES (1,'docentes','Gestion docente'),(2,'estudiantes','Gestion estudiantes'),(3,'biblioteca','Sistema biblioteca'),(4,'tramitaciones',NULL),(5,'permisos','Gestión de permisos'),(6,'cargos','Gestión de puestos y cargos'),(7,'licencias','Gestión de licencias docentes'),(8,'planilla_firmas','Planilla de firmas diaria'),(9,'auditoria','Registro de auditoría del sistema'),(10,'usuarios','Gestión de usuarios y accesos');
+INSERT INTO `modulos` VALUES (1,'docentes','Gestion docente'),(2,'estudiantes','Gestion estudiantes'),(3,'biblioteca','Sistema biblioteca'),(4,'tramitaciones',NULL),(5,'permisos','Gesti├│n de permisos'),(6,'cargos','Gesti├│n de puestos y cargos'),(7,'licencias','Gesti├│n de licencias docentes'),(8,'planilla_firmas','Planilla de firmas diaria'),(9,'auditoria','Registro de auditor├¡a del sistema'),(10,'usuarios','Gesti├│n de usuarios y accesos');
 /*!40000 ALTER TABLE `modulos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `password_resets`
+--
+
+DROP TABLE IF EXISTS `password_resets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_resets` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `used_at` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_token` (`token`),
+  KEY `idx_usuario` (`usuario_id`),
+  CONSTRAINT `fk_password_resets_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `password_resets`
+--
+
+LOCK TABLES `password_resets` WRITE;
+/*!40000 ALTER TABLE `password_resets` DISABLE KEYS */;
+/*!40000 ALTER TABLE `password_resets` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -736,7 +770,7 @@ CREATE TABLE `situaciones_revista` (
 
 LOCK TABLES `situaciones_revista` WRITE;
 /*!40000 ALTER TABLE `situaciones_revista` DISABLE KEYS */;
-INSERT INTO `situaciones_revista` VALUES (1,1,1,'TITULAR','Cargo permanente',1,'2020-03-01',NULL,'2026-02-04 04:30:35','2026-02-04 04:30:35',NULL),(2,2,2,'SUPLENTE','Reemplazo temporal',2,'2021-08-15',NULL,'2026-02-04 04:30:35','2026-02-04 04:30:35',NULL),(3,3,3,'INTERINO','Designación provisoria',3,'2022-02-10',NULL,'2026-02-04 04:30:35','2026-02-04 04:30:35',NULL);
+INSERT INTO `situaciones_revista` VALUES (1,1,1,'TITULAR','Cargo permanente',1,'2020-03-01',NULL,'2026-02-04 04:30:35','2026-02-04 04:30:35',NULL),(2,2,2,'SUPLENTE','Reemplazo temporal',2,'2021-08-15',NULL,'2026-02-04 04:30:35','2026-02-04 04:30:35',NULL),(3,3,3,'INTERINO','Designaci├│n provisoria',3,'2022-02-10',NULL,'2026-02-04 04:30:35','2026-02-04 04:30:35',NULL);
 /*!40000 ALTER TABLE `situaciones_revista` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -801,7 +835,7 @@ CREATE TABLE `tramitaciones` (
 
 LOCK TABLES `tramitaciones` WRITE;
 /*!40000 ALTER TABLE `tramitaciones` DISABLE KEYS */;
-INSERT INTO `tramitaciones` VALUES (1,'2026-04-03','',1,6,2,'EX-2025-14544125-GCABA-DGPDYNG',2,'realizado',NULL,'2026-04-03 17:34:27','2026-05-15 17:54:14',NULL,1),(2,'2026-04-03','',1,16,15,'EX-2025-1004125-GCABA-DGPDYNG',5,'caratulado',NULL,'2026-04-03 18:04:24','2026-04-03 18:14:28',NULL,1),(3,'2026-04-03','',3,16,45,'EX-2025-1000005-GCABA-DGPDYNG',2,'caratulado',NULL,'2026-04-03 18:30:33',NULL,NULL,1),(4,'2026-04-03','',4,16,45,'EX-2025-100006-GCABA-DGPDYNG',2,'realizado','FALTA QR','2026-04-03 18:34:54','2026-04-03 18:47:05',NULL,1),(5,'2026-04-03','',3,21,27,'EX-2025-100010-GCABA-DGPDYNG',5,'caratulado',NULL,'2026-04-03 19:41:08',NULL,NULL,1),(6,'2026-04-03','',4,21,27,'EX-2025-100011-GCABA-DGPDYNG',5,'caratulado',NULL,'2026-04-03 19:42:42',NULL,NULL,1),(7,'2024-08-12','',1,29,12,'EX-2025-100006-GCABA-DGPDYNG',16,'caratulado',NULL,'2026-04-19 15:26:26','2026-04-19 16:02:11',NULL,1),(8,'2026-04-19','',3,20,35,'EX-2025-222222-GCABA-DGPDYNG',16,'realizado',NULL,'2026-04-19 16:30:03','2026-05-09 14:20:41',NULL,1),(9,'2023-03-10','',1,30,27,'EX-2023- MUGUIWARA-ONEPIECE',17,'caratulado',NULL,'2026-06-26 21:49:32',NULL,NULL,2),(10,'2026-06-26','',3,12,28,'EX-2026- MUGUIWARA-ONEPIECE',17,'caratulado',NULL,'2026-06-26 22:41:56',NULL,NULL,3),(11,'2026-07-22','',6,12,28,'Exp: EX-2026- MUGUIWARA-ONEPIECE-CESE',17,'caratulado',NULL,'2026-07-22 12:04:07',NULL,NULL,2),(13,'2026-08-04','',1,28,57,'ex-2025-nojodas',10,'caratulado',NULL,'2026-08-04 19:36:11',NULL,NULL,2),(14,'2026-09-19','',1,20,43,'EX-2023- preceptoria-ecn1',3,'caratulado',NULL,'2026-09-19 16:00:52','2026-09-19 16:02:01',NULL,2),(15,'2026-10-05','',6,31,2,'EX-2023- MUGUIWARA-ONEPIECE',19,'caratulado',NULL,'2026-10-05 13:24:57','2026-10-05 13:26:15',NULL,6);
+INSERT INTO `tramitaciones` VALUES (15,'2026-10-05','',6,31,2,'EX-2023- MUGUIWARA-ONEPIECE',19,'caratulado',NULL,'2026-10-05 13:24:57','2026-10-05 13:26:15',NULL,6);
 /*!40000 ALTER TABLE `tramitaciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -842,7 +876,7 @@ CREATE TABLE `tramitaciones_legacy` (
 
 LOCK TABLES `tramitaciones_legacy` WRITE;
 /*!40000 ALTER TABLE `tramitaciones_legacy` DISABLE KEYS */;
-INSERT INTO `tramitaciones_legacy` VALUES (1,'2024-03-01','realizado',1,'alta','EXP-2024-0001',1,1,NULL,'Alta titular Arnau preceptor','2026-02-19 22:08:53','2026-02-19 22:08:53',NULL),(2,'2024-03-10','realizado',2,'alta','EXP-2024-0003',3,3,NULL,'Alta suplente Juárez reemplaza Arnau','2026-02-19 22:22:24','2026-02-19 22:22:24',NULL),(3,'2024-03-10','realizado',2,'alta','EXP-2024-0004',3,3,NULL,'Alta suplente Juárez reemplaza Arnau','2026-02-19 22:32:26','2026-02-19 22:32:26',NULL),(4,'2024-03-15','realizado',2,'baja','EXP-2024-0005',4,7,NULL,'Fin suplencia Juárez regreso titular Arnau','2026-02-19 22:45:34','2026-02-19 22:45:34',NULL);
+INSERT INTO `tramitaciones_legacy` VALUES (1,'2024-03-01','realizado',1,'alta','EXP-2024-0001',1,1,NULL,'Alta titular Arnau preceptor','2026-02-19 22:08:53','2026-02-19 22:08:53',NULL),(2,'2024-03-10','realizado',2,'alta','EXP-2024-0003',3,3,NULL,'Alta suplente Ju├írez reemplaza Arnau','2026-02-19 22:22:24','2026-02-19 22:22:24',NULL),(3,'2024-03-10','realizado',2,'alta','EXP-2024-0004',3,3,NULL,'Alta suplente Ju├írez reemplaza Arnau','2026-02-19 22:32:26','2026-02-19 22:32:26',NULL),(4,'2024-03-15','realizado',2,'baja','EXP-2024-0005',4,7,NULL,'Fin suplencia Ju├írez regreso titular Arnau','2026-02-19 22:45:34','2026-02-19 22:45:34',NULL);
 /*!40000 ALTER TABLE `tramitaciones_legacy` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -886,6 +920,7 @@ CREATE TABLE `usuarios` (
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `estado` enum('pendiente','activo','rechazado') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
   `activo` tinyint DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -902,9 +937,13 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'sergio','$2b$10$MHbhT8eCj9TSp2EHIdimgOhZT58mMiEWlN9wEP9nyjGNchK39RXjG','Sergio','activo',1,'2026-02-21 18:18:59','SECRETARIO',2),(2,'7u7e','$2b$10$mMTNd5OEUGgP5r539.hQn.s/vkolckQ8lVp8AKXwnJ17OMx6Vt22W','7u7e','activo',1,'2026-05-09 13:27:43','ADMINISTRADOR',1),(6,'Naty','$2b$10$nc2TpHDQCksHmAe5TqTrVe/7cFJWZM219eZKe.7KDOoA7r/LpBKZu','Natalia Blanco','activo',1,'2026-10-05 10:16:16',NULL,1);
+INSERT INTO `usuarios` VALUES (1,'sergio','$2b$10$MHbhT8eCj9TSp2EHIdimgOhZT58mMiEWlN9wEP9nyjGNchK39RXjG','Sergio',NULL,'activo',1,'2026-02-21 18:18:59','SECRETARIO',2),(2,'7u7e','$2b$10$mMTNd5OEUGgP5r539.hQn.s/vkolckQ8lVp8AKXwnJ17OMx6Vt22W','7u7e',NULL,'activo',1,'2026-05-09 13:27:43','ADMINISTRADOR',1),(6,'Naty','$2b$10$nc2TpHDQCksHmAe5TqTrVe/7cFJWZM219eZKe.7KDOoA7r/LpBKZu','Natalia Blanco',NULL,'activo',1,'2026-10-05 10:16:16',NULL,1);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'bd_cera1'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -915,4 +954,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-05 10:40:56
+-- Dump completed on 2026-10-12  8:35:36

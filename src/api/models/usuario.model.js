@@ -3,7 +3,7 @@ const db = require('../../../config/database');
 class UsuarioRepository {
     async findAll() {
         const [rows] = await db.query(`
-            SELECT u.id, u.username, u.nombre, u.estado, u.perfil_id,
+            SELECT u.id, u.username, u.nombre, u.email, u.estado, u.perfil_id,
                    p.nombre AS perfil_nombre, u.created_at
             FROM usuarios u
             LEFT JOIN perfiles p ON u.perfil_id = p.id
@@ -25,18 +25,26 @@ class UsuarioRepository {
         return rows[0];
     }
 
+    async findByUsernameOrEmail(identifier) {
+        const [rows] = await db.query(
+            "SELECT * FROM usuarios WHERE (username = ? OR email = ?) AND activo = 1",
+            [identifier, identifier]
+        );
+        return rows[0] || null;
+    }
+
     async create(usuario) {
-        const { username, password, nombre, perfil_id, estado } = usuario;
+        const { username, password, nombre, email, perfil_id, estado } = usuario;
         const [result] = await db.query(
-            "INSERT INTO usuarios (username, password, nombre, estado, perfil_id) VALUES (?, ?, ?, ?, ?)",
-            [username, password, nombre, estado || 'pendiente', perfil_id || null]
+            "INSERT INTO usuarios (username, password, nombre, email, estado, perfil_id) VALUES (?, ?, ?, ?, ?, ?)",
+            [username, password, nombre, email || null, estado || 'pendiente', perfil_id || null]
         );
         return result.insertId;
     }
 
     async findById(id) {
         const [rows] = await db.query(
-            `SELECT u.id, u.username, u.nombre, u.estado, u.perfil_id, p.nombre as perfil_nombre, u.created_at 
+            `SELECT u.id, u.username, u.nombre, u.email, u.estado, u.perfil_id, p.nombre as perfil_nombre, u.created_at 
              FROM usuarios u
              LEFT JOIN perfiles p ON u.perfil_id = p.id
              WHERE u.id = ?`,
@@ -56,6 +64,13 @@ class UsuarioRepository {
         await db.query(
             "UPDATE usuarios SET perfil_id = ? WHERE id = ?",
             [perfil_id, id]
+        );
+    }
+
+    async updatePassword(id, hashedPassword) {
+        await db.query(
+            "UPDATE usuarios SET password = ? WHERE id = ?",
+            [hashedPassword, id]
         );
     }
 }

@@ -83,15 +83,35 @@
         .btn-toggle:hover { background: #fff; color: #5E72E4; }
 
         .input-box { position: relative; width: 100%; margin: 20px 0; }
-        .input-box input { width: 100%; height: 50px; background: rgba(255, 255, 255, 0.2); color: #fff; border: 2px solid transparent; outline: none; border-radius: 8px; padding: 0 20px 0 45px; font-size: 16px; transition: 0.3s; }
+        .input-box input { width: 100%; height: 50px; background: rgba(255, 255, 255, 0.2); color: #fff; border: 2px solid transparent; outline: none; border-radius: 8px; padding: 0 45px 0 45px; font-size: 16px; transition: 0.3s; }
         .input-box input::placeholder { color: rgba(255, 255, 255, 0.8); }
         .input-box input:focus { border: 2px solid #fff; background: rgba(255, 255, 255, 0.3); }
-        .input-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #fff; }
+        .input-box i.input-icon-left { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #fff; pointer-events: none; }
+        .input-box .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 20px; color: rgba(255, 255, 255, 0.85); cursor: pointer; transition: 0.2s; z-index: 5; }
+        .input-box .toggle-password:hover { color: #fff; transform: translateY(-50%) scale(1.15); }
         
         .btn-submit { width: 100%; height: 50px; background: #fff; border: none; border-radius: 8px; color: #5E72E4; font-size: 16px; font-weight: 700; cursor: pointer; transition: .3s; }
         .btn-submit:hover { background: #f0f2f5; transform: scale(1.02); }
 
         .logo-img { width: 80px; margin-bottom: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        .link-forgot { display: block; text-align: right; margin-top: -10px; margin-bottom: 5px; color: rgba(255,255,255,0.8); font-size: 13px; cursor: pointer; text-decoration: underline; transition: 0.2s; }
+        .link-forgot:hover { color: #fff; }
+        /* Modal overlay */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-card { background: #fff; border-radius: 16px; padding: 36px 32px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); color: #333; }
+        .modal-card h3 { margin: 0 0 8px; font-size: 20px; color: #5E72E4; }
+        .modal-card p { margin: 0 0 18px; font-size: 13px; color: #666; line-height: 1.6; }
+        .modal-input { width: 100%; height: 46px; border: 2px solid #e0e0e0; border-radius: 8px; padding: 0 14px; font-size: 15px; outline: none; transition: 0.2s; box-sizing: border-box; }
+        .modal-input:focus { border-color: #5E72E4; }
+        .modal-btn { width: 100%; height: 46px; background: #5E72E4; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 14px; }
+        .modal-btn:hover { background: #4a5fd4; }
+        .modal-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .modal-msg { font-size: 13px; margin-top: 10px; padding: 8px 12px; border-radius: 6px; display: none; }
+        .modal-msg.success { background: #d1f7e3; color: #0a5f38; display: block; }
+        .modal-msg.error { background: #fde8e8; color: #c0392b; display: block; }
+        .modal-close { position: absolute; top: 14px; right: 18px; font-size: 22px; cursor: pointer; color: #999; }
+        .modal-card { position: relative; }
     </style>
 </head>
 <body>
@@ -102,13 +122,15 @@
         <div id="msg-login" class="alert alert-danger d-none"></div>
         <form onsubmit="event.preventDefault(); login();">
             <div class="input-box">
-                <i class='bx bxs-user'></i>
+                <i class='bx bxs-user input-icon-left'></i>
                 <input type="text" id="log-username" placeholder="Usuario" required>
             </div>
             <div class="input-box">
-                <i class='bx bxs-lock-alt'></i>
+                <i class='bx bxs-lock-alt input-icon-left'></i>
                 <input type="password" id="log-password" placeholder="Contraseña" required>
+                <i class='bx bx-show toggle-password' id="toggle-log-password" title="Ver contraseña" onclick="togglePasswordVisibility('log-password', 'toggle-log-password')"></i>
             </div>
+            <span class="link-forgot" onclick="abrirModalOlvidePassword()">¿Olvidaste tu contraseña?</span>
             <button type="submit" class="btn-submit mt-3">Ingresar</button>
         </form>
     </div>
@@ -118,16 +140,21 @@
         <div id="msg-reg" class="alert alert-info d-none"></div>
         <form onsubmit="event.preventDefault(); register();">
             <div class="input-box">
-                <i class='bx bxs-user-detail'></i>
+                <i class='bx bxs-user-detail input-icon-left'></i>
                 <input type="text" id="reg-nombre" placeholder="Nombre Completo" required>
             </div>
             <div class="input-box">
-                <i class='bx bxs-user'></i>
+                <i class='bx bxs-user input-icon-left'></i>
                 <input type="text" id="reg-username" placeholder="Usuario" required>
             </div>
             <div class="input-box">
-                <i class='bx bxs-lock-alt'></i>
+                <i class='bx bxs-lock-alt input-icon-left'></i>
                 <input type="password" id="reg-password" placeholder="Contraseña" required>
+                <i class='bx bx-show toggle-password' id="toggle-reg-password" title="Ver contraseña" onclick="togglePasswordVisibility('reg-password', 'toggle-reg-password')"></i>
+            </div>
+            <div class="input-box">
+                <i class='bx bx-envelope input-icon-left'></i>
+                <input type="email" id="reg-email" placeholder="Correo electrónico (para recuperar clave)">
             </div>
             <button type="submit" class="btn-submit mt-3">Registrarse</button>
         </form>
@@ -146,6 +173,36 @@
             <p class="mt-3 mb-4">Si ya tienes cuenta, ingresa con tus credenciales.</p>
             <button class="btn-toggle" onclick="document.getElementById('wrapper').classList.remove('active')">Ingresar</button>
         </div>
+    </div>
+</div>
+
+<!-- Modal: ¿Olvidaste tu contraseña? -->
+<div class="modal-overlay" id="modalForgotPassword">
+    <div class="modal-card">
+        <span class="modal-close" onclick="cerrarModales()" title="Cerrar">&times;</span>
+        <h3><i class='bx bx-lock-open' style="color:#5E72E4;"></i> Recuperar Contraseña</h3>
+        <p>Ingresá tu nombre de usuario o correo electrónico. Si existe en el sistema, recibirás un enlace para restablecer tu contraseña.</p>
+        <input class="modal-input" type="text" id="forgotIdentifier" placeholder="Usuario o correo electrónico">
+        <div id="forgotMsg" class="modal-msg"></div>
+        <button class="modal-btn" id="btnForgotSubmit" onclick="enviarRecuperacion()">Enviar enlace de recuperación</button>
+    </div>
+</div>
+
+<!-- Modal: Restablecer contraseña (cuando viene con token en URL) -->
+<div class="modal-overlay" id="modalResetPassword">
+    <div class="modal-card">
+        <h3><i class='bx bx-key' style="color:#5E72E4;"></i> Nueva Contraseña</h3>
+        <p>Ingresá tu nueva contraseña. Debe tener al menos 6 caracteres.</p>
+        <div style="position:relative;">
+            <input class="modal-input" type="password" id="resetNewPassword" placeholder="Nueva contraseña" style="padding-right:40px;">
+            <i class='bx bx-show' id="toggle-reset-pass" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:20px;color:#999;" onclick="togglePasswordVisibility('resetNewPassword','toggle-reset-pass')"></i>
+        </div>
+        <div style="position:relative;margin-top:12px;">
+            <input class="modal-input" type="password" id="resetConfirmPassword" placeholder="Confirmar contraseña" style="padding-right:40px;">
+            <i class='bx bx-show' id="toggle-confirm-pass" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:20px;color:#999;" onclick="togglePasswordVisibility('resetConfirmPassword','toggle-confirm-pass')"></i>
+        </div>
+        <div id="resetMsg" class="modal-msg"></div>
+        <button class="modal-btn" id="btnResetSubmit" onclick="confirmarNuevaPassword()">Guardar nueva contraseña</button>
     </div>
 </div>
 
@@ -190,12 +247,13 @@
         const nombre = document.getElementById('reg-nombre').value;
         const username = document.getElementById('reg-username').value;
         const password = document.getElementById('reg-password').value;
+        const email = document.getElementById('reg-email').value.trim() || null;
 
         try {
             const res = await fetch("/api/v1/usuarios/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nombre, username, password })
+                body: JSON.stringify({ nombre, username, password, email })
             });
 
             const data = await res.json();
@@ -222,6 +280,148 @@
             msg.classList.remove('d-none');
         }
     }
+
+    function togglePasswordVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (!input || !icon) return;
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bx-show');
+            icon.classList.add('bx-hide');
+            icon.title = 'Ocultar contraseña';
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bx-hide');
+            icon.classList.add('bx-show');
+            icon.title = 'Ver contraseña';
+        }
+    }
+
+    // ========================
+    // RECUPERACIÓN DE CONTRASEÑA
+    // ========================
+
+    let resetTokenFromUrl = null;
+
+    function abrirModalOlvidePassword() {
+        const msg = document.getElementById('forgotMsg');
+        msg.className = 'modal-msg';
+        msg.innerText = '';
+        document.getElementById('forgotIdentifier').value = '';
+        const btn = document.getElementById('btnForgotSubmit');
+        btn.disabled = false;
+        btn.innerText = 'Enviar enlace de recuperación';
+        document.getElementById('modalForgotPassword').classList.add('active');
+    }
+
+    function cerrarModales() {
+        document.getElementById('modalForgotPassword').classList.remove('active');
+        document.getElementById('modalResetPassword').classList.remove('active');
+    }
+
+    async function enviarRecuperacion() {
+        const identifier = document.getElementById('forgotIdentifier').value.trim();
+        const msg = document.getElementById('forgotMsg');
+        const btn = document.getElementById('btnForgotSubmit');
+        if (!identifier) {
+            msg.className = 'modal-msg error';
+            msg.innerText = 'Ingresá tu usuario o correo electrónico.';
+            return;
+        }
+        btn.disabled = true;
+        btn.innerText = 'Enviando...';
+        try {
+            const res = await fetch('/api/v1/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifier })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                msg.className = 'modal-msg success';
+                msg.innerText = data.message || 'Si el usuario existe, recibirás el correo en breve.';
+            } else {
+                msg.className = 'modal-msg error';
+                const errMsg = (data.error && typeof data.error === 'object' ? data.error.message : data.error) || data.message || 'Error al procesar la solicitud';
+                msg.innerText = errMsg;
+                btn.disabled = false;
+                btn.innerText = 'Enviar enlace de recuperación';
+            }
+        } catch (err) {
+            msg.className = 'modal-msg error';
+            msg.innerText = 'Error de conexión con el servidor.';
+            btn.disabled = false;
+            btn.innerText = 'Enviar enlace de recuperación';
+        }
+    }
+
+    async function confirmarNuevaPassword() {
+        const password = document.getElementById('resetNewPassword').value;
+        const confirm = document.getElementById('resetConfirmPassword').value;
+        const msg = document.getElementById('resetMsg');
+        const btn = document.getElementById('btnResetSubmit');
+
+        if (password.length < 6) {
+            msg.className = 'modal-msg error';
+            msg.innerText = 'La contraseña debe tener al menos 6 caracteres.';
+            return;
+        }
+        if (password !== confirm) {
+            msg.className = 'modal-msg error';
+            msg.innerText = 'Las contraseñas no coinciden.';
+            return;
+        }
+        btn.disabled = true;
+        btn.innerText = 'Guardando...';
+        try {
+            const res = await fetch('/api/v1/auth/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: resetTokenFromUrl, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                msg.className = 'modal-msg success';
+                msg.innerText = data.message || 'Contraseña cambiada correctamente. Reedirig. al inicio de sesión...';
+                setTimeout(() => {
+                    cerrarModales();
+                    // Limpiar token de la URL
+                    history.replaceState(null, '', '/login.html');
+                }, 2500);
+            } else {
+                msg.className = 'modal-msg error';
+                const errMsg = (data.error && typeof data.error === 'object' ? data.error.message : data.error) || data.message || 'Error al restablecer contraseña';
+                msg.innerText = errMsg;
+                btn.disabled = false;
+                btn.innerText = 'Guardar nueva contraseña';
+            }
+        } catch (err) {
+            msg.className = 'modal-msg error';
+            msg.innerText = 'Error de conexión con el servidor.';
+            btn.disabled = false;
+            btn.innerText = 'Guardar nueva contraseña';
+        }
+    }
+
+    // Detectar token de recuperación en la URL al cargar la página
+    (function checkResetToken() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('reset_token');
+        if (token) {
+            resetTokenFromUrl = token;
+            document.getElementById('modalResetPassword').classList.add('active');
+        }
+    })();
+
+    // Cerrar modales al hacer click fuera del card
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) cerrarModales();
+        });
+    });
+
 </script>
 
 </body>

@@ -64,6 +64,37 @@ class LicenciaRepository {
             WHERE cargo_id = ? AND docente_id = ? AND estado = ? AND deleted_at IS NULL
         `, [toState, cargoId, docenteId, fromState]);
     }
+
+    async findDocenteInfo(docenteId) {
+        if (!docenteId) return null;
+        const [rows] = await db.query(
+            "SELECT id, nombre, apellido, dni, email FROM docentes WHERE id = ? AND deleted_at IS NULL",
+            [docenteId]
+        );
+        return rows[0] || null;
+    }
+
+    async findCargoInfo(cargoId) {
+        if (!cargoId) return null;
+        const [rows] = await db.query(
+            "SELECT id, numero_puesto, tipo_cargo FROM cargos WHERE id = ? AND deleted_at IS NULL",
+            [cargoId]
+        );
+        return rows[0] || null;
+    }
+
+    async findPreceptoresByCargo(cargoId, anioLectivo) {
+        if (!cargoId) return [];
+        const [rows] = await db.query(`
+            SELECT DISTINCT d.id, d.nombre, d.apellido, d.email, c.id AS curso_id, c.anio, c.division
+            FROM distribucion_horas dh
+            JOIN cursos c ON dh.curso_id = c.id
+            JOIN curso_preceptor cp ON c.id = cp.curso_id AND cp.anio_lectivo = ?
+            JOIN docentes d ON cp.docente_id = d.id
+            WHERE dh.cargo_id = ? AND dh.deleted_at IS NULL AND d.deleted_at IS NULL
+        `, [anioLectivo, cargoId]);
+        return rows;
+    }
 }
 
 module.exports = new LicenciaRepository();

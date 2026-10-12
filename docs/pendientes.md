@@ -11,14 +11,16 @@
 - [x] `email.service.js` — Nodemailer + SMTP con fallback a `logs/email.log`
 - [x] `licencia_notificacion_template.js` — Plantillas HTML (solicitud + resolución)
 - [ ] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`)
-- [ ] Tabla `curso_preceptor` + interfaz de asignación en admin de cursos
-- [ ] Email automático a Preceptor/Secretaría al ingresar licencia
-- [ ] Email automático al Docente al Aprobar/Rechazar licencia
+- [x] Tabla `curso_preceptor` + interfaz de asignación en admin de cursos
+- [x] Email automático a Preceptor/Secretaría al ingresar licencia
+- [x] Email automático al Docente al Aprobar/Rechazar licencia
 
 ### Módulo Recuperación de Contraseña
-- [ ] `password_reset.service.js` — token único, expiración 1 hora
-- [ ] `password_reset.routes.js` — endpoints `forgot-password` y `reset-password`
-- [ ] Enlace + modal "¿Olvidaste tu contraseña?" en `login.html`
+- [x] `password_reset.service.js` — token único, expiración 1 hora
+- [x] `password_reset.routes.js` — endpoints `forgot-password` y `reset-password`
+- [x] Enlace + modal "¿Olvidaste tu contraseña?" en `login.html`
+- [x] Ojo para ver/ocultar contraseña en Login y Registro
+- [x] Campo email en registro de usuarios + migración BD
 
 ### Módulo Mails por Curso
 - [ ] Endpoints para extraer mails: Estudiantes / Tutores / Docentes del curso
@@ -50,7 +52,7 @@
 - [x] 🔍 **Revisar DELETE físico** en `alumno.service.js` — convertido a borrado lógico `deleted_at` (migración aplicada 2026-09-19)
 
 ### Refactoring General
-- [ ] Eliminar fallback de sesiones en `src/api/middlewares/auth.js`
+- [x] Eliminar fallback de sesiones en `src/api/middlewares/auth.js` — completado (solo JWT)
 - [ ] Esquemas Zod: `tramitacion.validation.js`, `codigo_tramite.validation.js`, `permiso.validation.js`
 - [ ] Actualizar `usuario.validation.js` — añadir adminCreate, status y perfil
 - [ ] Actualizar `cargo.validation.js` — añadir tipos-hora

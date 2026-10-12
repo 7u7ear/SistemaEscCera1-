@@ -3,6 +3,8 @@ const TramitacionRepository = require('../models/tramitacion.model');
 const AppError = require('../../shared/errors/AppError');
 const logger = require('../services/logger.service');
 const AuditoriaService = require('./auditoria.service');
+const emailService = require('./email.service');
+const { generarHtmlNotificacionLicencia, generarHtmlResolucionLicencia } = require('../templates/licencia_notificacion_template');
 
 class LicenciaService {
     async getAllLicencias() {
@@ -55,6 +57,10 @@ class LicenciaService {
         }
 
         await AuditoriaService.registrar(userId, 'CREATE', 'LICENCIAS', results[0] ?? null, { docente_id, tipo_licencia, fecha_inicio, cantidad: results.length });
+
+        // Disparar notificaciones por email de forma asíncrona sin bloquear la respuesta
+        this.notificarNuevaLicencia(docente_id, targets, fecha_inicio, fecha_fin, tipo_licencia, expediente, observaciones);
+
         return { licencias: results, tramitacion_id: tramitacionId };
     }
 
@@ -68,6 +74,7 @@ class LicenciaService {
         // If license ends, restore cargo status to 'activo'
         if (finalizar_puesto && currentLicencia.cargo_id && currentLicencia.docente_id) {
             await LicenciaRepository.updateCargoDocenteState(currentLicencia.cargo_id, currentLicencia.docente_id, 'licencia', 'activo');
+            this.notificarResolucionLicencia(currentLicencia, 'Finalizada / Reincorporado');
         }
 
         await AuditoriaService.registrar(userId, 'UPDATE', 'LICENCIAS', id, { finalizar_puesto });
@@ -88,6 +95,108 @@ class LicenciaService {
     async createTipoLicencia(cod, desc) {
         if (!cod || !desc) throw new AppError('Código y descripción obligatorios', 400);
         return await LicenciaRepository.createTipo(cod, desc);
+    }
+
+    async notificarNuevaLicencia(docenteId, targets, fechaInicio, fechaFin, tipoLicencia, expediente, observaciones) {
+        try {
+            const docente = await LicenciaRepository.findDocenteInfo(docenteId);
+            if (!docente) return;
+
+            const anioLectivo = fechaInicio ? new Date(fechaInicio).getFullYear() : new Date().getFullYear();
+            const secretariaEmail = process.env.SECRETARIA_EMAIL || process.env.SMTP_USER;
+            const emailsPreceptores = new Set();
+            const cargosInfo = [];
+
+            for (const cid of targets) {
+                if (cid) {
+                    const cargo = await LicenciaRepository.findCargoInfo(cid);
+                    if (cargo) cargosInfo.push(cargo);
+
+                    const preceptores = await LicenciaRepository.findPreceptoresByCargo(cid, anioLectivo);
+                    for (const p of preceptores) {
+                        if (p.email && p.email.trim() !== '') {
+                            emailsPreceptores.add(p.email.trim());
+                        }
+                    }
+                }
+            }
+
+            const puestoNombre = cargosInfo.map(c => `${c.tipo_cargo} (${c.numero_puesto})`).join(', ') || 'General';
+            const puestoNumero = cargosInfo.map(c => c.numero_puesto).join(', ') || '-';
+
+            // 1. Notificar a Secretaría / Conducción
+            if (secretariaEmail) {
+                const htmlSecretaria = generarHtmlNotificacionLicencia({
+                    docenteNombre: `${docente.apellido}, ${docente.nombre}`,
+                    docenteDni: docente.dni,
+                    puestoNombre,
+                    puestoNumero,
+                    fechaInicio,
+                    fechaFin,
+                    tipoLicencia,
+                    codigoTramite: expediente || null,
+                    observaciones,
+                    destinatarioRol: 'Secretaría / Conducción'
+                });
+                await emailService.sendMail(
+                    secretariaEmail,
+                    `[Licencia Docente] ${docente.apellido}, ${docente.nombre} - ${tipoLicencia}`,
+                    htmlSecretaria
+                );
+            }
+
+            // 2. Notificar a Preceptores de los cursos involucrados
+            for (const email of emailsPreceptores) {
+                const htmlPreceptor = generarHtmlNotificacionLicencia({
+                    docenteNombre: `${docente.apellido}, ${docente.nombre}`,
+                    docenteDni: docente.dni,
+                    puestoNombre,
+                    puestoNumero,
+                    fechaInicio,
+                    fechaFin,
+                    tipoLicencia,
+                    codigoTramite: expediente || null,
+                    observaciones,
+                    destinatarioRol: 'Preceptor/a'
+                });
+                await emailService.sendMail(
+                    email,
+                    `[Aviso Licencia Docente en Curso] ${docente.apellido}, ${docente.nombre}`,
+                    htmlPreceptor
+                );
+            }
+        } catch (error) {
+            logger.error('Error al enviar notificaciones por email de licencia:', error);
+        }
+    }
+
+    async notificarResolucionLicencia(licencia, estado) {
+        try {
+            if (!licencia || !licencia.docente_id) return;
+            const docente = await LicenciaRepository.findDocenteInfo(licencia.docente_id);
+            if (!docente || !docente.email) return;
+
+            const cargo = licencia.cargo_id ? await LicenciaRepository.findCargoInfo(licencia.cargo_id) : null;
+            const puestoNombre = cargo ? `${cargo.tipo_cargo} (${cargo.numero_puesto})` : 'General';
+
+            const html = generarHtmlResolucionLicencia({
+                docenteNombre: `${docente.nombre} ${docente.apellido}`,
+                puestoNombre,
+                fechaInicio: licencia.fecha_inicio,
+                fechaFin: licencia.fecha_fin,
+                tipoLicencia: licencia.tipo_licencia,
+                estado: estado || 'Procesada',
+                observaciones: licencia.observaciones
+            });
+
+            await emailService.sendMail(
+                docente.email,
+                `[Resolución de Licencia] ${licencia.tipo_licencia} - ${estado}`,
+                html
+            );
+        } catch (error) {
+            logger.error('Error al enviar notificación de resolución de licencia al docente:', error);
+        }
     }
 }
 

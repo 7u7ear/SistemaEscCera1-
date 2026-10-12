@@ -47,7 +47,8 @@ class UsuarioService {
         const newUser = {
             username: data.username,
             password: hashedPassword,
-            nombre: data.nombre
+            nombre: data.nombre,
+            email: data.email || null
         };
 
         const insertId = await UsuarioRepository.create(newUser);
