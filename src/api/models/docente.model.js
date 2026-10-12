@@ -82,6 +82,24 @@ class DocenteRepository {
         `, [tipoCargo]);
         return rows;
     }
+
+    async findPreceptores() {
+        const [rows] = await db.query(`
+            SELECT d.id, d.nombre, d.apellido, d.dni,
+                   GROUP_CONCAT(DISTINCT c.tipo_cargo SEPARATOR ', ') AS cargo_tipo
+            FROM docentes d
+            JOIN cargo_docente cd ON d.id = cd.docente_id
+            JOIN cargos c ON cd.cargo_id = c.id
+            WHERE (UPPER(c.tipo_cargo) LIKE '%PRECEPTOR%')
+              AND cd.estado = 'activo'
+              AND cd.deleted_at IS NULL
+              AND d.deleted_at IS NULL
+              AND c.deleted_at IS NULL
+            GROUP BY d.id, d.nombre, d.apellido, d.dni
+            ORDER BY d.apellido, d.nombre
+        `);
+        return rows;
+    }
 }
 
 module.exports = new DocenteRepository();

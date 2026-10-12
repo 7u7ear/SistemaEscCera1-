@@ -1,5 +1,6 @@
 const CursoRepository = require('../models/curso.model');
 const AppError = require('../../shared/errors/AppError');
+const AuditoriaService = require('./auditoria.service');
 
 class CursoService {
     async getAllCursos() {
@@ -14,22 +15,39 @@ class CursoService {
         return curso;
     }
 
+    async getPreceptoresByCurso(curso_id, anio_lectivo) {
+        return await CursoRepository.getPreceptoresByCurso(curso_id, anio_lectivo);
+    }
+
     async getPreceptorByCurso(curso_id, anio_lectivo) {
         return await CursoRepository.getPreceptorByCurso(curso_id, anio_lectivo);
     }
 
-    async assignPreceptor(curso_id, docente_id, anio_lectivo) {
-        return await CursoRepository.assignPreceptor(curso_id, docente_id, anio_lectivo);
+    async assignPreceptor(curso_id, docente_ids, anio_lectivo, userId = null) {
+        const ids = Array.isArray(docente_ids)
+            ? docente_ids
+            : (docente_ids !== undefined && docente_ids !== null && docente_ids !== '' ? [docente_ids] : []);
+
+        const result = await CursoRepository.assignPreceptor(curso_id, ids, anio_lectivo);
+
+        if (userId) {
+            await AuditoriaService.registrar(userId, 'ASSIGN_PRECEPTORES', 'CURSOS', curso_id, {
+                docente_ids: ids,
+                anio_lectivo
+            });
+        }
+
+        return result;
     }
 
     /**
-     * Obtiene el listado de docentes asignados al curso (materias + preceptor)
+     * Obtiene el listado de docentes asignados al curso (materias + preceptores)
      */
     async getDocentesDelCurso(cursoId, anioLectivo) {
         await this.getCursoById(cursoId);
 
         const rows = await CursoRepository.getDocentesMateriasByCurso(cursoId);
-        const preceptor = await CursoRepository.getPreceptorByCurso(cursoId, anioLectivo);
+        const preceptores = await CursoRepository.getPreceptoresByCurso(cursoId, anioLectivo);
 
         // Agrupar por materia y cargo para evitar duplicados por distintos días/módulos
         const asignacionesMap = new Map();
@@ -58,21 +76,27 @@ class CursoService {
 
         const listaDocentes = Array.from(asignacionesMap.values());
 
-        // Agregar preceptor si existe
-        if (preceptor) {
-            listaDocentes.unshift({
-                materia_id: null,
-                materia_nombre: 'Preceptoría',
-                cargo_id: null,
-                numero_puesto: null,
-                docente_id: preceptor.id,
-                docente_nombre: preceptor.nombre,
-                docente_apellido: preceptor.apellido,
-                docente_completo: `${preceptor.apellido}, ${preceptor.nombre}`,
-                situacion_revista: 'Titular',
-                email: preceptor.email || null,
-                telefono: preceptor.telefono || null,
-                rol: 'Preceptor/a'
+        // Agregar preceptores si existen
+        if (preceptores && preceptores.length > 0) {
+            preceptores.slice().reverse().forEach(p => {
+                const rol = (p.cargo_tipo && p.cargo_tipo.toUpperCase().includes('JEFE'))
+                    ? 'Jefe de Preceptores'
+                    : 'Preceptor/a';
+
+                listaDocentes.unshift({
+                    materia_id: null,
+                    materia_nombre: 'Preceptoría',
+                    cargo_id: null,
+                    numero_puesto: null,
+                    docente_id: p.id,
+                    docente_nombre: p.nombre,
+                    docente_apellido: p.apellido,
+                    docente_completo: `${p.apellido}, ${p.nombre}`,
+                    situacion_revista: 'Titular',
+                    email: p.email || null,
+                    telefono: p.telefono || null,
+                    rol: rol
+                });
             });
         }
 

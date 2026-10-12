@@ -11,25 +11,57 @@ class CursoRepository {
         return rows[0] || null;
     }
 
-    async getPreceptorByCurso(curso_id, anio_lectivo) {
+    async getPreceptoresByCurso(curso_id, anio_lectivo) {
         const [rows] = await db.query(`
-            SELECT d.id, d.nombre, d.apellido, d.email, d.telefono
+            SELECT d.id, d.nombre, d.apellido, d.email, d.telefono,
+                   GROUP_CONCAT(DISTINCT c.tipo_cargo SEPARATOR ', ') AS cargo_tipo
             FROM curso_preceptor cp
             JOIN docentes d ON cp.docente_id = d.id
+            LEFT JOIN cargo_docente cd ON cd.docente_id = d.id AND cd.estado = 'activo' AND cd.deleted_at IS NULL
+            LEFT JOIN cargos c ON cd.cargo_id = c.id AND c.deleted_at IS NULL
             WHERE cp.curso_id = ? AND cp.anio_lectivo = ? AND d.deleted_at IS NULL
+            GROUP BY d.id, d.nombre, d.apellido, d.email, d.telefono
+            ORDER BY d.apellido, d.nombre
         `, [curso_id, anio_lectivo]);
+        return rows;
+    }
+
+    async getPreceptorByCurso(curso_id, anio_lectivo) {
+        const rows = await this.getPreceptoresByCurso(curso_id, anio_lectivo);
         return rows[0] || null;
     }
 
+    async assignPreceptores(curso_id, docente_ids, anio_lectivo) {
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            await connection.query(`
+                DELETE FROM curso_preceptor 
+                WHERE curso_id = ? AND anio_lectivo = ?
+            `, [curso_id, anio_lectivo]);
+
+            if (Array.isArray(docente_ids) && docente_ids.length > 0) {
+                const values = docente_ids.map(docId => [curso_id, docId, anio_lectivo]);
+                await connection.query(`
+                    INSERT INTO curso_preceptor (curso_id, docente_id, anio_lectivo)
+                    VALUES ?
+                `, [values]);
+            }
+
+            await connection.commit();
+            return { count: docente_ids ? docente_ids.length : 0 };
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
     async assignPreceptor(curso_id, docente_id, anio_lectivo) {
-        const [result] = await db.query(`
-            INSERT INTO curso_preceptor (curso_id, docente_id, anio_lectivo, created_at, updated_at)
-            VALUES (?, ?, ?, NOW(), NOW())
-            ON DUPLICATE KEY UPDATE 
-                docente_id = VALUES(docente_id),
-                updated_at = NOW()
-        `, [curso_id, docente_id, anio_lectivo]);
-        return result;
+        const ids = Array.isArray(docente_id) ? docente_id : (docente_id ? [docente_id] : []);
+        return await this.assignPreceptores(curso_id, ids, anio_lectivo);
     }
 
     async getEstudiantesByCurso(curso_id, anio_lectivo) {

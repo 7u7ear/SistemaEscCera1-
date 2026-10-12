@@ -35,6 +35,10 @@ class DocenteService {
     async getDocentesByCargo(tipoCargo) {
         return await DocenteRepository.findByCargo(tipoCargo);
     }
+
+    async getPreceptores() {
+        return await DocenteRepository.findPreceptores();
+    }
 }
 
 module.exports = new DocenteService();

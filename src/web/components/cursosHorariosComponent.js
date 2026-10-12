@@ -5,6 +5,8 @@
 let cursoActivoId = null;
 let cursosListGlobal = [];
 let cursoPreceptorActualId = null;
+let cursoPreceptoresActualesIds = [];
+let listaPreceptoresGlobal = [];
 let dataEmailsCursoGlobal = null;
 let dataDocentesCursoGlobal = null;
 
@@ -44,11 +46,11 @@ async function verCursosHorarios() {
                         </div>
                         <div class="d-flex align-items-center bg-light px-3 py-2 rounded border gap-2">
                             <div class="text-end">
-                                <span class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Preceptor/a</span>
-                                <span id="cursoPreceptorNombre" class="text-muted small fst-italic">Sin asignar</span>
+                                <span class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Preceptores</span>
+                                <div id="cursoPreceptorNombre" class="text-muted small fst-italic">Sin asignar</div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" id="btnAsignarPreceptor" onclick="abrirModalAsignarPreceptor()" title="Asignar o cambiar preceptor">
-                                <i class="bi bi-person-gear me-1"></i> Asignar
+                            <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" id="btnAsignarPreceptor" onclick="abrirModalAsignarPreceptor()" title="Asignar o gestionar preceptores">
+                                <i class="bi bi-people me-1"></i> Asignar
                             </button>
                         </div>
                     </div>
@@ -289,22 +291,31 @@ async function verCursosHorarios() {
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow border-0">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title fs-6 fw-bold"><i class="bi bi-person-badge me-2"></i>Asignar Preceptor al Curso</h5>
+                        <h5 class="modal-title fs-6 fw-bold"><i class="bi bi-people-fill me-2"></i>Asignar Preceptores al Curso</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body p-4">
-                        <p class="small text-muted mb-3" id="modalPreceptorInfo">
-                            Seleccione el docente con cargo de preceptor para este curso.
+                        <p class="small text-muted mb-2" id="modalPreceptorInfo">
+                            Seleccione los preceptores o jefes de preceptores para este curso.
                         </p>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold small text-dark" for="selectPreceptoresModal">Preceptor/a a cargo:</label>
-                            <select class="form-select" id="selectPreceptoresModal">
-                                <option value="">Cargando preceptores...</option>
-                            </select>
-                            <div class="form-text small">Lista de docentes con cargo activo de preceptor.</div>
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm" id="filtroPreceptoresModal" placeholder="🔍 Buscar por nombre, DNI o cargo..." oninput="filtrarPreceptoresModal()">
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                            <span class="small text-muted fw-semibold" id="contadorPreceptoresSeleccionados">0 seleccionados</span>
+                            <div>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none me-2" onclick="seleccionarTodosPreceptores(true)">Marcar todos</button>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none text-danger" onclick="seleccionarTodosPreceptores(false)">Desmarcar todos</button>
+                            </div>
+                        </div>
+                        <div class="border rounded p-2 bg-light" id="contenedorListaPreceptoresModal" style="max-height: 240px; overflow-y: auto;">
+                            <div class="text-center text-muted small p-3">Cargando preceptores...</div>
+                        </div>
+                        <div class="form-text small mt-2">
+                            <i class="bi bi-info-circle me-1"></i>Puede tildar varios docentes. Incluye cargos activos de <strong>Preceptor</strong> o <strong>Jefe de Preceptores</strong>.
                         </div>
                     </div>
-                    <div class="modal-footer bg-light">
+                    <div class="modal-footer bg-light py-2">
                         <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-sm btn-primary fw-bold" id="btnGuardarPreceptorModal" onclick="guardarAsignacionPreceptor()">
                             <i class="bi bi-check2-circle me-1"></i> Guardar Asignación
@@ -1060,31 +1071,39 @@ async function cargarPreceptorDelCurso() {
     if (!cursoActivoId) return;
     const anioSelect = document.getElementById("selectAnioLectivoCurso");
     const anio = anioSelect ? anioSelect.value : new Date().getFullYear();
-    const preceptorSpan = document.getElementById("cursoPreceptorNombre");
-    if (!preceptorSpan) return;
+    const preceptorEl = document.getElementById("cursoPreceptorNombre");
+    if (!preceptorEl) return;
 
     try {
         const res = await api.get(`/api/v1/cursos/${cursoActivoId}/preceptor?anio_lectivo=${anio}`);
         if (res.ok) {
             const data = await res.json();
-            if (data.preceptor && data.preceptor.id) {
-                preceptorSpan.textContent = `${data.preceptor.apellido}, ${data.preceptor.nombre}`;
-                preceptorSpan.className = "fw-semibold text-primary small";
-                cursoPreceptorActualId = data.preceptor.id;
+            const preceptores = data.preceptores || (data.preceptor ? [data.preceptor] : []);
+            
+            if (preceptores.length > 0) {
+                cursoPreceptoresActualesIds = preceptores.map(p => p.id);
+                cursoPreceptorActualId = preceptores[0].id;
+                preceptorEl.innerHTML = preceptores.map(p => {
+                    const esJefe = p.cargo_tipo && p.cargo_tipo.toUpperCase().includes('JEFE');
+                    const badge = esJefe 
+                        ? '<span class="badge bg-warning text-dark border ms-1" style="font-size:0.65rem;">Jefe</span>' 
+                        : '';
+                    return `<span class="fw-semibold text-primary small d-inline-block me-2">${p.apellido}, ${p.nombre}${badge}</span>`;
+                }).join('');
             } else {
-                preceptorSpan.textContent = "Sin asignar";
-                preceptorSpan.className = "text-muted small fst-italic";
+                preceptorEl.innerHTML = '<span class="text-muted small fst-italic">Sin asignar</span>';
                 cursoPreceptorActualId = null;
+                cursoPreceptoresActualesIds = [];
             }
         } else {
-            preceptorSpan.textContent = "Sin asignar";
-            preceptorSpan.className = "text-muted small fst-italic";
+            preceptorEl.innerHTML = '<span class="text-muted small fst-italic">Sin asignar</span>';
             cursoPreceptorActualId = null;
+            cursoPreceptoresActualesIds = [];
         }
     } catch (err) {
-        preceptorSpan.textContent = "Error al cargar";
-        preceptorSpan.className = "text-danger small";
+        preceptorEl.innerHTML = '<span class="text-danger small">Error al cargar</span>';
         cursoPreceptorActualId = null;
+        cursoPreceptoresActualesIds = [];
     }
 }
 
@@ -1097,12 +1116,15 @@ async function abrirModalAsignarPreceptor() {
 
     const infoEl = document.getElementById("modalPreceptorInfo");
     if (infoEl) {
-        infoEl.innerHTML = `Asignar preceptor para <strong>${cursoNombre}</strong> (Ciclo Lectivo: <strong>${anio}</strong>).`;
+        infoEl.innerHTML = `Asignar preceptores para <strong>${cursoNombre}</strong> (Ciclo Lectivo: <strong>${anio}</strong>).`;
     }
 
-    const select = document.getElementById("selectPreceptoresModal");
-    if (select) {
-        select.innerHTML = '<option value="">Cargando preceptores...</option>';
+    const filtroInput = document.getElementById("filtroPreceptoresModal");
+    if (filtroInput) filtroInput.value = '';
+
+    const contenedor = document.getElementById("contenedorListaPreceptoresModal");
+    if (contenedor) {
+        contenedor.innerHTML = '<div class="text-center text-muted small p-3"><span class="spinner-border spinner-border-sm me-1"></span> Cargando lista de preceptores...</div>';
     }
 
     const modalEl = document.getElementById("modalAsignarPreceptor");
@@ -1112,32 +1134,100 @@ async function abrirModalAsignarPreceptor() {
     try {
         const res = await api.get('/api/v1/docentes/preceptores');
         if (!res.ok) throw new Error("Error al obtener lista de preceptores");
-        const preceptores = await res.json();
-
-        if (!preceptores || preceptores.length === 0) {
-            select.innerHTML = '<option value="">No hay docentes con cargo de preceptor activo</option>';
-            return;
-        }
-
-        let optionsHtml = '<option value="">-- Seleccionar Preceptor --</option>';
-        preceptores.forEach(p => {
-            const isSelected = (cursoPreceptorActualId && cursoPreceptorActualId === p.id) ? 'selected' : '';
-            optionsHtml += `<option value="${p.id}" ${isSelected}>${p.apellido}, ${p.nombre} (DNI: ${p.dni})</option>`;
-        });
-        select.innerHTML = optionsHtml;
+        listaPreceptoresGlobal = await res.json();
+        renderListaPreceptoresModal();
     } catch (err) {
-        if (select) {
-            select.innerHTML = `<option value="">Error al cargar preceptores: ${api.getErrorMessage(err)}</option>`;
+        if (contenedor) {
+            contenedor.innerHTML = `<div class="text-danger small p-2">Error al cargar: ${api.getErrorMessage(err)}</div>`;
         }
     }
 }
 
+function renderListaPreceptoresModal() {
+    const contenedor = document.getElementById("contenedorListaPreceptoresModal");
+    if (!contenedor) return;
+
+    const filtro = (document.getElementById("filtroPreceptoresModal")?.value || '').toLowerCase().trim();
+
+    if (!listaPreceptoresGlobal || listaPreceptoresGlobal.length === 0) {
+        contenedor.innerHTML = '<div class="text-muted small text-center p-3">No hay docentes con cargo de preceptor o jefe de preceptores activo.</div>';
+        actualizarContadorPreceptores();
+        return;
+    }
+
+    const filtrados = listaPreceptoresGlobal.filter(p => {
+        const texto = `${p.apellido} ${p.nombre} ${p.dni} ${p.cargo_tipo || ''}`.toLowerCase();
+        return texto.includes(filtro);
+    });
+
+    if (filtrados.length === 0) {
+        contenedor.innerHTML = '<div class="text-muted small text-center p-3">No se encontraron docentes con ese criterio.</div>';
+        actualizarContadorPreceptores();
+        return;
+    }
+
+    let html = '<div class="list-group list-group-flush">';
+    filtrados.forEach(p => {
+        const isChecked = cursoPreceptoresActualesIds.includes(p.id) ? 'checked' : '';
+        const esJefe = p.cargo_tipo && p.cargo_tipo.toUpperCase().includes('JEFE');
+        const badgeCargo = esJefe
+            ? '<span class="badge bg-warning text-dark border">Jefe de Preceptores</span>'
+            : '<span class="badge bg-secondary-subtle text-secondary border">Preceptor</span>';
+
+        html += `
+            <label class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2 rounded mb-1 border-0 bg-white shadow-xs cursor-pointer">
+                <div class="d-flex align-items-center gap-2">
+                    <input class="form-check-input mt-0 check-preceptor" type="checkbox" value="${p.id}" ${isChecked} onchange="onTogglePreceptorCheckbox(${p.id}, this.checked)">
+                    <div>
+                        <div class="fw-semibold small text-dark">${p.apellido}, ${p.nombre}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">DNI: ${p.dni || 'S/D'}</div>
+                    </div>
+                </div>
+                <div>${badgeCargo}</div>
+            </label>
+        `;
+    });
+    html += '</div>';
+
+    contenedor.innerHTML = html;
+    actualizarContadorPreceptores();
+}
+
+function onTogglePreceptorCheckbox(id, isChecked) {
+    if (isChecked) {
+        if (!cursoPreceptoresActualesIds.includes(id)) cursoPreceptoresActualesIds.push(id);
+    } else {
+        cursoPreceptoresActualesIds = cursoPreceptoresActualesIds.filter(x => x !== id);
+    }
+    actualizarContadorPreceptores();
+}
+
+function filtrarPreceptoresModal() {
+    renderListaPreceptoresModal();
+}
+
+function seleccionarTodosPreceptores(marcar) {
+    if (marcar) {
+        listaPreceptoresGlobal.forEach(p => {
+            if (!cursoPreceptoresActualesIds.includes(p.id)) cursoPreceptoresActualesIds.push(p.id);
+        });
+    } else {
+        cursoPreceptoresActualesIds = [];
+    }
+    renderListaPreceptoresModal();
+}
+
+function actualizarContadorPreceptores() {
+    const contador = document.getElementById("contadorPreceptoresSeleccionados");
+    if (contador) {
+        const count = cursoPreceptoresActualesIds.length;
+        contador.textContent = `${count} seleccionado${count === 1 ? '' : 's'}`;
+    }
+}
+
 async function guardarAsignacionPreceptor() {
-    if (!cursoActivoId) return;
-    const select = document.getElementById("selectPreceptoresModal");
-    const docenteId = select.value;
-    if (!docenteId) {
-        alert("Por favor seleccione un preceptor de la lista.");
+    if (!cursoActivoId) {
+        alert("Por favor seleccione un curso primero.");
         return;
     }
 
@@ -1152,18 +1242,22 @@ async function guardarAsignacionPreceptor() {
 
     try {
         const res = await api.post(`/api/v1/cursos/${cursoActivoId}/preceptor`, {
-            docente_id: parseInt(docenteId, 10),
+            docente_ids: cursoPreceptoresActualesIds,
             anio_lectivo: anio
         });
 
         if (res.ok) {
             const modalEl = document.getElementById("modalAsignarPreceptor");
-            const modal = bootstrap.Modal.getInstance(modalEl);
+            const modal = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
             if (modal) modal.hide();
-            await cargarPreceptorDelCurso();
+            await Promise.all([
+                cargarPreceptorDelCurso(),
+                cargarDocentesDelCursoActivo(),
+                cargarEmailsDelCursoActivo()
+            ]);
         } else {
             const err = await res.json();
-            alert("Error al asignar preceptor: " + api.getErrorMessage(err));
+            alert("Error al asignar preceptores: " + api.getErrorMessage(err));
         }
     } catch (err) {
         alert("Error al comunicarse con el servidor: " + api.getErrorMessage(err));
@@ -1178,6 +1272,9 @@ async function guardarAsignacionPreceptor() {
 window.onCambioAnioLectivoCurso = onCambioAnioLectivoCurso;
 window.abrirModalAsignarPreceptor = abrirModalAsignarPreceptor;
 window.guardarAsignacionPreceptor = guardarAsignacionPreceptor;
+window.filtrarPreceptoresModal = filtrarPreceptoresModal;
+window.seleccionarTodosPreceptores = seleccionarTodosPreceptores;
+window.onTogglePreceptorCheckbox = onTogglePreceptorCheckbox;
 
 // ============================
 // LOGICA DE DOCENTES Y MAILS POR CURSO

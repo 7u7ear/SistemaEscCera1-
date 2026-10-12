@@ -55,8 +55,11 @@ class CursoController {
         try {
             const { id } = req.params;
             const anio_lectivo = req.query.anio_lectivo || new Date().getFullYear();
-            const preceptor = await CursoService.getPreceptorByCurso(id, anio_lectivo);
-            res.json({ preceptor });
+            const preceptores = await CursoService.getPreceptoresByCurso(id, anio_lectivo);
+            res.json({
+                preceptores,
+                preceptor: preceptores[0] || null
+            });
         } catch (err) {
             next(err);
         }
@@ -65,12 +68,21 @@ class CursoController {
     async assignPreceptor(req, res, next) {
         try {
             const { id } = req.params;
-            const { docente_id, anio_lectivo } = req.body;
-            if (!docente_id || !anio_lectivo) {
-                return res.status(400).json({ error: 'Faltan datos obligatorios (docente_id, anio_lectivo)' });
+            const { docente_id, docente_ids, anio_lectivo } = req.body;
+            if (!anio_lectivo) {
+                return res.status(400).json({ error: 'Falta el año lectivo obligatorio (anio_lectivo)' });
             }
-            await CursoService.assignPreceptor(id, docente_id, anio_lectivo);
-            res.json({ success: true, message: 'Preceptor asignado correctamente' });
+
+            let ids = [];
+            if (Array.isArray(docente_ids)) {
+                ids = docente_ids;
+            } else if (docente_id !== undefined && docente_id !== null && docente_id !== '') {
+                ids = [docente_id];
+            }
+
+            const userId = req.user ? req.user.id : null;
+            await CursoService.assignPreceptor(id, ids, anio_lectivo, userId);
+            res.json({ success: true, message: 'Preceptores asignados correctamente' });
         } catch (err) {
             next(err);
         }

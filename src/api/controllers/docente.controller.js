@@ -13,7 +13,7 @@ class DocenteController {
 
     async getPreceptores(req, res, next) {
         try {
-            const preceptores = await DocenteService.getDocentesByCargo('PRECEPTOR');
+            const preceptores = await DocenteService.getPreceptores();
             res.json(preceptores);
         } catch (err) {
             next(err);

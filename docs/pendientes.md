@@ -100,3 +100,9 @@
   - Sección `seccion-auditoria` en dashboard con tabla detallada y badges por acción
   - Exportación directa a CSV con BOM UTF-8
   - Acceso restringido a perfiles: Administrador (edición), Secretario (edición), Conducción (lectura)
+- [x] **Asignación Múltiple de Preceptores y Jefe de Preceptores** (2026-10-12):
+  - Soporte para múltiples preceptores por curso en base de datos (`idx_curso_docente_anio` en `curso_preceptor`)
+  - Reconocimiento de cargos activos de `PRECEPTOR` y `JEFE DE PRECEPTORES` con badges diferenciados
+  - Modal interactivo con selector múltiple, buscador en tiempo real, contador y botones marcar/desmarcar todos
+  - Actualización sincronizada en cabecera del curso, planta de Docentes Asignados y listas de Mails del Curso
+  - Registro de auditoría bajo la entidad `CURSOS` y acción `ASSIGN_PRECEPTORES`

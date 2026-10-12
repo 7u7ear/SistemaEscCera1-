@@ -1,4 +1,4 @@
-﻿-- MySQL dump 10.13  Distrib 8.2.0, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.2.0, for Win64 (x86_64)
 --
 -- Host: localhost    Database: bd_cera1
 -- ------------------------------------------------------
@@ -341,7 +341,7 @@ CREATE TABLE `curso_preceptor` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_curso_anio` (`curso_id`,`anio_lectivo`),
+  UNIQUE KEY `idx_curso_docente_anio` (`curso_id`,`docente_id`,`anio_lectivo`),
   KEY `docente_id` (`docente_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -710,6 +710,36 @@ LOCK TABLES `perfil_modulo` WRITE;
 /*!40000 ALTER TABLE `perfil_modulo` DISABLE KEYS */;
 INSERT INTO `perfil_modulo` VALUES (1,1,1,'edicion'),(2,2,1,'edicion'),(3,1,2,'edicion'),(4,2,2,'edicion'),(5,1,3,'edicion'),(6,2,3,'edicion'),(7,1,4,'edicion'),(8,2,4,'edicion'),(9,1,5,'edicion'),(10,2,5,'edicion'),(11,1,6,'edicion'),(12,2,6,'edicion'),(13,1,7,'edicion'),(14,2,7,'edicion'),(15,1,8,'edicion'),(16,2,8,'edicion'),(17,1,9,'edicion'),(18,2,9,'edicion'),(19,1,10,'edicion'),(20,2,10,'edicion'),(21,4,1,'edicion'),(23,6,2,'lectura'),(24,3,1,'lectura'),(25,3,2,'edicion'),(26,4,7,'edicion'),(27,4,8,'edicion'),(28,4,10,'lectura'),(30,4,4,'edicion'),(31,7,2,'lectura'),(32,9,2,'lectura'),(33,5,2,'edicion'),(34,5,1,'lectura'),(35,5,6,'lectura'),(36,4,6,'edicion'),(37,6,7,'lectura');
 /*!40000 ALTER TABLE `perfil_modulo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `password_resets`
+--
+
+DROP TABLE IF EXISTS `password_resets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_resets` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `used_at` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_token` (`token`),
+  KEY `idx_usuario` (`usuario_id`),
+  CONSTRAINT `fk_password_resets_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `password_resets`
+--
+
+LOCK TABLES `password_resets` WRITE;
+/*!40000 ALTER TABLE `password_resets` DISABLE KEYS */;
+/*!40000 ALTER TABLE `password_resets` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
