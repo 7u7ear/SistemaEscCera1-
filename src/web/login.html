@@ -145,12 +145,15 @@
             </div>
             <div class="input-box">
                 <i class='bx bxs-user input-icon-left'></i>
-                <input type="text" id="reg-username" placeholder="Usuario" required>
+                <input type="text" id="reg-username" placeholder="Usuario (mín. 4 caracteres)" required minlength="4">
             </div>
-            <div class="input-box">
+            <div class="input-box mb-1">
                 <i class='bx bxs-lock-alt input-icon-left'></i>
-                <input type="password" id="reg-password" placeholder="Contraseña" required>
+                <input type="password" id="reg-password" placeholder="Contraseña" required minlength="6">
                 <i class='bx bx-show toggle-password' id="toggle-reg-password" title="Ver contraseña" onclick="togglePasswordVisibility('reg-password', 'toggle-reg-password')"></i>
+            </div>
+            <div class="text-start px-1" style="font-size: 11px; color: rgba(255, 255, 255, 0.9); margin-top: -10px; margin-bottom: 12px;">
+                <i class='bx bx-info-circle' style="vertical-align: middle;"></i> La contraseña debe tener más de 6 caracteres.
             </div>
             <div class="input-box">
                 <i class='bx bx-envelope input-icon-left'></i>
@@ -229,7 +232,16 @@
                 localStorage.setItem('user_perfil', data.user.perfil || 'Usuario');
                 window.location.href = "dashboard.html";
             } else {
-                const errMsg = (data.error && typeof data.error === 'object' ? data.error.message : data.error) || data.message || 'Error al ingresar';
+                let errMsg = 'Error al ingresar';
+                if (data.error && data.error.details && Array.isArray(data.error.details) && data.error.details.length > 0) {
+                    errMsg = data.error.details.map(d => d.message).join('. ');
+                } else if (data.error && typeof data.error === 'object' && data.error.message) {
+                    errMsg = data.error.message;
+                } else if (typeof data.error === 'string') {
+                    errMsg = data.error;
+                } else if (data.message) {
+                    errMsg = data.message;
+                }
                 msg.innerText = errMsg;
                 msg.classList.remove('d-none');
             }
@@ -270,7 +282,16 @@
                 }, 3000);
             } else {
                 msg.classList.add('alert-danger');
-                const errMsg = (data.error && typeof data.error === 'object' ? data.error.message : data.error) || data.message || 'Error al registrar';
+                let errMsg = 'Error al registrar';
+                if (data.error && data.error.details && Array.isArray(data.error.details) && data.error.details.length > 0) {
+                    errMsg = data.error.details.map(d => d.message).join('. ');
+                } else if (data.error && typeof data.error === 'object' && data.error.message) {
+                    errMsg = data.error.message;
+                } else if (typeof data.error === 'string') {
+                    errMsg = data.error;
+                } else if (data.message) {
+                    errMsg = data.message;
+                }
                 msg.innerText = errMsg;
                 msg.classList.remove('d-none');
             }

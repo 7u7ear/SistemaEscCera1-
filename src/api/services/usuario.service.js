@@ -1,3 +1,4 @@
+const db = require('../../../config/database');
 const UsuarioRepository = require('../models/usuario.model');
 const AppError = require('../../shared/errors/AppError');
 const bcrypt = require('bcrypt');
@@ -32,9 +33,7 @@ class UsuarioService {
             throw new AppError('Usuario no encontrado o contraseña incorrecta', 401);
         }
 
-        // Return user without password
-        const { password: _, ...userSafe } = user;
-        return userSafe;
+        return await UsuarioRepository.findById(user.id);
     }
 
     async register(data) {
@@ -62,14 +61,29 @@ class UsuarioService {
         }
 
         const hashedPassword = await bcrypt.hash(data.password, 10);
-        const newUser = {
-            ...data,
-            password: hashedPassword,
-            estado: 'activo'
-        };
+        const conn = await db.getConnection();
+        let insertId;
+        try {
+            await conn.beginTransaction();
+            const newUser = {
+                ...data,
+                password: hashedPassword,
+                estado: 'activo'
+            };
+            insertId = await UsuarioRepository.create(newUser, conn);
+            await conn.commit();
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
 
-        const insertId = await UsuarioRepository.create(newUser);
-        await AuditoriaService.registrar(adminId, 'CREATE_USER_ADMIN', 'USUARIOS', insertId, { username: data.username, perfil_id: data.perfil_id });
+        const perfilIds = data.perfil_ids || (data.perfil_id ? [data.perfil_id] : []);
+        await AuditoriaService.registrar(adminId, 'CREATE_USER_ADMIN', 'USUARIOS', insertId, { 
+            username: data.username, 
+            perfil_ids: perfilIds 
+        });
         return insertId;
     }
 
@@ -81,12 +95,33 @@ class UsuarioService {
         await AuditoriaService.registrar(adminId, 'UPDATE_STATUS', 'USUARIOS', id, { estado_anterior: user.estado, nuevo_estado: estado });
     }
 
-    async updateUserPerfil(id, perfil_id, adminId) {
+    async updateUserPerfiles(id, perfilIds, adminId) {
         const user = await UsuarioRepository.findById(id);
         if (!user) throw new AppError('Usuario no encontrado', 404);
 
-        await UsuarioRepository.updatePerfil(id, perfil_id);
-        await AuditoriaService.registrar(adminId, 'UPDATE_PERFIL', 'USUARIOS', id, { perfil_anterior: user.perfil_id, nuevo_perfil: perfil_id });
+        const ids = Array.isArray(perfilIds) ? perfilIds.map(Number).filter(Boolean) : [];
+
+        const conn = await db.getConnection();
+        try {
+            await conn.beginTransaction();
+            await UsuarioRepository.updatePerfiles(id, ids, conn);
+            await conn.commit();
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+
+        await AuditoriaService.registrar(adminId, 'UPDATE_PERFILES', 'USUARIOS', id, { 
+            perfiles_anteriores: user.perfil_ids || [], 
+            nuevos_perfiles: ids 
+        });
+    }
+
+    async updateUserPerfil(id, perfil_id, adminId) {
+        const ids = Array.isArray(perfil_id) ? perfil_id : (perfil_id ? [perfil_id] : []);
+        return await this.updateUserPerfiles(id, ids, adminId);
     }
 }
 

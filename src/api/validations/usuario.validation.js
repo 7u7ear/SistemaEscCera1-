@@ -27,6 +27,7 @@ const adminCreateSchema = z.object({
     nombre: z.string().min(1, 'Nombre es requerido'),
     email: z.string().email('Email inválido').optional().nullable().or(z.literal('')),
     perfil_id: parsePerfilId.optional(),
+    perfil_ids: z.array(z.number().int().positive()).optional()
 });
 
 const updateStatusSchema = z.object({
@@ -36,7 +37,10 @@ const updateStatusSchema = z.object({
 });
 
 const updatePerfilSchema = z.object({
-    perfil_id: parsePerfilId,
+    perfil_id: parsePerfilId.optional(),
+    perfil_ids: z.array(z.number().int().positive()).optional()
+}).refine(data => data.perfil_id !== undefined || data.perfil_ids !== undefined, {
+    message: 'Debe especificar perfil_id o perfil_ids'
 });
 
 const forgotPasswordSchema = z.object({

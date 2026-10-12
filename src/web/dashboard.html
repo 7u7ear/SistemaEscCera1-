@@ -1206,10 +1206,11 @@
             <input type="text" id="usuarioUsername" class="form-control" readonly>
         </div>
         <div class="mb-3">
-            <label class="form-label text-muted small fw-bold">Asignar Perfil (Rol)</label>
-            <select id="usuarioPerfil" class="form-select">
-                <option value="">-- Seleccionar Perfil --</option>
-            </select>
+            <label class="form-label text-muted small fw-bold">Asignar Perfiles (Roles)</label>
+            <div id="usuarioPerfilesContainer" class="border rounded p-3 bg-light" style="max-height: 180px; overflow-y: auto;">
+                <p class="text-muted small mb-0">Cargando perfiles...</p>
+            </div>
+            <div class="form-text small">Puede seleccionar uno o más perfiles (ej. Preceptor y Docente). Sus permisos se combinarán.</div>
         </div>
         <div class="mb-3" id="divUsuarioEstado">
             <label class="form-label text-muted small fw-bold">Estado de Cuenta</label>
@@ -1250,10 +1251,11 @@
             <input type="password" id="crearPassword" class="form-control">
         </div>
         <div class="mb-3">
-            <label class="form-label text-muted small fw-bold">Perfil</label>
-            <select id="crearPerfil" class="form-select">
-                <option value="">-- Seleccionar Perfil --</option>
-            </select>
+            <label class="form-label text-muted small fw-bold">Perfiles (Roles)</label>
+            <div id="crearPerfilesContainer" class="border rounded p-3 bg-light" style="max-height: 180px; overflow-y: auto;">
+                <p class="text-muted small mb-0">Cargando perfiles...</p>
+            </div>
+            <div class="form-text small">Seleccione los perfiles iniciales del usuario.</div>
         </div>
       </div>
       <div class="modal-footer border-0">

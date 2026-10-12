@@ -106,3 +106,11 @@
   - Modal interactivo con selector múltiple, buscador en tiempo real, contador y botones marcar/desmarcar todos
   - Actualización sincronizada en cabecera del curso, planta de Docentes Asignados y listas de Mails del Curso
   - Registro de auditoría bajo la entidad `CURSOS` y acción `ASSIGN_PRECEPTORES`
+- [x] **Asignación de Múltiples Perfiles por Usuario** (2026-10-12):
+  - Tabla intermedia `usuario_perfil` con claves foráneas en cascada e índices optimizados
+  - Combinación matemática de permisos con precedencia (`edición` > `lectura` > `ninguno`)
+  - Transacciones atómicas para actualización y creación de usuarios con múltiples perfiles
+  - Middleware de seguridad `permisos.js` adaptado para consultar todos los perfiles asignados en tiempo real
+  - Modal de gestión de usuarios y creación con lista de checkboxes interactiva
+  - Visualización de múltiples badges de perfil en la tabla de usuarios y en la barra superior del dashboard
+  - Registro de auditoría `UPDATE_PERFILES` con historial de perfiles anteriores y nuevos

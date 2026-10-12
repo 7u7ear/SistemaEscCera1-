@@ -76,8 +76,10 @@ function tienePermisoModulo(modulo, nivel = 'lectura') {
     if (!usuarioActual) return false;
 
     // Perfil ADMINISTRADOR tiene acceso completo a todos los módulos
-    const perfilNombre = (usuarioActual.perfil_nombre || '').toUpperCase();
-    if (perfilNombre === 'ADMINISTRADOR') return true;
+    const perfilesNombres = Array.isArray(usuarioActual.perfiles) 
+        ? usuarioActual.perfiles.map(p => (p.nombre || '').toUpperCase()) 
+        : (usuarioActual.perfil_nombre || '').toUpperCase().split(',').map(s => s.trim());
+    if (perfilesNombres.includes('ADMINISTRADOR')) return true;
 
     if (!usuarioActual.permisos) return false;
 
@@ -96,8 +98,10 @@ function tienePermisoModulo(modulo, nivel = 'lectura') {
 function aplicarPermisosSidebar() {
     if (!usuarioActual) return;
 
-    const perfilNombre = (usuarioActual.perfil_nombre || '').toUpperCase();
-    const esAdmin = perfilNombre === 'ADMINISTRADOR';
+    const perfilesNombres = Array.isArray(usuarioActual.perfiles) 
+        ? usuarioActual.perfiles.map(p => (p.nombre || '').toUpperCase()) 
+        : (usuarioActual.perfil_nombre || '').toUpperCase().split(',').map(s => s.trim());
+    const esAdmin = perfilesNombres.includes('ADMINISTRADOR');
 
     document.querySelectorAll('.sidebar-link[data-modulo]').forEach(link => {
         const modulo = link.getAttribute('data-modulo');
@@ -169,7 +173,7 @@ async function cargarUsuario() {
     const res = await api.get("/api/v1/usuarios/me");
     if (!res.ok) { window.location.href = "login.html"; return; }
     usuarioActual = await res.json();
-    const perfilStr = usuarioActual.perfil_nombre ? usuarioActual.perfil_nombre : "Usuario";
+    const perfilStr = usuarioActual.perfiles_nombres || usuarioActual.perfil_nombre || "Usuario";
     document.getElementById("titulo").innerText = `Bienvenido/a, ${usuarioActual.nombre}`;
     document.getElementById("userInfo").innerText = `Cargo: ${perfilStr} | Usuario: ${usuarioActual.username}`;
 

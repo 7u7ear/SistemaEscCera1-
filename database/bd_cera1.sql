@@ -708,7 +708,7 @@ CREATE TABLE `perfil_modulo` (
 
 LOCK TABLES `perfil_modulo` WRITE;
 /*!40000 ALTER TABLE `perfil_modulo` DISABLE KEYS */;
-INSERT INTO `perfil_modulo` VALUES (1,1,1,'edicion'),(2,2,1,'edicion'),(3,1,2,'edicion'),(4,2,2,'edicion'),(5,1,3,'edicion'),(6,2,3,'edicion'),(7,1,4,'edicion'),(8,2,4,'edicion'),(9,1,5,'edicion'),(10,2,5,'edicion'),(11,1,6,'edicion'),(12,2,6,'edicion'),(13,1,7,'edicion'),(14,2,7,'edicion'),(15,1,8,'edicion'),(16,2,8,'edicion'),(17,1,9,'edicion'),(18,2,9,'edicion'),(19,1,10,'edicion'),(20,2,10,'edicion'),(21,4,1,'edicion'),(23,6,2,'lectura'),(24,3,1,'lectura'),(25,3,2,'edicion'),(26,4,7,'edicion'),(27,4,8,'edicion'),(28,4,10,'lectura'),(30,4,4,'edicion'),(31,7,2,'lectura'),(32,9,2,'lectura'),(33,5,2,'edicion'),(34,5,1,'lectura'),(35,5,6,'lectura'),(36,4,6,'edicion'),(37,6,7,'lectura');
+INSERT INTO `perfil_modulo` VALUES (1,1,1,'edicion'),(2,2,1,'edicion'),(3,1,2,'edicion'),(4,2,2,'edicion'),(5,1,3,'edicion'),(6,2,3,'edicion'),(7,1,4,'edicion'),(8,2,4,'edicion'),(9,1,5,'edicion'),(10,2,5,'edicion'),(11,1,6,'edicion'),(12,2,6,'edicion'),(13,1,7,'edicion'),(14,2,7,'edicion'),(15,1,8,'edicion'),(16,2,8,'edicion'),(17,1,9,'edicion'),(18,2,9,'edicion'),(19,1,10,'edicion'),(20,2,10,'edicion'),(21,4,1,'edicion'),(23,6,2,'lectura'),(24,3,1,'lectura'),(25,3,2,'edicion'),(26,4,7,'edicion'),(27,4,8,'edicion'),(28,4,10,'lectura'),(30,4,4,'edicion'),(31,7,2,'lectura'),(32,9,2,'lectura'),(33,5,2,'edicion'),(34,5,1,'lectura'),(35,5,6,'lectura'),(36,4,6,'edicion');
 /*!40000 ALTER TABLE `perfil_modulo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -969,6 +969,35 @@ LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
 INSERT INTO `usuarios` VALUES (1,'sergio','$2b$10$MHbhT8eCj9TSp2EHIdimgOhZT58mMiEWlN9wEP9nyjGNchK39RXjG','Sergio',NULL,'activo',1,'2026-02-21 18:18:59','SECRETARIO',2),(2,'7u7e','$2b$10$mMTNd5OEUGgP5r539.hQn.s/vkolckQ8lVp8AKXwnJ17OMx6Vt22W','7u7e',NULL,'activo',1,'2026-05-09 13:27:43','ADMINISTRADOR',1),(6,'Naty','$2b$10$nc2TpHDQCksHmAe5TqTrVe/7cFJWZM219eZKe.7KDOoA7r/LpBKZu','Natalia Blanco',NULL,'activo',1,'2026-10-05 10:16:16',NULL,1);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usuario_perfil`
+--
+
+DROP TABLE IF EXISTS `usuario_perfil`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuario_perfil` (
+  `usuario_id` int NOT NULL,
+  `perfil_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`usuario_id`,`perfil_id`),
+  KEY `idx_usuario_perfil_usuario` (`usuario_id`),
+  KEY `idx_usuario_perfil_perfil` (`perfil_id`),
+  CONSTRAINT `fk_usuario_perfil_perfil` FOREIGN KEY (`perfil_id`) REFERENCES `perfiles` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_usuario_perfil_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuario_perfil`
+--
+
+LOCK TABLES `usuario_perfil` WRITE;
+/*!40000 ALTER TABLE `usuario_perfil` DISABLE KEYS */;
+INSERT INTO `usuario_perfil` VALUES (1,2,'2026-10-12 14:48:06'),(2,1,'2026-10-12 14:48:06'),(6,1,'2026-10-12 14:48:06'),(7,6,'2026-10-12 14:48:06');
+/*!40000 ALTER TABLE `usuario_perfil` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

@@ -1,4 +1,5 @@
 const db = require('../../../config/database');
+const logger = require('../services/logger.service');
 
 /**
  * Middleware de Control de Acceso (RBAC + Excepciones)
@@ -24,15 +25,37 @@ module.exports = (nombreModulo, tipoRequerido) => {
 
             let permisoFinal = userPerm.length > 0 ? userPerm[0].permiso : null;
 
-            // 3. PRIORIDAD 2: Si no hay permiso específico, verificar por PERFIL (RBAC Dinámico)
-            if (!permisoFinal && user.perfil_id) {
-                const [perfilPerm] = await db.query(`
-                    SELECT permiso FROM perfil_modulo 
-                    WHERE perfil_id = ? AND modulo_id = ?
-                `, [user.perfil_id, moduloId]);
-                
-                if (perfilPerm.length > 0) {
-                    permisoFinal = perfilPerm[0].permiso;
+            // 3. PRIORIDAD 2: Si no hay permiso específico, verificar por PERFILES asignados (RBAC Dinámico)
+            if (!permisoFinal) {
+                const [userPerfiles] = await db.query(
+                    'SELECT perfil_id FROM usuario_perfil WHERE usuario_id = ?',
+                    [user.id]
+                );
+                let perfilIds = userPerfiles.map(r => r.perfil_id);
+                if (perfilIds.length === 0) {
+                    if (Array.isArray(user.perfil_ids) && user.perfil_ids.length > 0) {
+                        perfilIds = user.perfil_ids;
+                    } else if (user.perfil_id) {
+                        perfilIds = [user.perfil_id];
+                    }
+                }
+
+                if (perfilIds.length > 0) {
+                    const [perfilPerms] = await db.query(`
+                        SELECT permiso FROM perfil_modulo 
+                        WHERE perfil_id IN (?) AND modulo_id = ?
+                    `, [perfilIds, moduloId]);
+                    
+                    if (perfilPerms.length > 0) {
+                        // El permiso mayor prevalece: edicion > lectura > ninguno
+                        if (perfilPerms.some(p => p.permiso === 'edicion')) {
+                            permisoFinal = 'edicion';
+                        } else if (perfilPerms.some(p => p.permiso === 'lectura')) {
+                            permisoFinal = 'lectura';
+                        } else {
+                            permisoFinal = 'ninguno';
+                        }
+                    }
                 }
             }
 
@@ -52,7 +75,7 @@ module.exports = (nombreModulo, tipoRequerido) => {
             return res.status(403).json({ error: `Permiso de ${tipoRequerido} insuficiente para el módulo ${nombreModulo}` });
 
         } catch (err) {
-            console.error('Error en Middleware de Permisos:', err);
+            logger.error(`Error en Middleware de Permisos: ${err.message}`, { stack: err.stack });
             res.status(500).json({ error: "Error interno de seguridad" });
         }
     };

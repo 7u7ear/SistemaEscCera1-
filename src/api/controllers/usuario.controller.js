@@ -92,9 +92,10 @@ class UsuarioController {
     async updatePerfil(req, res, next) {
         try {
             const { id } = req.params;
-            const { perfil_id } = updatePerfilSchema.parse(req.body);
-            await UsuarioService.updateUserPerfil(id, perfil_id, req.user.id);
-            res.json({ message: `Perfil de usuario actualizado a ID ${perfil_id}` });
+            const parsed = updatePerfilSchema.parse(req.body);
+            const perfilIds = parsed.perfil_ids || (parsed.perfil_id ? [parsed.perfil_id] : []);
+            await UsuarioService.updateUserPerfiles(id, perfilIds, req.user.id);
+            res.json({ message: 'Perfiles de usuario actualizados correctamente', perfil_ids: perfilIds });
         } catch (err) {
             next(err);
         }

@@ -14,7 +14,8 @@ const generarToken = (user) => {
         { 
             id: user.id, 
             username: user.username, 
-            perfil_id: user.perfil_id 
+            perfil_id: user.perfil_id,
+            perfil_ids: user.perfil_ids || (user.perfil_id ? [user.perfil_id] : [])
         }, 
         JWT_SECRET, 
         { expiresIn: JWT_EXPIRES_IN }

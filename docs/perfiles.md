@@ -53,6 +53,8 @@ A continuación se detallan los perfiles identificados para el sistema. Se utili
 
 ---
 
-## Próximos Pasos
-- Definir la matriz de permisos (Lectura/Escritura) para cada módulo basándose en estos perfiles.
-- Implementar la lógica de verificación de perfiles en el middleware de autenticación.
+## Soporte de Múltiples Perfiles por Usuario
+Un usuario puede tener asignados múltiples perfiles simultáneamente (por ejemplo, `PRECEPTOR/A` y `DOCENTE`). En estos casos:
+- Sus permisos se combinan automáticamente otorgando el mayor nivel de acceso (`edición` > `lectura` > `ninguno`).
+- Si cualquier perfil asignado tiene privilegios de `ADMINISTRADOR`, el usuario posee acceso total a todos los módulos.
+- La relación se administra mediante la tabla intermedia `usuario_perfil`.
