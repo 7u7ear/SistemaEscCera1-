@@ -1,28 +1,13 @@
 # Tareas Pendientes — Sistema Escolar CERA 1
 
-> Última actualización: 2026-08-01
+> Última actualización: 2026-10-12
 > Este documento es la fuente de verdad del estado del proyecto. Leerlo al inicio de cada sesión.
 
 ---
 
-## 🔴 ALTA PRIORIDAD — Funcionalidades Nuevas
+## 🔴 ALTA PRIORIDAD — Próximos Desarrollos
 
-### Módulo Email + Licencias
-- [x] `email.service.js` — Nodemailer + SMTP con fallback a `logs/email.log`
-- [x] `licencia_notificacion_template.js` — Plantillas HTML (solicitud + resolución)
-- [ ] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`)
-- [x] Tabla `curso_preceptor` + interfaz de asignación en admin de cursos
-- [x] Email automático a Preceptor/Secretaría al ingresar licencia
-- [x] Email automático al Docente al Aprobar/Rechazar licencia
-
-### Módulo Recuperación de Contraseña
-- [x] `password_reset.service.js` — token único, expiración 1 hora
-- [x] `password_reset.routes.js` — endpoints `forgot-password` y `reset-password`
-- [x] Enlace + modal "¿Olvidaste tu contraseña?" en `login.html`
-- [x] Ojo para ver/ocultar contraseña en Login y Registro
-- [x] Campo email en registro de usuarios + migración BD
-
-### Módulo Mails por Curso
+### Módulo Mails por Curso (Siguiente paso recomendado)
 - [ ] Endpoints para extraer mails: Estudiantes / Tutores / Docentes del curso
 - [ ] 3 listas independientes en `cursosHorariosComponent.js`
 - [ ] Botón "Copiar al portapapeles" (formato CCO/BCC)
@@ -34,6 +19,9 @@
 
 ### Visualizador de Auditoría
 - [ ] Pantalla con filtros por fecha, usuario y entidad (roles: Admin / Conducción)
+
+### Licencias & Puestos
+- [ ] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`)
 
 ---
 
@@ -93,6 +81,17 @@
 - [x] Alerta de usuarios pendientes de aprobación en Dashboard
 - [x] Métricas en vivo en Dashboard (docentes, puestos, estudiantes, cursos)
 - [x] Normalización de ordinales (1º° → 1º en todo el frontend)
-- [x] Botones negros→azules (detección y corrección estática en archivos principales)
 - [x] Documentación oficial: `docs/manual/manual_usuario.md` y `docs/manual/manual_tecnico.md`
 - [x] Credenciales de base de datos Aiven MySQL Cloud en `docs/README.md`
+- [x] **Módulo Email + Notificaciones de Licencias** (2026-10-12):
+  - Nodemailer + SMTP configurado con fallback a `logs/email.log`
+  - Plantillas HTML de notificación (`licencia_notificacion_template.js`)
+  - Asignación de preceptor por curso (`curso_preceptor` en BD + UI en Cursos y Horarios)
+  - Notificaciones automáticas por correo al preceptor y secretaría al registrar licencias
+  - Notificación automática por correo al docente al aprobar/rechazar licencias
+- [x] **Módulo Recuperación de Contraseña & Autenticación** (2026-10-12):
+  - Servicio `password_reset.service.js` con tokens seguros y validez de 1 hora
+  - Endpoints `/api/v1/auth/forgot-password` y `/api/v1/auth/reset-password`
+  - Modal interactivo de "¿Olvidaste tu contraseña?" y formulario de cambio de clave en `login.html`
+  - Icono "ojo" (ver/ocultar contraseña) en inputs de login y registro
+  - Campo email en registro de usuarios y columna `email` en tabla `usuarios`
