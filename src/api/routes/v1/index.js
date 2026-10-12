@@ -14,6 +14,7 @@ const permisosRoutes = require('./permisos.routes');
 const alumnoRoutes = require('./alumno.routes');
 const bloqueHorarioRoutes = require('./bloque_horario.routes');
 const passwordResetRoutes = require('./password_reset.routes');
+const auditoriaRoutes = require('./auditoria.routes');
 
 // Define API v1 routes
 router.use('/cargos', cargoRoutes);
@@ -29,6 +30,7 @@ router.use('/permisos', permisosRoutes);
 router.use('/alumnos', alumnoRoutes);
 router.use('/bloques-horarios', bloqueHorarioRoutes);
 router.use('/auth', passwordResetRoutes);
+router.use('/auditoria', auditoriaRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ status: 'API v1 is healthy', timestamp: new Date() });

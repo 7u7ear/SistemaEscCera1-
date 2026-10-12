@@ -20,6 +20,19 @@ class AuditoriaService {
             logger.error(`Error guardando auditoría: ${error.message}`);
         }
     }
+
+    async obtener(filtros) {
+        return await AuditoriaModel.getAll(filtros);
+    }
+
+    async obtenerFiltros() {
+        const [entidades, acciones] = await Promise.all([
+            AuditoriaModel.getEntidades(),
+            AuditoriaModel.getAcciones()
+        ]);
+        return { entidades, acciones };
+    }
 }
 
 module.exports = new AuditoriaService();
+

@@ -56,20 +56,92 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // ============================
+// CONTROL DE ACCESO Y PERMISOS SIDEBAR
+// ============================
+
+const SECCION_MODULO_MAP = {
+    'docentes': 'docentes',
+    'cargos': 'cargos',
+    'tramitaciones': 'tramitaciones',
+    'licencias': 'licencias',
+    'planilla': 'planilla_firmas',
+    'alumnos': 'estudiantes',
+    'cursos_horarios': 'cursos_horarios',
+    'usuarios': 'usuarios',
+    'permisos': 'permisos',
+    'auditoria': 'auditoria'
+};
+
+function tienePermisoModulo(modulo, nivel = 'lectura') {
+    if (!usuarioActual) return false;
+
+    // Perfil ADMINISTRADOR tiene acceso completo a todos los módulos
+    const perfilNombre = (usuarioActual.perfil_nombre || '').toUpperCase();
+    if (perfilNombre === 'ADMINISTRADOR') return true;
+
+    if (!usuarioActual.permisos) return false;
+
+    const permiso = usuarioActual.permisos[modulo];
+    if (!permiso || permiso === 'ninguno') return false;
+
+    if (nivel === 'lectura') {
+        return permiso === 'lectura' || permiso === 'edicion';
+    }
+    if (nivel === 'edicion') {
+        return permiso === 'edicion';
+    }
+    return false;
+}
+
+function aplicarPermisosSidebar() {
+    if (!usuarioActual) return;
+
+    const perfilNombre = (usuarioActual.perfil_nombre || '').toUpperCase();
+    const esAdmin = perfilNombre === 'ADMINISTRADOR';
+
+    document.querySelectorAll('.sidebar-link[data-modulo]').forEach(link => {
+        const modulo = link.getAttribute('data-modulo');
+        const tieneAcceso = esAdmin || tienePermisoModulo(modulo, 'lectura');
+
+        if (tieneAcceso) {
+            link.style.display = 'flex';
+        } else {
+            // Ocultar completamente (no deshabilitar) si no tiene permiso L o E
+            link.style.display = 'none';
+        }
+    });
+}
+
+// ============================
 // NAVEGACIÓN
 // ============================
 
 function mostrarSeccion(seccion) {
+    // Si la sección corresponde a un módulo restringido, validar permiso de lectura antes de cargar
+    const moduloRequerido = SECCION_MODULO_MAP[seccion];
+    if (moduloRequerido && !tienePermisoModulo(moduloRequerido, 'lectura')) {
+        alert("No cuenta con los permisos necesarios para acceder a este módulo.");
+        mostrarSeccion('dashboard');
+        return;
+    }
+
     document.querySelectorAll('.sidebar-link').forEach(link => {
         link.classList.remove('active');
-        if (link.textContent.toLowerCase().includes(seccion)) link.classList.add('active');
+        const onclickAttr = link.getAttribute('onclick') || '';
+        if (onclickAttr.includes(`'${seccion}'`)) {
+            link.classList.add('active');
+        }
     });
 
     document.querySelectorAll('.view-section').forEach(section => {
         section.classList.remove('active');
     });
-    document.getElementById(`seccion-${seccion}`).classList.add('active');
-    
+
+    const targetSection = document.getElementById(`seccion-${seccion}`);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+
     // Manejar visibilidad del header global
     const globalHeader = document.querySelector('.main-content > header');
     if (globalHeader) {
@@ -86,6 +158,7 @@ function mostrarSeccion(seccion) {
     if (seccion === 'permisos') verPermisos();
     if (seccion === 'alumnos') verAlumnos();
     if (seccion === 'cursos_horarios') verCursosHorarios();
+    if (seccion === 'auditoria') verAuditoria();
 }
 
 // ============================
@@ -99,9 +172,15 @@ async function cargarUsuario() {
     const perfilStr = usuarioActual.perfil_nombre ? usuarioActual.perfil_nombre : "Usuario";
     document.getElementById("titulo").innerText = `Bienvenido/a, ${usuarioActual.nombre}`;
     document.getElementById("userInfo").innerText = `Cargo: ${perfilStr} | Usuario: ${usuarioActual.username}`;
-    
+
+    // Aplicar filtrado dinámico del menú según permisos de lectura/edición
+    aplicarPermisosSidebar();
+
     verInicio();
 }
+
+window.tienePermisoModulo = tienePermisoModulo;
+window.aplicarPermisosSidebar = aplicarPermisosSidebar;
 
 // ============================
 // UTILS

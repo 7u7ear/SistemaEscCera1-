@@ -2,7 +2,7 @@
 
 ## Stack Técnico
 - **Backend**: Node.js + Express
-- **Base de datos**: MySQL (Aiven Cloud)
+- **Base de datos**: MySQL (Local — WAMP + phpMyAdmin)
 - **Frontend**: HTML + Bootstrap
 - **Autenticación**: JWT (sin sesiones)
 - **Arquitectura**: MVC + Service Layer

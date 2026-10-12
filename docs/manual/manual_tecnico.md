@@ -20,13 +20,13 @@ El sistema sigue una arquitectura en capas **MVC + Service Layer**:
 ## 3. Configuración de Variables de Entorno (`.env`)
 ```env
 PORT=3000
-DB_HOST=mysql-fde0d9c-bdecn1.i.aivencloud.com
-DB_PORT=23887
-DB_USER=avnadmin
-DB_PASS=tu_contraseña_aqui
-DB_NAME=defaultdb
-SESSION_SECRET=ceramica_secret_dev_2024
-JWT_SECRET=ceramica_jwt_token_secret_2024
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASS=
+DB_NAME=bd_cera1
+SESSION_SECRET=tu_session_secret
+JWT_SECRET=tu_jwt_secret
 NODE_ENV=production
 ```
 

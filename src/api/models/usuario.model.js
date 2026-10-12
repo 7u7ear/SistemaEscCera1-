@@ -42,6 +42,32 @@ class UsuarioRepository {
         return result.insertId;
     }
 
+    async getEffectivePermissions(userId, perfilId) {
+        const [rows] = await db.query(`
+            SELECT 
+                m.nombre AS modulo,
+                COALESCE(um.permiso, pm.permiso, 'ninguno') AS permiso
+            FROM modulos m
+            LEFT JOIN usuario_modulo um ON um.modulo_id = m.id AND um.usuario_id = ?
+            LEFT JOIN perfil_modulo pm ON pm.modulo_id = m.id AND pm.perfil_id = ?
+            ORDER BY m.nombre
+        `, [userId, perfilId]);
+
+        const permisos = {};
+        rows.forEach(r => {
+            permisos[r.modulo] = r.permiso;
+        });
+
+        // Cursos y Horarios accesible si el usuario tiene permiso en estudiantes, docentes o cargos
+        const tieneCursos = ['estudiantes', 'docentes', 'cargos'].some(mod => {
+            const p = permisos[mod];
+            return p === 'lectura' || p === 'edicion';
+        });
+        permisos['cursos_horarios'] = tieneCursos ? (permisos['estudiantes'] || permisos['docentes'] || 'lectura') : 'ninguno';
+
+        return permisos;
+    }
+
     async findById(id) {
         const [rows] = await db.query(
             `SELECT u.id, u.username, u.nombre, u.email, u.estado, u.perfil_id, p.nombre as perfil_nombre, u.created_at 
@@ -50,7 +76,11 @@ class UsuarioRepository {
              WHERE u.id = ?`,
             [id]
         );
-        return rows[0];
+        const user = rows[0];
+        if (!user) return null;
+
+        user.permisos = await this.getEffectivePermissions(user.id, user.perfil_id);
+        return user;
     }
 
     async updateStatus(id, estado) {

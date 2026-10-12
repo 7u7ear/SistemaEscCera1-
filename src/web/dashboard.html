@@ -40,8 +40,26 @@
             background: var(--primary-saas);
             color: white;
             padding-top: 2rem;
+            padding-bottom: 2.5rem;
+            overflow-y: auto;
+            overflow-x: hidden;
             z-index: 1050;
             box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.5);
         }
         .sidebar-brand {
             padding: 0 1.5rem 2rem;
@@ -173,39 +191,42 @@
     <div class="sidebar-brand">
         <i class="bi bi-mortarboard-fill"></i> EscCera1
     </div>
-    <nav>
-        <a class="sidebar-link active" onclick="mostrarSeccion('dashboard')">
+    <nav id="sidebarNav">
+        <a class="sidebar-link active" id="link-inicio" onclick="mostrarSeccion('dashboard')">
             <i class="bi bi-house-door"></i> Inicio
         </a>
-        <a class="sidebar-link" onclick="mostrarSeccion('docentes')">
+        <a class="sidebar-link" id="link-docentes" data-modulo="docentes" onclick="mostrarSeccion('docentes')">
             <i class="bi bi-people"></i> Docentes
         </a>
-        <a class="sidebar-link" onclick="mostrarSeccion('cargos')">
+        <a class="sidebar-link" id="link-cargos" data-modulo="cargos" onclick="mostrarSeccion('cargos')">
             <i class="bi bi-briefcase"></i> Puestos
         </a>
-        <a class="sidebar-link" onclick="mostrarSeccion('tramitaciones')">
+        <a class="sidebar-link" id="link-tramitaciones" data-modulo="tramitaciones" onclick="mostrarSeccion('tramitaciones')">
             <i class="bi bi-file-earmark-text"></i> Tramitaciones
         </a>
-        <a class="sidebar-link" onclick="mostrarSeccion('licencias')">
+        <a class="sidebar-link" id="link-licencias" data-modulo="licencias" onclick="mostrarSeccion('licencias')">
             <i class="bi bi-calendar-check"></i> Licencias
         </a>
-        <a class="sidebar-link" onclick="mostrarSeccion('planilla')">
+        <a class="sidebar-link" id="link-planilla" data-modulo="planilla_firmas" onclick="mostrarSeccion('planilla')">
             <i class="bi bi-pen"></i> Planilla de Firmas
         </a>
-        <a class="sidebar-link" id="link-alumnos" onclick="mostrarSeccion('alumnos')">
+        <a class="sidebar-link" id="link-alumnos" data-modulo="estudiantes" onclick="mostrarSeccion('alumnos')">
             <i class="bi bi-person-workspace"></i> Estudiantes
         </a>
-        <a class="sidebar-link" id="link-cursos_horarios" onclick="mostrarSeccion('cursos_horarios')">
+        <a class="sidebar-link" id="link-cursos_horarios" data-modulo="cursos_horarios" onclick="mostrarSeccion('cursos_horarios')">
             <i class="bi bi-calendar3"></i> Cursos y Horarios
         </a>
-        <a class="sidebar-link" id="link-usuarios" onclick="mostrarSeccion('usuarios')">
+        <a class="sidebar-link" id="link-usuarios" data-modulo="usuarios" onclick="mostrarSeccion('usuarios')">
             <i class="bi bi-person-lock"></i> Usuarios
         </a>
-        <a class="sidebar-link" id="link-permisos" onclick="mostrarSeccion('permisos')">
+        <a class="sidebar-link" id="link-permisos" data-modulo="permisos" onclick="mostrarSeccion('permisos')">
             <i class="bi bi-shield-check"></i> Matriz de Permisos
         </a>
+        <a class="sidebar-link" id="link-auditoria" data-modulo="auditoria" onclick="mostrarSeccion('auditoria')">
+            <i class="bi bi-journal-text"></i> Auditoría
+        </a>
         <hr class="mx-3 opacity-25">
-        <a class="sidebar-link" onclick="logout()">
+        <a class="sidebar-link" id="link-salir" onclick="logout()">
             <i class="bi bi-box-arrow-right"></i> Salir
         </a>
     </nav>
@@ -401,6 +422,77 @@
     <div id="seccion-cursos_horarios" class="view-section">
         <!-- Renderizado dinámico desde cursosHorariosComponent.js -->
     </div>
+
+    <!-- SECCION AUDITORIA -->
+    <div id="seccion-auditoria" class="view-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-0"><i class="bi bi-journal-text text-primary me-2"></i>Registro de Auditoría</h3>
+                <p class="text-muted small mb-0">Historial completo de operaciones del sistema</p>
+            </div>
+            <button class="btn btn-outline-success px-4 fw-bold" onclick="exportarAuditoriaCSV()">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Exportar CSV
+            </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small fw-semibold mb-1">Desde</label>
+                        <input type="date" id="filtroAuditoriaDesde" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small fw-semibold mb-1">Hasta</label>
+                        <input type="date" id="filtroAuditoriaHasta" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small fw-semibold mb-1">Entidad</label>
+                        <select id="filtroAuditoriaEntidad" class="form-select form-select-sm">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small fw-semibold mb-1">Acción</label>
+                        <select id="filtroAuditoriaAccion" class="form-select form-select-sm">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-muted small fw-semibold mb-1">ID Usuario</label>
+                        <input type="number" id="filtroAuditoriaUsuarioId" class="form-control form-control-sm" placeholder="Nro. usuario">
+                    </div>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button class="btn btn-primary btn-sm w-100" onclick="buscarAuditoria(1)">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="limpiarFiltrosAuditoria()" title="Limpiar filtros">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
+                <span class="fw-semibold text-muted small">Resultados: <strong id="auditoriaTotal" class="text-dark">-</strong></span>
+                <div id="auditoriaPaginacion"></div>
+            </div>
+            <div class="card-body p-0">
+                <div id="tablaAuditoria" class="p-4 text-center text-muted">
+                    <i class="bi bi-filter-circle fs-1 d-block mb-2 text-primary opacity-50"></i>
+                    Aplique filtros y presione Buscar para ver los registros.
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 d-flex justify-content-end py-2">
+                <div id="auditoriaPaginacionBottom"></div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <!-- MODAL NUEVO/EDITAR ALUMNO -->
@@ -1185,6 +1277,7 @@
 <script src="components/permisosComponent.js"></script>
 <script src="components/alumnosComponent.js?v=fix_matricula_1"></script>
 <script src="components/cursosHorariosComponent.js?v=print_fix_v4"></script>
+<script src="components/auditoriaComponent.js?v=v1"></script>
 
 </body>
 </html>

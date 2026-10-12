@@ -7,12 +7,6 @@
 
 ## 🔴 ALTA PRIORIDAD — Próximos Desarrollos
 
-### Sidebar Dinámico por Permisos (Siguiente paso recomendado)
-- [ ] `dashboard_script.js` — ocultar (no deshabilitar) ítems del menú sin permisos L o E
-
-### Visualizador de Auditoría
-- [ ] Pantalla con filtros por fecha, usuario y entidad (roles: Admin / Conducción)
-
 ### Licencias & Puestos
 - [ ] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`)
 
@@ -75,7 +69,7 @@
 - [x] Métricas en vivo en Dashboard (docentes, puestos, estudiantes, cursos)
 - [x] Normalización de ordinales (1º° → 1º en todo el frontend)
 - [x] Documentación oficial: `docs/manual/manual_usuario.md` y `docs/manual/manual_tecnico.md`
-- [x] Credenciales de base de datos Aiven MySQL Cloud en `docs/README.md`
+- [x] Configuración de base de datos MySQL local (WAMP) documentada en `docs/README.md`
 - [x] **Módulo Email + Notificaciones de Licencias** (2026-10-12):
   - Nodemailer + SMTP configurado con fallback a `logs/email.log`
   - Plantillas HTML de notificación (`licencia_notificacion_template.js`)
@@ -95,3 +89,14 @@
   - Botón "Copiar CCO / BCC" para pegado directo en clientes de correo
   - Exportación y descarga directa en formatos TXT y CSV para cada una de las listas
   - Métricas de cobertura de correos en tiempo real y buscador/filtro interactivo
+- [x] **Sidebar Dinámico por Permisos** (2026-10-12):
+  - `aplicarPermisosSidebar` en `dashboard_script.js` oculta ítems sin permiso L o E
+  - Endpoint `/api/v1/permisos/mis-permisos` y `getEffectivePermissions` en `usuario.model.js`
+  - Protección de rutas en `mostrarSeccion` con alerta y redirección al dashboard
+- [x] **Visualizador de Auditoría** (2026-10-12):
+  - Endpoint `GET /api/v1/auditoria` con filtros por fecha, usuario, entidad y acción
+  - Paginación de 50 registros por página con navegación
+  - Filtros dinámicos poblados desde la BD (entidades y acciones reales)
+  - Sección `seccion-auditoria` en dashboard con tabla detallada y badges por acción
+  - Exportación directa a CSV con BOM UTF-8
+  - Acceso restringido a perfiles: Administrador (edición), Secretario (edición), Conducción (lectura)

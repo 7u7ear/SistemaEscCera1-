@@ -8,7 +8,7 @@ Sistema web de gestión administrativa escolar para docentes, cargos, licencias 
 |------|-----------|
 | Runtime | Node.js 18+ |
 | Framework | Express.js 4 |
-| Base de Datos | MySQL 8 (Aiven Cloud / Local) |
+| Base de Datos | MySQL 8 (Local — WAMP + phpMyAdmin) |
 | Validación | Zod |
 | Logging | Winston |
 | Seguridad | Helmet, bcrypt, JWT |
@@ -62,13 +62,13 @@ cp .env.example .env
 Variables requeridas en `.env`:
 ```env
 PORT=3000
-DB_HOST=mysql-fde0d9c-bdecn1.i.aivencloud.com
-DB_PORT=23887
-DB_USER=avnadmin
-DB_PASS=tu_contraseña_aqui
-DB_NAME=defaultdb
-SESSION_SECRET=ceramica_secret_dev_2024
-JWT_SECRET=ceramica_jwt_token_secret_2024
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASS=
+DB_NAME=bd_cera1
+SESSION_SECRET=tu_session_secret
+JWT_SECRET=tu_jwt_secret
 NODE_ENV=development
 ```
 
@@ -110,7 +110,7 @@ npm run format
 ## 🔐 Seguridad
 
 - Contraseñas hasheadas con **bcrypt**
-- Sesiones protegidas con `httpOnly` y `sameSite=lax`
+- Autenticación mediante **JWT** (sin sesiones de servidor)
 - Headers de seguridad vía **Helmet**
 - Control de acceso basado en roles (**RBAC**) por módulo
 - Validación de todas las entradas con **Zod**
