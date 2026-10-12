@@ -1207,10 +1207,11 @@
         </div>
         <div class="mb-3">
             <label class="form-label text-muted small fw-bold">Asignar Perfiles (Roles)</label>
-            <div id="usuarioPerfilesContainer" class="border rounded p-3 bg-light" style="max-height: 180px; overflow-y: auto;">
-                <p class="text-muted small mb-0">Cargando perfiles...</p>
-            </div>
-            <div class="form-text small">Puede seleccionar uno o más perfiles (ej. Preceptor y Docente). Sus permisos se combinarán.</div>
+            <div id="usuarioPerfilesContainer"></div>
+            <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="agregarFilaPerfil('usuarioPerfilesContainer')">
+                <i class="bi bi-plus-circle"></i> Agregar otro perfil
+            </button>
+            <div class="form-text small mt-1">Puede asignar más de un perfil. Sus permisos se combinarán.</div>
         </div>
         <div class="mb-3" id="divUsuarioEstado">
             <label class="form-label text-muted small fw-bold">Estado de Cuenta</label>
@@ -1252,10 +1253,11 @@
         </div>
         <div class="mb-3">
             <label class="form-label text-muted small fw-bold">Perfiles (Roles)</label>
-            <div id="crearPerfilesContainer" class="border rounded p-3 bg-light" style="max-height: 180px; overflow-y: auto;">
-                <p class="text-muted small mb-0">Cargando perfiles...</p>
-            </div>
-            <div class="form-text small">Seleccione los perfiles iniciales del usuario.</div>
+            <div id="crearPerfilesContainer"></div>
+            <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="agregarFilaPerfil('crearPerfilesContainer')">
+                <i class="bi bi-plus-circle"></i> Agregar otro perfil
+            </button>
+            <div class="form-text small mt-1">Puede asignar más de un perfil.</div>
         </div>
       </div>
       <div class="modal-footer border-0">
