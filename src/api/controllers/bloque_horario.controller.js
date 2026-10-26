@@ -5,7 +5,7 @@ class BloqueHorarioController {
         try {
             const { turno } = req.query;
             let sql = "SELECT * FROM bloques_horarios WHERE deleted_at IS NULL";
-            let params = [];
+            const params = [];
 
             if (turno && !['COMPLETO', 'TODOS', 'ALL'].includes(turno.toUpperCase())) {
                 sql += " AND turno = ?";

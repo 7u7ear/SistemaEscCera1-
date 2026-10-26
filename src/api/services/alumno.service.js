@@ -174,7 +174,7 @@ class AlumnoService {
 
     async deleteAlumno(id, userId) {
         const [alumnos] = await db.query("SELECT id, dni FROM alumnos WHERE id = ? AND deleted_at IS NULL", [id]);
-        if (alumnos.length === 0) throw new AppError('Alumno no encontrado', 404);
+        if (alumnos.length === 0) {throw new AppError('Alumno no encontrado', 404);}
 
         await db.query("UPDATE alumnos SET deleted_at = NOW() WHERE id = ?", [id]);
         await AuditoriaService.registrar(userId, 'DELETE', 'ALUMNOS', id, { dni: alumnos[0].dni });
@@ -368,7 +368,7 @@ class AlumnoService {
 
     async updateMateriaAdeudada(id, estado, userId) {
         const [rows] = await db.query("SELECT alumno_id, materia_id FROM materias_adeudadas WHERE id = ?", [id]);
-        if (rows.length === 0) throw new AppError('Registro no encontrado', 404);
+        if (rows.length === 0) {throw new AppError('Registro no encontrado', 404);}
 
         await db.query(
             "UPDATE materias_adeudadas SET estado = ?, updated_at = NOW() WHERE id = ?",
@@ -380,7 +380,7 @@ class AlumnoService {
 
     async deleteMateriaAdeudada(id, userId) {
         const [rows] = await db.query("SELECT alumno_id, materia_id FROM materias_adeudadas WHERE id = ?", [id]);
-        if (rows.length === 0) throw new AppError('Registro no encontrado', 404);
+        if (rows.length === 0) {throw new AppError('Registro no encontrado', 404);}
 
         await db.query("DELETE FROM materias_adeudadas WHERE id = ?", [id]);
         await AuditoriaService.registrar(userId, 'DELETE_MATERIA_ADEUDADA', 'ALUMNOS', rows[0].alumno_id, { materia_id: rows[0].materia_id });
@@ -403,7 +403,7 @@ class AlumnoService {
              WHERE ma.id = ?`,
             [materiaAdeudadaId]
         );
-        if (rows.length === 0) throw new AppError('Materia adeudada no encontrada', 404);
+        if (rows.length === 0) {throw new AppError('Materia adeudada no encontrada', 404);}
 
         const materiaAdeudada = rows[0];
         const nota = parseFloat(data.nota);
@@ -442,7 +442,7 @@ class AlumnoService {
             "SELECT * FROM materia_adeudada_examenes WHERE id = ?",
             [examenId]
         );
-        if (examenes.length === 0) throw new AppError('Registro de examen no encontrado', 404);
+        if (examenes.length === 0) {throw new AppError('Registro de examen no encontrado', 404);}
 
         const examen = examenes[0];
         const [adeudadas] = await db.query(

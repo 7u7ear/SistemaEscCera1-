@@ -31,7 +31,7 @@ class UsuarioController {
     async getMe(req, res, next) {
         try {
             const userToken = req.user;
-            if (!userToken) return res.status(401).json({ error: 'No autorizado' });
+            if (!userToken) {return res.status(401).json({ error: 'No autorizado' });}
 
             const userFull = await UsuarioService.getUsuarioById(userToken.id);
             res.json(userFull);

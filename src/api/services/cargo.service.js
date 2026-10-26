@@ -37,7 +37,7 @@ class CargoService {
     async assignDocente(cargoId, assignmentData, userId) {
         const { docente_id, situacion_revista, fecha_inicio, reemplaza_a } = assignmentData;
         
-        if (!docente_id) throw new AppError('Docente es requerido', 400);
+        if (!docente_id) {throw new AppError('Docente es requerido', 400);}
 
         const activos = await CargoRepository.findActiveAssignments(cargoId);
         const titularActivo = activos.find(a => a.situacion_revista === 'titular');
@@ -68,8 +68,8 @@ class CargoService {
 
     async bajaDocente(cargoId, cargoDocenteId, bajaData, userId) {
         const assignment = await CargoRepository.findAssignmentById(cargoDocenteId);
-        if (!assignment) throw new AppError('Designación no encontrada', 404);
-        if (assignment.cargo_id != cargoId) throw new AppError('La designación no pertenece a este puesto', 400);
+        if (!assignment) {throw new AppError('Designación no encontrada', 404);}
+        if (assignment.cargo_id != cargoId) {throw new AppError('La designación no pertenece a este puesto', 400);}
 
         await CargoRepository.bajaDocente(cargoDocenteId, bajaData);
 
@@ -91,7 +91,7 @@ class CargoService {
 
     async addDistribucion(cargoId, data, userId) {
         const cargo = await CargoRepository.findById(cargoId);
-        if (!cargo) throw new AppError('El cargo no existe', 404);
+        if (!cargo) {throw new AppError('El cargo no existe', 404);}
         
         const distActual = await CargoRepository.getDistribucion(cargoId);
         const horasActuales = distActual.reduce((acc, curr) => acc + curr.cantidad_horas, 0);

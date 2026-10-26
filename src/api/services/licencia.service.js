@@ -67,7 +67,7 @@ class LicenciaService {
     async updateLicencia(id, updateData, userId) {
         const { finalizar_puesto } = updateData;
         const currentLicencia = await LicenciaRepository.findById(id);
-        if (!currentLicencia) throw new AppError('Licencia no encontrada', 404);
+        if (!currentLicencia) {throw new AppError('Licencia no encontrada', 404);}
 
         await LicenciaRepository.update(id, updateData);
 
@@ -82,7 +82,7 @@ class LicenciaService {
 
     async deleteLicencia(id, userId) {
         const current = await LicenciaRepository.findById(id);
-        if (!current) throw new AppError('Licencia no encontrada', 404);
+        if (!current) {throw new AppError('Licencia no encontrada', 404);}
 
         await LicenciaRepository.delete(id);
         await AuditoriaService.registrar(userId, 'DELETE', 'LICENCIAS', id, { docente_id: current.docente_id });
@@ -93,14 +93,14 @@ class LicenciaService {
     }
 
     async createTipoLicencia(cod, desc) {
-        if (!cod || !desc) throw new AppError('Código y descripción obligatorios', 400);
+        if (!cod || !desc) {throw new AppError('Código y descripción obligatorios', 400);}
         return await LicenciaRepository.createTipo(cod, desc);
     }
 
     async notificarNuevaLicencia(docenteId, targets, fechaInicio, fechaFin, tipoLicencia, expediente, observaciones) {
         try {
             const docente = await LicenciaRepository.findDocenteInfo(docenteId);
-            if (!docente) return;
+            if (!docente) {return;}
 
             const anioLectivo = fechaInicio ? new Date(fechaInicio).getFullYear() : new Date().getFullYear();
             const secretariaEmail = process.env.SECRETARIA_EMAIL || process.env.SMTP_USER;
@@ -110,7 +110,7 @@ class LicenciaService {
             for (const cid of targets) {
                 if (cid) {
                     const cargo = await LicenciaRepository.findCargoInfo(cid);
-                    if (cargo) cargosInfo.push(cargo);
+                    if (cargo) {cargosInfo.push(cargo);}
 
                     const preceptores = await LicenciaRepository.findPreceptoresByCargo(cid, anioLectivo);
                     for (const p of preceptores) {
@@ -172,9 +172,9 @@ class LicenciaService {
 
     async notificarResolucionLicencia(licencia, estado) {
         try {
-            if (!licencia || !licencia.docente_id) return;
+            if (!licencia || !licencia.docente_id) {return;}
             const docente = await LicenciaRepository.findDocenteInfo(licencia.docente_id);
-            if (!docente || !docente.email) return;
+            if (!docente || !docente.email) {return;}
 
             const cargo = licencia.cargo_id ? await LicenciaRepository.findCargoInfo(licencia.cargo_id) : null;
             const puestoNombre = cargo ? `${cargo.tipo_cargo} (${cargo.numero_puesto})` : 'General';

@@ -18,7 +18,7 @@ class CodigoTramiteService {
 
     async update(id, data) {
         const existing = await CodigoTramiteRepository.findById(id);
-        if (!existing) throw new AppError('Código de trámite no encontrado', 404);
+        if (!existing) {throw new AppError('Código de trámite no encontrado', 404);}
         await CodigoTramiteRepository.update(id, {
             codigo: data.codigo,
             descripcion_tramite: data.descripcion
@@ -27,7 +27,7 @@ class CodigoTramiteService {
 
     async delete(id) {
         const existing = await CodigoTramiteRepository.findById(id);
-        if (!existing) throw new AppError('Código de trámite no encontrado', 404);
+        if (!existing) {throw new AppError('Código de trámite no encontrado', 404);}
         await CodigoTramiteRepository.delete(id);
     }
 }

@@ -10,9 +10,9 @@ class PlanillaRepository {
     async getPlanillaCargos(diaNombre, fecha, turno) {
         // Filtros de hora según turno
         let horaFiltro = "";
-        if (turno === 'mañana') horaFiltro = "AND dh.hora_ingreso < '12:40:00'";
-        else if (turno === 'tarde') horaFiltro = "AND dh.hora_ingreso >= '12:40:00' AND dh.hora_ingreso < '18:30:00'";
-        else if (turno === 'noche') horaFiltro = "AND dh.hora_ingreso >= '18:30:00'";
+        if (turno === 'mañana') {horaFiltro = "AND dh.hora_ingreso < '12:40:00'";}
+        else if (turno === 'tarde') {horaFiltro = "AND dh.hora_ingreso >= '12:40:00' AND dh.hora_ingreso < '18:30:00'";}
+        else if (turno === 'noche') {horaFiltro = "AND dh.hora_ingreso >= '18:30:00'";}
 
         // Query: Buscamos el docente que está 'activo' (puede ser titular o suplente).
         // Si no hay nadie 'activo' porque el titular está de 'licencia' y no hay suplente aún,

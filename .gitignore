@@ -7,3 +7,6 @@ dist/
 
 debug_*.js
 test_*.js
+tmp_*.js
+tmp/
+db_results.json

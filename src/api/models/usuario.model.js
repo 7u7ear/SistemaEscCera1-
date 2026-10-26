@@ -146,7 +146,7 @@ class UsuarioRepository {
             [id]
         );
         const user = rows[0];
-        if (!user) return null;
+        if (!user) {return null;}
 
         const [perfilesRows] = await db.query(`
             SELECT p.id, p.nombre

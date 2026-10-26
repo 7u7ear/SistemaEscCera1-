@@ -14,7 +14,7 @@ const registerSchema = z.object({
 
 const parsePerfilId = z.preprocess(
     (val) => {
-        if (val === '' || val === null || val === undefined) return null;
+        if (val === '' || val === null || val === undefined) {return null;}
         const num = Number(val);
         return isNaN(num) ? val : num;
     },
