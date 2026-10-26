@@ -143,7 +143,7 @@ class CursoService {
         const docentesMap = new Map();
 
         docentesAsignados.forEach(d => {
-            if (!d.docente_id) return; // Vacante
+            if (!d.docente_id) {return;} // Vacante
             const docId = d.docente_id;
 
             if (!docentesMap.has(docId)) {

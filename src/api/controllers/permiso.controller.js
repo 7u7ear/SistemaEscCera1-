@@ -24,10 +24,10 @@ class PermisoController {
     async getMisPermisos(req, res, next) {
         try {
             const userToken = req.user;
-            if (!userToken) return res.status(401).json({ error: 'No autorizado' });
+            if (!userToken) {return res.status(401).json({ error: 'No autorizado' });}
             const UsuarioRepository = require('../models/usuario.model');
             const user = await UsuarioRepository.findById(userToken.id);
-            if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+            if (!user) {return res.status(404).json({ error: 'Usuario no encontrado' });}
             res.json({ permisos: user.permisos });
         } catch (err) {
             next(err);

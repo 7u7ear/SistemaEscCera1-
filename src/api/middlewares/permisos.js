@@ -10,11 +10,11 @@ module.exports = (nombreModulo, tipoRequerido) => {
     return async (req, res, next) => {
         try {
             const user = req.user;
-            if (!user) return res.status(401).json({ error: "No autorizado" });
+            if (!user) {return res.status(401).json({ error: "No autorizado" });}
 
             // 1. Obtener ID del módulo
             const [modulos] = await db.query("SELECT id FROM modulos WHERE nombre = ?", [nombreModulo]);
-            if (modulos.length === 0) return res.status(403).json({ error: "Módulo inexistente" });
+            if (modulos.length === 0) {return res.status(403).json({ error: "Módulo inexistente" });}
             const moduloId = modulos[0].id;
 
             // 2. PRIORIDAD 1: Verificar permiso específico por usuario (Excepciones)
@@ -65,11 +65,11 @@ module.exports = (nombreModulo, tipoRequerido) => {
             }
 
             if (tipoRequerido === 'lectura') {
-                if (['lectura', 'edicion'].includes(permisoFinal)) return next();
+                if (['lectura', 'edicion'].includes(permisoFinal)) {return next();}
             }
 
             if (tipoRequerido === 'edicion') {
-                if (permisoFinal === 'edicion') return next();
+                if (permisoFinal === 'edicion') {return next();}
             }
 
             return res.status(403).json({ error: `Permiso de ${tipoRequerido} insuficiente para el módulo ${nombreModulo}` });

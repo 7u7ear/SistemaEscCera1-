@@ -48,6 +48,7 @@ describe('UsuarioService.authenticate', () => {
   it('should return user without password on success', async () => {
     const fakeUser = { id: 1, username: 'admin', estado: 'activo', password: 'hash', nombre: 'Admin' };
     UsuarioRepository.findByUsername.mockResolvedValue(fakeUser);
+    UsuarioRepository.findById.mockResolvedValue({ id: 1, username: 'admin', estado: 'activo', nombre: 'Admin' });
     bcrypt.compare.mockResolvedValue(true);
 
     const result = await UsuarioService.authenticate('admin', 'correct');

@@ -89,7 +89,7 @@ class UsuarioService {
 
     async updateUserStatus(id, estado, adminId) {
         const user = await UsuarioRepository.findById(id);
-        if (!user) throw new AppError('Usuario no encontrado', 404);
+        if (!user) {throw new AppError('Usuario no encontrado', 404);}
 
         await UsuarioRepository.updateStatus(id, estado);
         await AuditoriaService.registrar(adminId, 'UPDATE_STATUS', 'USUARIOS', id, { estado_anterior: user.estado, nuevo_estado: estado });
@@ -97,7 +97,7 @@ class UsuarioService {
 
     async updateUserPerfiles(id, perfilIds, adminId) {
         const user = await UsuarioRepository.findById(id);
-        if (!user) throw new AppError('Usuario no encontrado', 404);
+        if (!user) {throw new AppError('Usuario no encontrado', 404);}
 
         const ids = Array.isArray(perfilIds) ? perfilIds.map(Number).filter(Boolean) : [];
 

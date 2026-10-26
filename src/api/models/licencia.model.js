@@ -66,7 +66,7 @@ class LicenciaRepository {
     }
 
     async findDocenteInfo(docenteId) {
-        if (!docenteId) return null;
+        if (!docenteId) {return null;}
         const [rows] = await db.query(
             "SELECT id, nombre, apellido, dni, email FROM docentes WHERE id = ? AND deleted_at IS NULL",
             [docenteId]
@@ -75,7 +75,7 @@ class LicenciaRepository {
     }
 
     async findCargoInfo(cargoId) {
-        if (!cargoId) return null;
+        if (!cargoId) {return null;}
         const [rows] = await db.query(
             "SELECT id, numero_puesto, tipo_cargo FROM cargos WHERE id = ? AND deleted_at IS NULL",
             [cargoId]
@@ -84,7 +84,7 @@ class LicenciaRepository {
     }
 
     async findPreceptoresByCargo(cargoId, anioLectivo) {
-        if (!cargoId) return [];
+        if (!cargoId) {return [];}
         const [rows] = await db.query(`
             SELECT DISTINCT d.id, d.nombre, d.apellido, d.email, c.id AS curso_id, c.anio, c.division
             FROM distribucion_horas dh

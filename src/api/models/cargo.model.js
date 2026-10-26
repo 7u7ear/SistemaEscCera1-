@@ -104,7 +104,7 @@ class CargoRepository {
         `;
 
         const params = [docente_id, cargo_id, situacion_revista || 'interino'];
-        if (fecha_inicio) params.push(fecha_inicio);
+        if (fecha_inicio) {params.push(fecha_inicio);}
         params.push(reemplaza_a || null);
         params.push(rol || 0);
         params.push(expediente_alta || null);
@@ -132,7 +132,7 @@ class CargoRepository {
             WHERE id = ? AND deleted_at IS NULL
         `;
         const params = [];
-        if (fecha_fin) params.push(fecha_fin);
+        if (fecha_fin) {params.push(fecha_fin);}
         params.push(expediente_baja || null);
         params.push(cargoDocenteId);
 

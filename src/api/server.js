@@ -10,6 +10,9 @@ const errorHandler = require('./middlewares/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust first proxy (Nginx reverse proxy in production)
+app.set('trust proxy', 1);
+
 // ==================
 // SECURITY & MIDDLEWARES
 // ==================

@@ -3,7 +3,7 @@ const logger = require('../services/logger.service');
 const xssClean = (req, res, next) => {
     try {
         if (req.body) {
-            for (let key in req.body) {
+            for (const key in req.body) {
                 if (typeof req.body[key] === 'string') {
                     // Reemplazamos los < y > simples para evitar tags HTML
                     req.body[key] = req.body[key].replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -11,7 +11,7 @@ const xssClean = (req, res, next) => {
             }
         }
         if (req.query) {
-            for (let key in req.query) {
+            for (const key in req.query) {
                 if (typeof req.query[key] === 'string') {
                     req.query[key] = req.query[key].replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 }

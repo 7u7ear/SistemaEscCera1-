@@ -31,9 +31,9 @@ class PlanillaService {
         // 2. Si hay un docente 'activo' hoy (titular o suplente), lo mostramos con su marcador [T,I,0S].
         const cargosProcesados = cargos.map(c => {
             let marker = '';
-            if (c.situacion_revista === 'titular') marker = '[T] ';
-            else if (c.situacion_revista === 'interino') marker = '[I] ';
-            else if (c.situacion_revista === 'suplente') marker = '[S] ';
+            if (c.situacion_revista === 'titular') {marker = '[T] ';}
+            else if (c.situacion_revista === 'interino') {marker = '[I] ';}
+            else if (c.situacion_revista === 'suplente') {marker = '[S] ';}
 
             const docenteNombreCompleto = (c.apellido && c.docente_nombre) ? 
                 `${marker}${c.apellido}, ${c.docente_nombre}` : null;

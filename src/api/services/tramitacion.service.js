@@ -15,14 +15,14 @@ class TramitacionService {
 
     async update(id, data, userId) {
         const existing = await TramitacionRepository.findById(id);
-        if (!existing) throw new AppError('Tramitación no encontrada', 404);
+        if (!existing) {throw new AppError('Tramitación no encontrada', 404);}
         await TramitacionRepository.update(id, data);
         await AuditoriaService.registrar(userId, 'UPDATE', 'TRAMITACIONES', id, { estado: data.estado });
     }
 
     async delete(id, userId) {
         const existing = await TramitacionRepository.findById(id);
-        if (!existing) throw new AppError('Tramitación no encontrada', 404);
+        if (!existing) {throw new AppError('Tramitación no encontrada', 404);}
         await TramitacionRepository.delete(id);
         await AuditoriaService.registrar(userId, 'DELETE', 'TRAMITACIONES', id, { docente_id: existing.docente_id });
     }
