@@ -114,3 +114,8 @@
   - Modal de gestión de usuarios y creación con lista de checkboxes interactiva
   - Visualización de múltiples badges de perfil en la tabla de usuarios y en la barra superior del dashboard
   - Registro de auditoría `UPDATE_PERFILES` con historial de perfiles anteriores y nuevos
+- [x] **Nuevo Perfil de Permisos 'JEFE DE PRECEPTORES/AS'** (2026-10-27):
+  - Incorporación a tabla `perfiles` con migración `database/migrations/2026_10_27_add_perfil_jefe_preceptores.sql`
+  - Permisos iniciales en `perfil_modulo`: Estudiantes (`edicion`), Planilla de Firmas (`edicion`) y Docentes (`lectura`)
+  - Integración automática en la Matriz de Permisos RBAC y en la asignación de perfiles a usuarios
+

@@ -24,6 +24,7 @@ El Sistema de Gestión Escolar CERA 1 es una plataforma integral web diseñada p
 - **DOCENTE**: Consulta de situación de revista propia y solicitud de licencias.
 - **BIBLIOTECA**: Consulta y gestión de material bibliográfico.
 - **ESTUDIANTE**: Consulta de horarios y datos académicos.
+- **JEFE DE PRECEPTORES/AS**: Supervisión y gestión de preceptoría, planilla de firmas y estudiantes.
 
 ---
 
