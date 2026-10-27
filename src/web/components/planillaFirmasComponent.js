@@ -7,7 +7,10 @@ let planillaDataActiva = { cargos: [], licencias: [] };
 
 function fmtOrdinal(val) {
     if (!val && val !== 0) return '';
-    const clean = String(val).trim().replace(/[°º]+$/g, '');
+    const str = String(val).trim();
+    const numMatch = str.match(/\d+/);
+    if (numMatch) return `${numMatch[0]}º`;
+    const clean = str.replace(/[°º┬║⊥\x00-\x1F\x7F-\x9F]+/g, '').trim();
     return clean ? `${clean}º` : '';
 }
 
