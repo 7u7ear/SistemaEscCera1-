@@ -146,7 +146,8 @@ async function abrirModalLicencia() {
         if (divExp) divExp.style.display = "none";
 
         const divSync = document.getElementById("divSyncPuestoLicencia");
-        if (divSync) divSync.style.display = "none";
+        const chkSync = document.getElementById("checkActualizarEstadoPuesto");
+        if (chkSync) chkSync.checked = false;
 
         const labelSync = document.querySelector('label[for="checkActualizarEstadoPuesto"]');
         if (labelSync) labelSync.innerHTML = '<strong>Cambiar estado a "Licencia"</strong> en los puestos seleccionados (permite cargar suplentes).';

@@ -27,7 +27,7 @@ class PlanillaRepository {
                 d.apellido, d.nombre AS docente_nombre, d.dni,
                 cd.rol, cd.situacion_revista, cd.estado AS status_docente,
                 (SELECT COUNT(*) FROM licencias l 
-                 WHERE l.docente_id = d.id AND l.cargo_id = c.id AND l.deleted_at IS NULL 
+                 WHERE l.docente_id = d.id AND (l.cargo_id IS NULL OR l.cargo_id = c.id) AND l.deleted_at IS NULL 
                  AND l.fecha_inicio <= ? AND (l.fecha_fin IS NULL OR l.fecha_fin >= ?)
                 ) AS tiene_licencia_hoy
             FROM distribucion_horas dh
@@ -61,8 +61,8 @@ class PlanillaRepository {
             horaFiltro = "AND dh.hora_ingreso >= '18:30:00'";
         }
 
-        // Caso 1: Docentes con estado 'licencia' en cargo_docente (reemplazados por suplente)
-        // Caso 2: Docentes 'activos' que tienen una licencia registrada que cubre hoy (ausentes sin suplente aún)
+        // Caso 1: Docentes reemplazados por un suplente activo hoy
+        // Caso 2: Docentes que tienen una licencia registrada que cubre hoy
         const [rows] = await db.query(`
             SELECT DISTINCT
                 d.apellido, d.nombre AS docente_nombre,
@@ -76,10 +76,9 @@ class PlanillaRepository {
                 -- Obtener el suplente activo que reemplaza a este docente de licencia
                 CONCAT(ds.apellido, ' ', ds.nombre) AS suplente_nombre,
                 CASE 
-                    WHEN cd.estado = 'licencia' AND ds.id IS NOT NULL 
+                    WHEN ds.id IS NOT NULL 
                         THEN CONCAT('Con Reemplazo: ', ds.apellido, ' ', ds.nombre)
-                    WHEN cd.estado = 'licencia' AND ds.id IS NULL THEN 'Con Reemplazo (Lic.)'
-                    WHEN (cd.estado = 'activo' AND l.id IS NOT NULL) THEN 'Sin Reemplazo (Lic.)'
+                    WHEN l.id IS NOT NULL THEN 'Sin Reemplazo (Lic.)'
                     ELSE 'Licencia'
                 END AS estado_licencia
             FROM cargo_docente cd
@@ -93,6 +92,7 @@ class PlanillaRepository {
                 AND cd_sup.reemplaza_a = cd.id 
                 AND cd_sup.estado = 'activo' 
                 AND cd_sup.deleted_at IS NULL
+                AND cd_sup.fecha_inicio <= ? AND (cd_sup.fecha_fin IS NULL OR cd_sup.fecha_fin >= ?)
             LEFT JOIN docentes ds ON ds.id = cd_sup.docente_id AND ds.deleted_at IS NULL
             -- Subconsulta para verificar si el docente TIENE licencia hoy
             LEFT JOIN licencias l ON d.id = l.docente_id AND (l.cargo_id IS NULL OR l.cargo_id = c.id) 
@@ -101,13 +101,11 @@ class PlanillaRepository {
             WHERE dh.dia = ? AND dh.deleted_at IS NULL
             ${horaFiltro}
             AND (
-                cd.estado = 'licencia' -- Ya marcado como licencia (tiene suplente)
-                OR (
-                    cd.estado = 'activo' AND l.id IS NOT NULL -- Está activo pero ausente por licencia hoy
-                )
+                l.id IS NOT NULL
+                OR ds.id IS NOT NULL
             )
             ORDER BY d.apellido ASC
-        `, [fecha, fecha, diaNombre]);
+        `, [fecha, fecha, fecha, fecha, diaNombre]);
 
         return rows;
     }
