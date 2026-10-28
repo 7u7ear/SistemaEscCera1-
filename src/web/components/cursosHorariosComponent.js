@@ -10,10 +10,13 @@ let listaPreceptoresGlobal = [];
 let dataEmailsCursoGlobal = null;
 let dataDocentesCursoGlobal = null;
 
-// Sanitiza el año/división: evita duplicación de símbolos ordinales (ej: 1º° -> 1º)
+// Sanitiza el año/división: extrae número base y normaliza ordinal (ej: 1, 1º, 1┬║, 1º⊥, 1º° -> 1º)
 function fmtOrdinal(val) {
     if (!val && val !== 0) return '';
-    const clean = String(val).trim().replace(/[°º]+$/g, '');
+    const str = String(val).trim();
+    const numMatch = str.match(/\d+/);
+    if (numMatch) return `${numMatch[0]}º`;
+    const clean = str.replace(/[°º┬║⊥\x00-\x1F\x7F-\x9F]+/g, '').trim();
     return clean ? `${clean}º` : '';
 }
 

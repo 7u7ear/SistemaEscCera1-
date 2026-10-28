@@ -51,6 +51,13 @@ A continuación se detallan los perfiles identificados para el sistema. Se utili
    - Solicitud de constancias.
    - Acceso a recursos de biblioteca.
 
+10. **JEFE DE PRECEPTORES/AS**
+    - Coordinación y supervisión general de la preceptoría.
+    - Gestión de legajos y asistencia de estudiantes (Edición).
+    - Control y gestión integral de planillas de firmas de todos los cursos y turnos (Edición).
+    - Consulta de la planta docente asignada a cursos y materias (Lectura).
+
+
 ---
 
 ## Soporte de Múltiples Perfiles por Usuario
