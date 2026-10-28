@@ -158,10 +158,6 @@ async function abrirModalGestion(cargoId, defaultTab = 'asignaciones') {
         selectCursos.innerHTML += `<option value="${c.id}">${nombreCurso.trim().replace(/\s+/g, ' ')}</option>`;
     });
 
-    await renderCadenaAsignaciones(cargoId);
-    await cargarDistribucion(cargoId);
-    await cargarHistorialCargo(cargoId);
-
     // Configurar fechas y limpiar inputs de Alta
     document.getElementById("fechaAsignacion").value = new Date().toISOString().split('T')[0];
     document.getElementById("situacionRevista").value = "interino"; // Default
@@ -169,6 +165,10 @@ async function abrirModalGestion(cargoId, defaultTab = 'asignaciones') {
     document.getElementById("divReemplazaA").style.display = "none";
     document.getElementById("inputExpedienteAlta").value = "";
     document.getElementById("inputRolAsignacion").value = "";
+
+    await renderCadenaAsignaciones(cargoId);
+    await cargarDistribucion(cargoId);
+    await cargarHistorialCargo(cargoId);
 
     modalGestionCargo.show();
 }
@@ -197,7 +197,8 @@ async function renderCadenaAsignaciones(cargoId) {
             const isLast = (index === chain.length - 1);
             const statusBadge = node.licencia_actual ? 
                 `<span class="badge bg-warning text-dark badge-saas">Licencia: ${node.licencia_actual}</span>` : 
-                (isLast ? '<span class="badge bg-white text-primary badge-saas">ACTUAL EN CURSO</span>' : '<span class="badge bg-success badge-saas">Activo</span>');
+                (node.estado === 'licencia' ? '<span class="badge bg-warning text-dark badge-saas">En Licencia</span>' :
+                (isLast ? '<span class="badge bg-white text-primary badge-saas">ACTUAL EN CURSO</span>' : '<span class="badge bg-success badge-saas">Activo</span>'));
             
             const cardClass = isLast ? 'active-chain-node node-actual' : 'active-chain-node node-highlight';
             const icon = node.situacion_revista === 'titular' ? 'bi-person-badge-fill' : 'bi-person-fill';
@@ -228,7 +229,8 @@ async function renderCadenaAsignaciones(cargoId) {
         const selectR = document.getElementById("selectReemplazaA");
         selectR.innerHTML = '<option value="">-- Seleccionar Docente Licenciado --</option>';
         chain.forEach(node => {
-            selectR.innerHTML += `<option value="${node.id}">[${node.situacion_revista.toUpperCase()}] ${node.docente_nombre}</option>`;
+            const licInfo = node.licencia_actual ? ` (Lic: ${node.licencia_actual})` : (node.estado === 'licencia' ? ' (En Licencia)' : '');
+            selectR.innerHTML += `<option value="${node.id}">[${node.situacion_revista.toUpperCase()}] ${node.docente_nombre}${licInfo}</option>`;
         });
 
     } catch (err) {
@@ -284,11 +286,24 @@ async function cargarCursos() {
 function toggleReemplazoDrop() {
     const sit = document.getElementById("situacionRevista").value;
     const div = document.getElementById("divReemplazaA");
+    const selectR = document.getElementById("selectReemplazaA");
     if (sit.toLowerCase() === 'suplente') {
         div.style.display = "block";
+        if (!selectR.value && selectR.options.length > 1) {
+            if (selectR.options.length === 2) {
+                selectR.selectedIndex = 1;
+            } else {
+                for (let i = 1; i < selectR.options.length; i++) {
+                    if (selectR.options[i].text.includes('Licencia') || selectR.options[i].text.includes('Lic:')) {
+                        selectR.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
     } else {
         div.style.display = "none";
-        document.getElementById("selectReemplazaA").value = "";
+        selectR.value = "";
     }
 }
 
