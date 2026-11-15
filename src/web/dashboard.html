@@ -904,7 +904,14 @@
                                             <button type="button" class="btn btn-outline-primary" onclick="abrirModalCrearMateria()" title="Crear nueva materia o función en el catálogo"><i class="bi bi-plus-lg"></i></button>
                                         </div>
                                     </div>
-                                    <div class="col-md-5"><select id="selectCurso" class="form-select form-select-sm"></select></div>
+                                    <div class="col-md-5">
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" id="inputCursoSeleccionado" class="form-control form-control-sm bg-white" placeholder="-- Seleccionar Curso --" readonly onclick="abrirSelectorGuiadoCurso()" style="cursor: pointer;">
+                                            <input type="hidden" id="selectCurso" value="">
+                                            <button type="button" class="btn btn-outline-secondary" onclick="abrirSelectorGuiadoCurso()" title="Seleccionar Curso en cascada (B.E.C / T.C.A / AUX)"><i class="bi bi-diagram-3"></i></button>
+                                            <button type="button" class="btn btn-outline-danger" id="btnLimpiarCursoSeleccionado" onclick="limpiarCursoSeleccionado()" title="Limpiar selección" style="display: none;"><i class="bi bi-x"></i></button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="row g-2 mb-2">
                                     <div class="col-md-4"><select id="selectDia" class="form-select form-select-sm">
@@ -1300,6 +1307,43 @@
             <button type="button" class="btn btn-sm btn-light px-3" data-bs-dismiss="modal">Cancelar</button>
             <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" onclick="guardarNuevaMateria()">Guardar</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SELECTOR GUIADO DE CURSO (B.E.C / T.C.A / AUX) -->
+<div class="modal fade" id="modalSelectorCurso" tabindex="-1" style="z-index: 1060;">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 pb-1">
+        <h6 class="modal-title fw-bold text-primary"><i class="bi bi-diagram-3-fill me-2"></i>Seleccionar Curso</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-3">
+        <!-- Breadcrumbs / Pasos -->
+        <div id="selectorCursoPasos" class="d-flex align-items-center flex-wrap gap-1 mb-3 text-muted small pb-2 border-bottom">
+            <span class="badge bg-primary" id="badgePasoModalidad">1. Carrera</span>
+            <i class="bi bi-chevron-right text-muted small"></i>
+            <span class="badge bg-light text-dark" id="badgePasoTurno">2. Turno</span>
+            <span id="sepPasoEsp" style="display:none;"><i class="bi bi-chevron-right text-muted small"></i></span>
+            <span class="badge bg-light text-dark" id="badgePasoEsp" style="display:none;">3. Especialidad</span>
+            <i class="bi bi-chevron-right text-muted small"></i>
+            <span class="badge bg-light text-dark" id="badgePasoCurso">Curso</span>
+        </div>
+
+        <!-- Contenedor dinámico de opciones -->
+        <div id="selectorCursoContenido" class="d-flex flex-column gap-2">
+            <!-- Botones generados dinámicamente -->
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0 d-flex justify-content-between">
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnVolverPasoCurso" onclick="selectorCursoVolverPaso()" style="display:none;">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-dark ms-auto" onclick="seleccionarCursoExtraclase()">
+            <i class="bi bi-dash-circle me-1"></i>No aplica (Extraclase)
+        </button>
       </div>
     </div>
   </div>

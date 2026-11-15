@@ -280,6 +280,7 @@ function limpiarFormMateria() {
     document.getElementById("inputHoraEgreso").value = "";
     document.getElementById("selectMateria").value = "";
     document.getElementById("selectCurso").value = "";
+    limpiarCursoSeleccionado();
     document.getElementById("selectDia").value = "lunes";
     document.getElementById("selectTipoHora").value = "";
 }
@@ -381,70 +382,267 @@ async function cargarMaterias() {
     }
 }
 
-function poblarSelectCursos() {
-    const selectCursos = document.getElementById("selectCurso");
-    if (!selectCursos) return;
+let selectorCursoEstado = {
+    modalidad: null,
+    turno: null,
+    especialidad: null
+};
 
-    selectCursos.innerHTML = '<option value="">-- Seleccionar Curso --</option>';
-    selectCursos.innerHTML += '<option value="null">-- No aplica (Extraclase) --</option>';
-
-    // Agrupar cursos por modalidad
-    const porModalidad = {};
-    cursosGlobal.forEach(c => {
-        const mod = (c.modalidad || 'General').toUpperCase().trim();
-        if (!porModalidad[mod]) porModalidad[mod] = [];
-        porModalidad[mod].push(c);
-    });
-
-    const ordenPrioridad = ['B.E.C', 'T.C.A', 'AUX'];
-    const modalidadesOrdenadas = Object.entries(porModalidad).sort(([a], [b]) => {
-        let idxA = ordenPrioridad.findIndex(p => a.includes(p));
-        let idxB = ordenPrioridad.findIndex(p => b.includes(p));
-        if (idxA === -1) idxA = 99;
-        if (idxB === -1) idxB = 99;
-        return idxA - idxB;
-    });
-
-    for (const [modName, cursosMod] of modalidadesOrdenadas) {
-        const optgroup = document.createElement("optgroup");
-        let labelGroup = modName;
-        if (modName.includes('B.E.C')) labelGroup = 'B.E.C (Bachillerato)';
-        else if (modName.includes('T.C.A')) labelGroup = 'T.C.A (Técnico Ceramista)';
-        else if (modName.includes('AUX')) labelGroup = 'AUX (Auxiliar de Taller)';
-        optgroup.label = labelGroup;
-
-        // Ordenar por año, división y turno
-        cursosMod.sort((a, b) => {
-            const anioA = parseInt(a.anio, 10) || 0;
-            const anioB = parseInt(b.anio, 10) || 0;
-            if (anioA !== anioB) return anioA - anioB;
-            return (a.division || '').localeCompare(b.division || '');
-        });
-
-        cursosMod.forEach(c => {
-            let desc = `${fmtOrdinal(c.anio)} ${fmtOrdinal(c.division)}`;
-            if (c.especialidad && c.especialidad.trim()) {
-                desc += ` ${c.especialidad.trim()}`;
-            }
-            if (c.turno && c.turno.trim()) {
-                desc += ` (${c.turno.trim().toUpperCase()})`;
-            }
-
-            const opt = document.createElement("option");
-            opt.value = c.id;
-            opt.textContent = desc.trim().replace(/\s+/g, ' ');
-            optgroup.appendChild(opt);
-        });
-
-        selectCursos.appendChild(optgroup);
+function abrirSelectorGuiadoCurso() {
+    selectorCursoEstado = { modalidad: null, turno: null, especialidad: null };
+    renderPasoSelectorCurso();
+    const modalEl = document.getElementById("modalSelectorCurso");
+    if (modalEl && window.bootstrap && bootstrap.Modal) {
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
     }
+}
+
+function renderPasoSelectorCurso() {
+    const contenedor = document.getElementById("selectorCursoContenido");
+    const badgeMod = document.getElementById("badgePasoModalidad");
+    const badgeTur = document.getElementById("badgePasoTurno");
+    const badgeEsp = document.getElementById("badgePasoEsp");
+    const sepEsp = document.getElementById("sepPasoEsp");
+    const badgeCur = document.getElementById("badgePasoCurso");
+    const btnVolver = document.getElementById("btnVolverPasoCurso");
+    if (!contenedor) return;
+
+    contenedor.innerHTML = "";
+
+    // PASO 1: Elegir Carrera / Modalidad
+    if (!selectorCursoEstado.modalidad) {
+        btnVolver.style.display = "none";
+        badgeMod.className = "badge bg-primary";
+        badgeMod.textContent = "1. Carrera";
+        badgeTur.className = "badge bg-light text-dark";
+        badgeEsp.style.display = "none";
+        sepEsp.style.display = "none";
+        badgeCur.className = "badge bg-light text-dark";
+
+        contenedor.innerHTML = `
+            <div class="text-muted small mb-2 fw-semibold">Paso 1: Seleccioná la Carrera / Modalidad</div>
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-outline-primary text-start p-3 fw-bold d-flex justify-content-between align-items-center" onclick="selectorCursoElegirMod('B.E.C')">
+                    <div>
+                        <div class="fs-6"><i class="bi bi-mortarboard-fill text-primary me-2"></i>B.E.C</div>
+                        <small class="text-muted fw-normal">Bachillerato con Orientación en Cerámica</small>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted fs-5"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary text-start p-3 fw-bold d-flex justify-content-between align-items-center" onclick="selectorCursoElegirMod('T.C.A')">
+                    <div>
+                        <div class="fs-6"><i class="bi bi-palette-fill text-primary me-2"></i>T.C.A</div>
+                        <small class="text-muted fw-normal">Técnico Ceramista Artístico</small>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted fs-5"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary text-start p-3 fw-bold d-flex justify-content-between align-items-center" onclick="selectorCursoElegirMod('AUX')">
+                    <div>
+                        <div class="fs-6"><i class="bi bi-tools text-primary me-2"></i>AUX</div>
+                        <small class="text-muted fw-normal">Auxiliares de Taller (Cursos Específicos)</small>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted fs-5"></i>
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    btnVolver.style.display = "inline-block";
+    const mod = selectorCursoEstado.modalidad;
+    badgeMod.className = "badge bg-success";
+    badgeMod.textContent = `1. ${mod}`;
+
+    // PASO 2: Elegir Turno
+    if (!selectorCursoEstado.turno) {
+        badgeTur.className = "badge bg-primary";
+        badgeTur.textContent = "2. Turno";
+        badgeEsp.style.display = "none";
+        sepEsp.style.display = "none";
+        badgeCur.className = "badge bg-light text-dark";
+
+        const cursosDeMod = cursosGlobal.filter(c => (c.modalidad || '').toUpperCase().trim() === mod);
+        const turnosDisponibles = Array.from(new Set(cursosDeMod.map(c => (c.turno || 'Sin Turno').toUpperCase().trim())));
+        const ordenTurnos = ['MAÑANA', 'TARDE', 'NOCHE'];
+        turnosDisponibles.sort((a, b) => {
+            let ia = ordenTurnos.indexOf(a);
+            let ib = ordenTurnos.indexOf(b);
+            if (ia === -1) ia = 99;
+            if (ib === -1) ib = 99;
+            return ia - ib;
+        });
+
+        const btns = turnosDisponibles.map(t => {
+            const count = cursosDeMod.filter(c => (c.turno || '').toUpperCase().trim() === t).length;
+            let iconoTurno = 'bi-brightness-high text-warning';
+            if (t === 'TARDE') iconoTurno = 'bi-sunset text-warning';
+            if (t === 'NOCHE') iconoTurno = 'bi-moon-stars text-info';
+
+            return `
+                <button type="button" class="btn btn-outline-primary text-start p-3 fw-bold d-flex justify-content-between align-items-center" onclick="selectorCursoElegirTurno('${t}')">
+                    <span class="fs-6"><i class="bi ${iconoTurno} me-2"></i>Turno ${t}</span>
+                    <span class="badge bg-secondary">${count} cursos</span>
+                </button>
+            `;
+        }).join('');
+
+        contenedor.innerHTML = `
+            <div class="text-muted small mb-2 fw-semibold">Paso 2: Seleccioná el Turno para <strong>${mod}</strong></div>
+            <div class="d-grid gap-2">${btns}</div>
+        `;
+        return;
+    }
+
+    const tur = selectorCursoEstado.turno;
+    badgeTur.className = "badge bg-success";
+    badgeTur.textContent = `2. ${tur}`;
+
+    // PASO 3 (SOLO PARA AUX): Elegir Especialidad
+    if (mod === 'AUX' && !selectorCursoEstado.especialidad) {
+        badgeEsp.style.display = "inline-block";
+        sepEsp.style.display = "inline-block";
+        badgeEsp.className = "badge bg-primary";
+        badgeEsp.textContent = "3. Especialidad";
+        badgeCur.className = "badge bg-light text-dark";
+
+        const cursosModTur = cursosGlobal.filter(c => 
+            (c.modalidad || '').toUpperCase().trim() === mod &&
+            (c.turno || '').toUpperCase().trim() === tur
+        );
+
+        const especialidades = Array.from(new Set(cursosModTur.map(c => (c.especialidad || 'General').toUpperCase().trim()))).sort();
+
+        const btns = especialidades.map(esp => {
+            const count = cursosModTur.filter(c => (c.especialidad || 'General').toUpperCase().trim() === esp).length;
+            return `
+                <button type="button" class="btn btn-outline-primary text-start p-2 fw-bold d-flex justify-content-between align-items-center" onclick="selectorCursoElegirEspecialidad('${esp}')">
+                    <span><i class="bi bi-gem me-2 text-primary"></i>${esp}</span>
+                    <span class="badge bg-secondary">${count}</span>
+                </button>
+            `;
+        }).join('');
+
+        contenedor.innerHTML = `
+            <div class="text-muted small mb-2 fw-semibold">Paso 3: Seleccioná la Especialidad (AUX - ${tur})</div>
+            <div class="d-grid gap-2">${btns}</div>
+        `;
+        return;
+    }
+
+    if (mod === 'AUX') {
+        badgeEsp.style.display = "inline-block";
+        sepEsp.style.display = "inline-block";
+        badgeEsp.className = "badge bg-success";
+        badgeEsp.textContent = `3. ${selectorCursoEstado.especialidad}`;
+    } else {
+        badgeEsp.style.display = "none";
+        sepEsp.style.display = "none";
+    }
+
+    // PASO FINAL: Elegir Año y División
+    badgeCur.className = "badge bg-primary";
+    badgeCur.textContent = (mod === 'AUX' ? "4. Curso" : "3. Curso");
+
+    let cursosFinales = cursosGlobal.filter(c => 
+        (c.modalidad || '').toUpperCase().trim() === mod &&
+        (c.turno || '').toUpperCase().trim() === tur
+    );
+
+    if (mod === 'AUX') {
+        cursosFinales = cursosFinales.filter(c => 
+            (c.especialidad || 'General').toUpperCase().trim() === selectorCursoEstado.especialidad
+        );
+    }
+
+    cursosFinales.sort((a, b) => {
+        const anioA = parseInt(a.anio, 10) || 0;
+        const anioB = parseInt(b.anio, 10) || 0;
+        if (anioA !== anioB) return anioA - anioB;
+        return (a.division || '').localeCompare(b.division || '');
+    });
+
+    const btns = cursosFinales.map(c => {
+        const desc = `${fmtOrdinal(c.anio)} ${fmtOrdinal(c.division)} ${c.modalidad || ''} ${c.especialidad || ''} (${c.turno || ''})`.replace(/\s+/g, ' ').trim();
+        return `
+            <button type="button" class="btn btn-outline-success text-start p-2 fw-bold d-flex justify-content-between align-items-center" onclick="seleccionarCursoFinal(${c.id}, '${desc.replace(/'/g, "\\'")}')">
+                <span><i class="bi bi-check-circle-fill text-success me-2"></i>${fmtOrdinal(c.anio)} ${fmtOrdinal(c.division)}</span>
+                <span class="badge bg-success">Elegir</span>
+            </button>
+        `;
+    }).join('');
+
+    contenedor.innerHTML = `
+        <div class="text-muted small mb-2 fw-semibold">Paso Final: Seleccioná el Año y División</div>
+        <div class="d-grid gap-2">${btns || '<div class="text-muted text-center p-3">No hay cursos disponibles para esta combinación.</div>'}</div>
+    `;
+}
+
+function selectorCursoElegirMod(mod) {
+    selectorCursoEstado.modalidad = mod;
+    renderPasoSelectorCurso();
+}
+
+function selectorCursoElegirTurno(turno) {
+    selectorCursoEstado.turno = turno;
+    renderPasoSelectorCurso();
+}
+
+function selectorCursoElegirEspecialidad(esp) {
+    selectorCursoEstado.especialidad = esp;
+    renderPasoSelectorCurso();
+}
+
+function selectorCursoVolverPaso() {
+    if (selectorCursoEstado.especialidad) {
+        selectorCursoEstado.especialidad = null;
+    } else if (selectorCursoEstado.turno) {
+        selectorCursoEstado.turno = null;
+    } else if (selectorCursoEstado.modalidad) {
+        selectorCursoEstado.modalidad = null;
+    }
+    renderPasoSelectorCurso();
+}
+
+function seleccionarCursoFinal(cursoId, descCurso) {
+    const inputHidden = document.getElementById("selectCurso");
+    const inputVisual = document.getElementById("inputCursoSeleccionado");
+    const btnLimpiar = document.getElementById("btnLimpiarCursoSeleccionado");
+
+    if (inputHidden) inputHidden.value = cursoId;
+    if (inputVisual) inputVisual.value = descCurso;
+    if (btnLimpiar) btnLimpiar.style.display = "inline-block";
+
+    const modalEl = document.getElementById("modalSelectorCurso");
+    if (modalEl && window.bootstrap && bootstrap.Modal) {
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+    }
+}
+
+function seleccionarCursoExtraclase() {
+    seleccionarCursoFinal("null", "-- No aplica (Extraclase) --");
+}
+
+function limpiarCursoSeleccionado() {
+    const inputHidden = document.getElementById("selectCurso");
+    const inputVisual = document.getElementById("inputCursoSeleccionado");
+    const btnLimpiar = document.getElementById("btnLimpiarCursoSeleccionado");
+
+    if (inputHidden) inputHidden.value = "";
+    if (inputVisual) inputVisual.value = "";
+    if (btnLimpiar) btnLimpiar.style.display = "none";
+}
+
+function poblarSelectCursos() {
+    // Inicialización del selector guiado
+    limpiarCursoSeleccionado();
 }
 
 async function cargarCursos() {
     const res = await api.get("/api/v1/cursos");
     if (res.ok) {
         cursosGlobal = await res.json();
-        poblarSelectCursos();
     }
 }
 
@@ -687,7 +885,25 @@ function editarMateria(id) {
     const mat = materiasGlobal.find(m => Number(m.id) === Number(d.materia_id));
     const inputBuscar = document.getElementById("inputBuscarMateria");
     if (inputBuscar) inputBuscar.value = mat ? mat.nombre : (d.materia_nombre || "");
-    document.getElementById("selectCurso").value = d.curso_id;
+
+    const hiddenCurso = document.getElementById("selectCurso");
+    const visualCurso = document.getElementById("inputCursoSeleccionado");
+    const btnLimpiarCurso = document.getElementById("btnLimpiarCursoSeleccionado");
+
+    if (d.curso_id && d.curso_id !== "null") {
+        if (hiddenCurso) hiddenCurso.value = d.curso_id;
+        const cur = cursosGlobal.find(c => Number(c.id) === Number(d.curso_id));
+        if (cur && visualCurso) {
+            visualCurso.value = `${fmtOrdinal(cur.anio)} ${fmtOrdinal(cur.division)} ${cur.modalidad || ''} ${cur.especialidad || ''} (${cur.turno || ''})`.replace(/\s+/g, ' ').trim();
+        } else if (visualCurso) {
+            visualCurso.value = `Curso ID: ${d.curso_id}`;
+        }
+        if (btnLimpiarCurso) btnLimpiarCurso.style.display = "inline-block";
+    } else {
+        if (hiddenCurso) hiddenCurso.value = "null";
+        if (visualCurso) visualCurso.value = "-- No aplica (Extraclase) --";
+        if (btnLimpiarCurso) btnLimpiarCurso.style.display = "inline-block";
+    }
     document.getElementById("selectDia").value = d.dia;
     document.getElementById("inputHoraIngreso").value = d.hora_ingreso ? d.hora_ingreso.substring(0, 5) : "";
     document.getElementById("inputHoraEgreso").value = d.hora_egreso ? d.hora_egreso.substring(0, 5) : "";
