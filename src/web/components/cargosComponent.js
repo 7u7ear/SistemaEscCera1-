@@ -856,7 +856,8 @@ async function cargarDistribucion(cargoId) {
         const horario = (d.hora_ingreso && d.hora_egreso) ? `${d.hora_ingreso.substring(0, 5)} a ${d.hora_egreso.substring(0, 5)}` : 'A definir';
         let cursoTxt = '';
         if (d.curso_anio) {
-            cursoTxt = `${fmtOrdinal(d.curso_anio)} ${fmtOrdinal(d.curso_division)} ${d.curso_modalidad || ''} ${d.curso_turno || ''}`;
+            const turnoStr = d.curso_turno ? `(${d.curso_turno.toUpperCase()})` : '';
+            cursoTxt = `${fmtOrdinal(d.curso_anio)} ${fmtOrdinal(d.curso_division)} ${d.curso_modalidad || ''} ${d.curso_especialidad || ''} ${turnoStr}`;
             cursoTxt = cursoTxt.trim().replace(/\s+/g, ' ');
         }
         html += `<tr>
