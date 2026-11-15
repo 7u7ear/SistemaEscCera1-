@@ -112,3 +112,24 @@ WHERE `id` > 0;
 UPDATE `cursos` SET `especialidad` = REPLACE(`especialidad`, 'DECORACI?N', 'DECORACION') WHERE `especialidad` LIKE '%DECORACI?N%';
 UPDATE `cursos` SET `especialidad` = TRIM(`especialidad`) WHERE `id` > 0;
 
+-- 8. CORREGIR CARACTERES CORRUPTOS EN cursos.turno y cursos.anio
+-- La Ñ y el ordinal º llegaron como '?' (ASCII 0x3F) en datos históricos.
+-- Corregir turno MAÑANA
+UPDATE `cursos` SET `turno` = 'MAÑANA' WHERE `turno` = 'MA?ANA';
+
+-- Corregir anio (1º..6º)
+UPDATE `cursos` SET `anio` = '1º' WHERE `anio` = '1?';
+UPDATE `cursos` SET `anio` = '2º' WHERE `anio` = '2?';
+UPDATE `cursos` SET `anio` = '3º' WHERE `anio` = '3?';
+UPDATE `cursos` SET `anio` = '4º' WHERE `anio` = '4?';
+UPDATE `cursos` SET `anio` = '5º' WHERE `anio` = '5?';
+UPDATE `cursos` SET `anio` = '6º' WHERE `anio` = '6?';
+
+-- Corregir division (1º..6º)
+UPDATE `cursos` SET `division` = '1º' WHERE `division` = '1?';
+UPDATE `cursos` SET `division` = '2º' WHERE `division` = '2?';
+UPDATE `cursos` SET `division` = '3º' WHERE `division` = '3?';
+UPDATE `cursos` SET `division` = '4º' WHERE `division` = '4?';
+UPDATE `cursos` SET `division` = '5º' WHERE `division` = '5?';
+UPDATE `cursos` SET `division` = '6º' WHERE `division` = '6?';
+
