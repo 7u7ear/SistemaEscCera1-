@@ -4,6 +4,7 @@ class CargoRepository {
     async findAll() {
         const [rows] = await db.query(`
             SELECT c.id, c.numero_puesto, c.tipo_cargo, c.total_horas, c.estado,
+                   -- Docente activo asignado (titular o suplente)
                    (SELECT CONCAT(d.apellido, ' ', d.nombre)
                     FROM cargo_docente cd2
                     JOIN docentes d ON cd2.docente_id = d.id
@@ -11,7 +12,51 @@ class CargoRepository {
                       AND cd2.estado = 'activo' 
                       AND cd2.deleted_at IS NULL
                     ORDER BY cd2.fecha_inicio DESC
-                    LIMIT 1) AS docente_nombre
+                    LIMIT 1) AS docente_nombre,
+                   -- Si no hay docente activo, obtener el docente en licencia
+                   (SELECT CONCAT(d.apellido, ' ', d.nombre)
+                    FROM cargo_docente cd3
+                    JOIN docentes d ON cd3.docente_id = d.id
+                    WHERE cd3.cargo_id = c.id 
+                      AND cd3.estado = 'licencia' 
+                      AND cd3.deleted_at IS NULL
+                    ORDER BY cd3.fecha_inicio DESC
+                    LIMIT 1) AS docente_licencia_nombre,
+                   -- Situación de revista del docente asignado
+                   (SELECT cd4.situacion_revista
+                    FROM cargo_docente cd4
+                    WHERE cd4.cargo_id = c.id 
+                      AND cd4.estado IN ('activo', 'licencia')
+                      AND cd4.deleted_at IS NULL
+                    ORDER BY CASE WHEN cd4.estado = 'activo' THEN 1 ELSE 2 END, cd4.fecha_inicio DESC
+                    LIMIT 1) AS situacion_revista,
+                   -- Estado en cargo_docente ('activo', 'licencia')
+                   (SELECT cd5.estado
+                    FROM cargo_docente cd5
+                    WHERE cd5.cargo_id = c.id 
+                      AND cd5.estado IN ('activo', 'licencia')
+                      AND cd5.deleted_at IS NULL
+                    ORDER BY CASE WHEN cd5.estado = 'activo' THEN 1 ELSE 2 END, cd5.fecha_inicio DESC
+                    LIMIT 1) AS docente_estado,
+                   -- Tipo de licencia activa o pendiente para el puesto
+                   (SELECT l.tipo_licencia
+                    FROM licencias l
+                    JOIN cargo_docente cd6 ON cd6.docente_id = l.docente_id AND cd6.cargo_id = c.id AND cd6.deleted_at IS NULL
+                    WHERE l.deleted_at IS NULL
+                      AND (l.cargo_id IS NULL OR l.cargo_id = c.id)
+                      AND (l.fecha_fin IS NULL OR l.fecha_fin >= CURDATE())
+                    ORDER BY l.fecha_inicio DESC
+                    LIMIT 1) AS licencia_activa,
+                   -- Estado del trámite de licencia (caratulado, en_tramitacion, realizado)
+                   (SELECT t.estado
+                    FROM licencias l2
+                    JOIN tramitaciones t ON l2.tramitacion_id = t.id
+                    JOIN cargo_docente cd7 ON cd7.docente_id = l2.docente_id AND cd7.cargo_id = c.id AND cd7.deleted_at IS NULL
+                    WHERE l2.deleted_at IS NULL
+                      AND (l2.cargo_id IS NULL OR l2.cargo_id = c.id)
+                      AND (l2.fecha_fin IS NULL OR l2.fecha_fin >= CURDATE())
+                    ORDER BY l2.fecha_inicio DESC
+                    LIMIT 1) AS tramite_estado
             FROM cargos c
             WHERE c.deleted_at IS NULL
         `);
@@ -219,18 +264,20 @@ class CargoRepository {
             SELECT cd.*, 
                    CONCAT(d.apellido, ' ', d.nombre) AS docente_nombre,
                    d.dni AS docente_dni,
-                   l.tipo_licencia AS licencia_actual
+                   l.tipo_licencia AS licencia_actual,
+                   l.id AS licencia_id,
+                   t.estado AS tramite_estado
             FROM cargo_docente cd
             JOIN docentes d ON cd.docente_id = d.id
-            LEFT JOIN licencias l ON d.id = l.docente_id AND cd.cargo_id = l.cargo_id 
+            LEFT JOIN licencias l ON d.id = l.docente_id 
+                 AND (l.cargo_id IS NULL OR l.cargo_id = cd.cargo_id)
                  AND l.deleted_at IS NULL AND l.fecha_inicio <= CURDATE() 
                  AND (l.fecha_fin IS NULL OR l.fecha_fin >= CURDATE())
+            LEFT JOIN tramitaciones t ON l.tramitacion_id = t.id
             WHERE cd.cargo_id = ? AND cd.estado IN ('activo', 'licencia') AND cd.deleted_at IS NULL
             ORDER BY cd.fecha_inicio ASC
         `, [cargoId]);
 
-        // Reorganizar jerárquicamente en el servicio si fuera necesario, 
-        // pero con esta lista plana ordenada por fecha de inicio el frontend ya puede trabajar.
         return rows;
     }
 }

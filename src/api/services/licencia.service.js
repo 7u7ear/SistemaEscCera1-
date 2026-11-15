@@ -8,7 +8,7 @@ const { generarHtmlNotificacionLicencia, generarHtmlResolucionLicencia } = requi
 
 class LicenciaService {
     async getAllLicencias() {
-        return await LicenciaRepository.findAll();
+        return LicenciaRepository.findAll();
     }
 
     async createLicencia(licenciaData, userId) {
@@ -89,12 +89,12 @@ class LicenciaService {
     }
 
     async getTiposLicencia() {
-        return await LicenciaRepository.findTipos();
+        return LicenciaRepository.findTipos();
     }
 
     async createTipoLicencia(cod, desc) {
         if (!cod || !desc) {throw new AppError('Código y descripción obligatorios', 400);}
-        return await LicenciaRepository.createTipo(cod, desc);
+        return LicenciaRepository.createTipo(cod, desc);
     }
 
     async notificarNuevaLicencia(docenteId, targets, fechaInicio, fechaFin, tipoLicencia, expediente, observaciones) {

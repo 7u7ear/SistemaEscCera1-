@@ -1324,7 +1324,6 @@ async function cargarDocentesDelCursoActivo() {
                         <th>Puesto</th>
                         <th>Sit. Revista</th>
                         <th>Correo Electrónico</th>
-                        <th>Teléfono</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1352,8 +1351,6 @@ async function cargarDocentesDelCursoActivo() {
                    </div>`
                 : `<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i>Sin correo</span>`;
 
-            const telHtml = d.telefono ? `<span class="small text-muted"><i class="bi bi-telephone me-1"></i>${d.telefono}</span>` : '-';
-
             html += `
                 <tr class="${rowClass}">
                     <td class="text-center text-muted fw-bold small">${idx + 1}</td>
@@ -1367,7 +1364,6 @@ async function cargarDocentesDelCursoActivo() {
                     <td class="small">${puestoText}</td>
                     <td>${situacionBadge}</td>
                     <td>${emailHtml}</td>
-                    <td>${telHtml}</td>
                 </tr>
             `;
         });

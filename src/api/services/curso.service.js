@@ -4,7 +4,7 @@ const AuditoriaService = require('./auditoria.service');
 
 class CursoService {
     async getAllCursos() {
-        return await CursoRepository.findAll();
+        return CursoRepository.findAll();
     }
 
     async getCursoById(id) {
@@ -16,11 +16,11 @@ class CursoService {
     }
 
     async getPreceptoresByCurso(curso_id, anio_lectivo) {
-        return await CursoRepository.getPreceptoresByCurso(curso_id, anio_lectivo);
+        return CursoRepository.getPreceptoresByCurso(curso_id, anio_lectivo);
     }
 
     async getPreceptorByCurso(curso_id, anio_lectivo) {
-        return await CursoRepository.getPreceptorByCurso(curso_id, anio_lectivo);
+        return CursoRepository.getPreceptorByCurso(curso_id, anio_lectivo);
     }
 
     async assignPreceptor(curso_id, docente_ids, anio_lectivo, userId = null) {

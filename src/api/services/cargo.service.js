@@ -1,11 +1,10 @@
 const CargoRepository = require('../models/cargo.model');
 const AppError = require('../../shared/errors/AppError');
-const logger = require('../services/logger.service');
 const AuditoriaService = require('../services/auditoria.service');
 
 class CargoService {
     async getAllCargos() {
-        return await CargoRepository.findAll();
+        return CargoRepository.findAll();
     }
 
     async createCargo(cargoData, userId) {
@@ -69,7 +68,7 @@ class CargoService {
     async bajaDocente(cargoId, cargoDocenteId, bajaData, userId) {
         const assignment = await CargoRepository.findAssignmentById(cargoDocenteId);
         if (!assignment) {throw new AppError('Designación no encontrada', 404);}
-        if (assignment.cargo_id != cargoId) {throw new AppError('La designación no pertenece a este puesto', 400);}
+        if (Number(assignment.cargo_id) !== Number(cargoId)) {throw new AppError('La designación no pertenece a este puesto', 400);}
 
         await CargoRepository.bajaDocente(cargoDocenteId, bajaData);
 
@@ -82,11 +81,11 @@ class CargoService {
     }
 
     async getHistorial(id) {
-        return await CargoRepository.getHistorial(id);
+        return CargoRepository.getHistorial(id);
     }
 
     async getDistribucionByCargo(cargoId) {
-        return await CargoRepository.getDistribucion(cargoId);
+        return CargoRepository.getDistribucion(cargoId);
     }
 
     async addDistribucion(cargoId, data, userId) {
@@ -119,7 +118,7 @@ class CargoService {
 
     // --- Tipos de Hora ---
     async getTiposHora() {
-        return await CargoRepository.findTiposHora();
+        return CargoRepository.findTiposHora();
     }
 
     async createTipoHora(nombre, descripcion, userId) {
@@ -130,7 +129,7 @@ class CargoService {
 
     // --- Cadena Activa ---
     async getActiveChain(cargoId) {
-        return await CargoRepository.findActiveChain(cargoId);
+        return CargoRepository.findActiveChain(cargoId);
     }
 }
 

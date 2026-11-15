@@ -40,7 +40,7 @@ class UsuarioController {
         }
     }
 
-    async logout(req, res, next) {
+    logout(req, res, next) {
         try {
             // Dado que usamos JWT, el logout normalmente se maneja en el cliente eliminando el token.
             // Si tuviéramos tabla de tokens revocados, lo haríamos aquí.

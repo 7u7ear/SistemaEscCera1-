@@ -23,15 +23,40 @@ function renderTablaCargos(data) {
     if (data.length === 0) { container.innerHTML = "<p class='text-center p-4'>No hay cargos registrados.</p>"; return; }
     let html = `<table class="table table-hover align-middle">
         <thead class="table-light">
-            <tr><th>Puesto</th><th>Tipo</th><th>Docente Asignado</th><th>Estado</th><th>Acciones</th></tr>
+            <tr><th>Puesto</th><th>Tipo</th><th>Docente Asignado</th><th>Estado Puesto</th><th>Acciones</th></tr>
         </thead>
         <tbody>`;
     data.forEach(c => {
+        // Visualización del docente y su rol/situación
+        let docenteHtml = '';
+        if (c.docente_nombre) {
+            docenteHtml = `<i class="bi bi-person-circle me-1 text-primary"></i><strong>${c.docente_nombre}</strong>`;
+            if (c.situacion_revista === 'suplente' && c.docente_licencia_nombre) {
+                docenteHtml += `<div class="small text-muted"><i class="bi bi-arrow-return-right"></i> Suplente de: ${c.docente_licencia_nombre}</div>`;
+            }
+        } else if (c.docente_licencia_nombre) {
+            docenteHtml = `<i class="bi bi-person-dash me-1 text-warning"></i><strong>${c.docente_licencia_nombre}</strong> <span class="badge bg-warning text-dark ms-1">En Licencia</span>`;
+        } else {
+            docenteHtml = `<span class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i>VACANTE</span>`;
+        }
+
+        // Estado del Puesto y afectación por Licencias
+        let estadoBadge = `<span class="badge ${c.estado === 'activo' ? 'bg-success' : 'bg-secondary'}">${c.estado}</span>`;
+        if (c.licencia_activa) {
+            if (c.tramite_estado === 'caratulado' || c.tramite_estado === 'en_tramitacion') {
+                estadoBadge += `<br><span class="badge bg-warning text-dark mt-1 shadow-sm" title="Licencia con trámite pendiente"><i class="bi bi-hourglass-split"></i> Lic. Pendiente (${c.licencia_activa})</span>`;
+            } else {
+                estadoBadge += `<br><span class="badge bg-info text-dark mt-1 shadow-sm" title="Licencia registrada vigente"><i class="bi bi-calendar-check"></i> Licencia (${c.licencia_activa})</span>`;
+            }
+        } else if (c.docente_estado === 'licencia') {
+            estadoBadge += `<br><span class="badge bg-warning text-dark mt-1"><i class="bi bi-person-dash"></i> En Licencia</span>`;
+        }
+
         html += `<tr>
             <td><span class="badge bg-secondary">${c.numero_puesto}</span></td>
             <td>${c.tipo_cargo}</td>
-            <td><i class="bi bi-person-circle"></i> ${c.docente_nombre ?? '<span class="text-danger small fw-bold">VACANTE</span>'}</td>
-            <td><span class="badge ${c.estado === 'activo' ? 'bg-success' : 'bg-secondary'}">${c.estado}</span></td>
+            <td>${docenteHtml}</td>
+            <td>${estadoBadge}</td>
             <td>
                 <div class="btn-group">
                     <button class="btn btn-sm btn-info text-white" onclick="abrirModalGestion(${c.id})" title="Gestionar Detalle"><i class="bi bi-gear-fill"></i></button>
@@ -50,7 +75,9 @@ function filtrarCargos() {
     const filtrados = cargosGlobal.filter(c =>
         (c.numero_puesto && c.numero_puesto.toString().toLowerCase().includes(texto)) ||
         (c.docente_nombre && c.docente_nombre.toLowerCase().includes(texto)) ||
-        (c.tipo_cargo && c.tipo_cargo.toLowerCase().includes(texto))
+        (c.docente_licencia_nombre && c.docente_licencia_nombre.toLowerCase().includes(texto)) ||
+        (c.tipo_cargo && c.tipo_cargo.toLowerCase().includes(texto)) ||
+        (c.licencia_activa && c.licencia_activa.toLowerCase().includes(texto))
     );
     renderTablaCargos(filtrados);
 }
@@ -195,10 +222,17 @@ async function renderCadenaAsignaciones(cargoId) {
         let html = '';
         chain.forEach((node, index) => {
             const isLast = (index === chain.length - 1);
-            const statusBadge = node.licencia_actual ? 
-                `<span class="badge bg-warning text-dark badge-saas">Licencia: ${node.licencia_actual}</span>` : 
-                (node.estado === 'licencia' ? '<span class="badge bg-warning text-dark badge-saas">En Licencia</span>' :
-                (isLast ? '<span class="badge bg-white text-primary badge-saas">ACTUAL EN CURSO</span>' : '<span class="badge bg-success badge-saas">Activo</span>'));
+            let statusBadge = '';
+            if (node.licencia_actual) {
+                const pendText = (node.tramite_estado === 'caratulado' || node.tramite_estado === 'en_tramitacion') ? ' (Pendiente)' : '';
+                statusBadge = `<span class="badge bg-warning text-dark badge-saas">Licencia: ${node.licencia_actual}${pendText}</span>`;
+            } else if (node.estado === 'licencia') {
+                statusBadge = '<span class="badge bg-warning text-dark badge-saas">En Licencia</span>';
+            } else if (isLast) {
+                statusBadge = '<span class="badge bg-white text-primary badge-saas">ACTUAL EN CURSO</span>';
+            } else {
+                statusBadge = '<span class="badge bg-success badge-saas">Activo</span>';
+            }
             
             const cardClass = isLast ? 'active-chain-node node-actual' : 'active-chain-node node-highlight';
             const icon = node.situacion_revista === 'titular' ? 'bi-person-badge-fill' : 'bi-person-fill';
@@ -229,7 +263,8 @@ async function renderCadenaAsignaciones(cargoId) {
         const selectR = document.getElementById("selectReemplazaA");
         selectR.innerHTML = '<option value="">-- Seleccionar Docente Licenciado --</option>';
         chain.forEach(node => {
-            const licInfo = node.licencia_actual ? ` (Lic: ${node.licencia_actual})` : (node.estado === 'licencia' ? ' (En Licencia)' : '');
+            const pendText = (node.tramite_estado === 'caratulado' || node.tramite_estado === 'en_tramitacion') ? ' (Pendiente)' : '';
+            const licInfo = node.licencia_actual ? ` [Lic: ${node.licencia_actual}${pendText}]` : (node.estado === 'licencia' ? ' [En Licencia]' : '');
             selectR.innerHTML += `<option value="${node.id}">[${node.situacion_revista.toUpperCase()}] ${node.docente_nombre}${licInfo}</option>`;
         });
 

@@ -22,7 +22,7 @@ class AuditoriaService {
     }
 
     async obtener(filtros) {
-        return await AuditoriaModel.getAll(filtros);
+        return AuditoriaModel.getAll(filtros);
     }
 
     async obtenerFiltros() {

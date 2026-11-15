@@ -2,7 +2,7 @@ const MateriaRepository = require('../models/materia.model');
 
 class MateriaService {
     async getAllMaterias() {
-        return await MateriaRepository.findAll();
+        return MateriaRepository.findAll();
     }
 }
 

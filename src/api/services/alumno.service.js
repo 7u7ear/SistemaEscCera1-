@@ -1,7 +1,6 @@
 const db = require('../../../config/database');
 const AppError = require('../../shared/errors/AppError');
 const AuditoriaService = require('./auditoria.service');
-const logger = require('./logger.service');
 
 class AlumnoService {
     async getAllAlumnos() {

@@ -3,14 +3,14 @@ const AppError = require('../../shared/errors/AppError');
 
 class CodigoTramiteService {
     async getAll() {
-        return await CodigoTramiteRepository.findAll();
+        return CodigoTramiteRepository.findAll();
     }
 
     async create(data) {
         if (!data.codigo || !data.descripcion_tramite) {
             throw new AppError('Código y descripción son obligatorios', 400);
         }
-        return await CodigoTramiteRepository.create({
+        return CodigoTramiteRepository.create({
             codigo: data.codigo,
             descripcion_tramite: data.descripcion_tramite
         });
@@ -21,7 +21,7 @@ class CodigoTramiteService {
         if (!existing) {throw new AppError('Código de trámite no encontrado', 404);}
         await CodigoTramiteRepository.update(id, {
             codigo: data.codigo,
-            descripcion_tramite: data.descripcion
+            descripcion_tramite: data.descripcion_tramite || data.descripcion
         });
     }
 

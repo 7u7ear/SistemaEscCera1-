@@ -2,7 +2,6 @@
  * Unit tests for DocenteService business logic.
  * Repository layer is mocked to isolate service behavior.
  */
-const AppError = require('../../src/shared/errors/AppError');
 
 jest.mock('../../src/api/models/docente.model', () => ({
   findAll: jest.fn(),

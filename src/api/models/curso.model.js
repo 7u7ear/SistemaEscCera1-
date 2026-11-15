@@ -61,7 +61,7 @@ class CursoRepository {
 
     async assignPreceptor(curso_id, docente_id, anio_lectivo) {
         const ids = Array.isArray(docente_id) ? docente_id : (docente_id ? [docente_id] : []);
-        return await this.assignPreceptores(curso_id, ids, anio_lectivo);
+        return this.assignPreceptores(curso_id, ids, anio_lectivo);
     }
 
     async getEstudiantesByCurso(curso_id, anio_lectivo) {

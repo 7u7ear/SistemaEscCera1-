@@ -1,6 +1,6 @@
 const logger = require('../services/logger.service');
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   // Handle Zod Validation Errors
   if (err.name === 'ZodError') {
     return res.status(400).json({

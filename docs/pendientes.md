@@ -1,6 +1,6 @@
 # Tareas Pendientes — Sistema Escolar CERA 1
 
-> Última actualización: 2026-10-12
+> Última actualización: 2026-11-15
 > Este documento es la fuente de verdad del estado del proyecto. Leerlo al inicio de cada sesión.
 
 ---
@@ -8,7 +8,11 @@
 ## 🔴 ALTA PRIORIDAD — Próximos Desarrollos
 
 ### Licencias & Puestos
-- [ ] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`)
+- [x] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`) (2026-11-15):
+  - Detección inmediata en `cargo.model.js` (`docente_licencia_nombre`, `licencia_activa`, `tramite_estado`) evitando que puestos con titular en licencia figuren como "VACANTE".
+  - Badges informativos en la tabla de Cargos: `Lic. Pendiente` (con trámite caratulado/en tramitación) y `Licencia Vigente`.
+  - Integración en la cadena de asignaciones (`findActiveChain`) soportando licencias específicas y generales (`cargo_id IS NULL`), facilitando el reemplazo inmediato por suplentes.
+  - Visualización sincronizada en Cursos y Horarios (`(En Licencia)`).
 
 ---
 
@@ -28,17 +32,17 @@
 
 ### Refactoring General
 - [x] Eliminar fallback de sesiones en `src/api/middlewares/auth.js` — completado (solo JWT)
-- [ ] Esquemas Zod: `tramitacion.validation.js`, `codigo_tramite.validation.js`, `permiso.validation.js`
-- [ ] Actualizar `usuario.validation.js` — añadir adminCreate, status y perfil
-- [ ] Actualizar `cargo.validation.js` — añadir tipos-hora
-- [ ] Refactorizar módulo Permisos → MVC + Service Layer:
-  - [ ] `src/api/models/permiso.model.js`
-  - [ ] `src/api/services/permiso.service.js`
-  - [ ] `src/api/controllers/permiso.controller.js`
-  - [ ] Modificar `src/api/routes/v1/permisos.routes.js`
-- [ ] Aplicar Zod en controllers: `usuario`, `cargo`, `tramitacion`, `codigo_tramite`
+- [x] Esquemas Zod: `tramitacion.validation.js`, `codigo_tramite.validation.js`, `permiso.validation.js` (2026-11-15)
+- [x] Actualizar `usuario.validation.js` — añadir adminCreate, status y perfil (2026-11-15)
+- [x] Actualizar `cargo.validation.js` — añadir tipos-hora (2026-11-15)
+- [x] Refactorizar módulo Permisos → MVC + Service Layer (2026-11-15):
+  - [x] `src/api/models/permiso.model.js`
+  - [x] `src/api/services/permiso.service.js`
+  - [x] `src/api/controllers/permiso.controller.js`
+  - [x] Modificar `src/api/routes/v1/permisos.routes.js`
+- [x] Aplicar Zod en controllers: `usuario`, `cargo`, `tramitacion`, `codigo_tramite` (2026-11-15)
 - [x] Campo `anio_materia` y `ciclo_lectivo` en materias adeudadas + historial de exámenes (nota, libro, folio, fecha) (2026-10-12)
-- [ ] Revisión visual botones negros→azules en modales: tramitaciones, licencias, docentes, cargos
+- [x] Revisión visual botones negros→azules en modales: tramitaciones, licencias, docentes, cargos (2026-11-15)
 
 ---
 

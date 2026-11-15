@@ -1,6 +1,5 @@
 const CargoService = require('../services/cargo.service');
 const { createCargoSchema, updateCargoSchema, assignDocenteSchema, addDistribucionSchema, createTipoHoraSchema, bajaDocenteSchema } = require('../validations/cargo.validation');
-const logger = require('../services/logger.service');
 
 class CargoController {
     async getAll(req, res, next) {

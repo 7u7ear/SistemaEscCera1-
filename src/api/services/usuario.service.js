@@ -6,15 +6,15 @@ const AuditoriaService = require('./auditoria.service');
 
 class UsuarioService {
     async getAllUsuarios() {
-        return await UsuarioRepository.findAll();
+        return UsuarioRepository.findAll();
     }
 
     async getAllPerfiles() {
-        return await UsuarioRepository.findAllPerfiles();
+        return UsuarioRepository.findAllPerfiles();
     }
 
     async getUsuarioById(id) {
-        return await UsuarioRepository.findById(id);
+        return UsuarioRepository.findById(id);
     }
 
     async authenticate(username, password) {
@@ -33,7 +33,7 @@ class UsuarioService {
             throw new AppError('Usuario no encontrado o contraseña incorrecta', 401);
         }
 
-        return await UsuarioRepository.findById(user.id);
+        return UsuarioRepository.findById(user.id);
     }
 
     async register(data) {
@@ -121,7 +121,7 @@ class UsuarioService {
 
     async updateUserPerfil(id, perfil_id, adminId) {
         const ids = Array.isArray(perfil_id) ? perfil_id : (perfil_id ? [perfil_id] : []);
-        return await this.updateUserPerfiles(id, ids, adminId);
+        return this.updateUserPerfiles(id, ids, adminId);
     }
 }
 

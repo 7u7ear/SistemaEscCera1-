@@ -3,7 +3,7 @@ const AppError = require('../../shared/errors/AppError');
 
 class DocenteService {
     async getAllDocentes() {
-        return await DocenteRepository.findAll();
+        return DocenteRepository.findAll();
     }
 
     async createDocente(docenteData) {
@@ -12,7 +12,7 @@ class DocenteService {
         if (exists) {
             throw new AppError('Ya existe un docente con ese RRHH ID, DNI o CUIL', 400);
         }
-        return await DocenteRepository.create(docenteData);
+        return DocenteRepository.create(docenteData);
     }
 
     async updateDocente(id, docenteData) {
@@ -29,15 +29,15 @@ class DocenteService {
     }
 
     async getDocenteCargos(id) {
-        return await DocenteRepository.findCargos(id);
+        return DocenteRepository.findCargos(id);
     }
 
     async getDocentesByCargo(tipoCargo) {
-        return await DocenteRepository.findByCargo(tipoCargo);
+        return DocenteRepository.findByCargo(tipoCargo);
     }
 
     async getPreceptores() {
-        return await DocenteRepository.findPreceptores();
+        return DocenteRepository.findPreceptores();
     }
 }
 

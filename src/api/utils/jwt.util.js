@@ -30,7 +30,7 @@ const generarToken = (user) => {
 const verificarToken = (token) => {
     try {
         return jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch (_error) {
         return null;
     }
 };

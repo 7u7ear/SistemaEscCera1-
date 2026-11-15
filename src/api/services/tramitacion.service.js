@@ -4,7 +4,7 @@ const AuditoriaService = require('./auditoria.service');
 
 class TramitacionService {
     async getAll() {
-        return await TramitacionRepository.findAll();
+        return TramitacionRepository.findAll();
     }
 
     async create(data, userId) {

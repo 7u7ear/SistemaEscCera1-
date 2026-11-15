@@ -17,28 +17,56 @@ class CursoController {
             const [rows] = await db.query(`
                 SELECT dh.*, m.nombre AS materia_nombre,
                        c.numero_puesto,
-                       (SELECT CONCAT(d.apellido, ', ', d.nombre)
-                        FROM cargo_docente cd2
-                        JOIN docentes d ON cd2.docente_id = d.id
-                        WHERE cd2.cargo_id = dh.cargo_id 
-                          AND cd2.estado = 'activo' 
-                          AND cd2.deleted_at IS NULL
-                        ORDER BY cd2.fecha_inicio DESC
-                        LIMIT 1) AS docente_display,
-                       (SELECT cd2.situacion_revista
-                        FROM cargo_docente cd2
-                        WHERE cd2.cargo_id = dh.cargo_id 
-                          AND cd2.estado = 'activo' 
-                          AND cd2.deleted_at IS NULL
-                        ORDER BY cd2.fecha_inicio DESC
-                        LIMIT 1) AS situacion_revista,
-                       (SELECT cd2.id
-                        FROM cargo_docente cd2
-                        WHERE cd2.cargo_id = dh.cargo_id 
-                          AND cd2.estado = 'activo' 
-                          AND cd2.deleted_at IS NULL
-                        ORDER BY cd2.fecha_inicio DESC
-                        LIMIT 1) AS cargo_docente_id
+                       COALESCE(
+                           (SELECT CONCAT(d.apellido, ', ', d.nombre)
+                            FROM cargo_docente cd2
+                            JOIN docentes d ON cd2.docente_id = d.id
+                            WHERE cd2.cargo_id = dh.cargo_id 
+                              AND cd2.estado = 'activo' 
+                              AND cd2.deleted_at IS NULL
+                            ORDER BY cd2.fecha_inicio DESC
+                            LIMIT 1),
+                           (SELECT CONCAT(d.apellido, ', ', d.nombre, ' (En Licencia)')
+                            FROM cargo_docente cd3
+                            JOIN docentes d ON cd3.docente_id = d.id
+                            WHERE cd3.cargo_id = dh.cargo_id 
+                              AND cd3.estado = 'licencia' 
+                              AND cd3.deleted_at IS NULL
+                            ORDER BY cd3.fecha_inicio DESC
+                            LIMIT 1)
+                       ) AS docente_display,
+                       COALESCE(
+                           (SELECT cd2.situacion_revista
+                            FROM cargo_docente cd2
+                            WHERE cd2.cargo_id = dh.cargo_id 
+                              AND cd2.estado = 'activo' 
+                              AND cd2.deleted_at IS NULL
+                            ORDER BY cd2.fecha_inicio DESC
+                            LIMIT 1),
+                           (SELECT cd3.situacion_revista
+                            FROM cargo_docente cd3
+                            WHERE cd3.cargo_id = dh.cargo_id 
+                              AND cd3.estado = 'licencia' 
+                              AND cd3.deleted_at IS NULL
+                            ORDER BY cd3.fecha_inicio DESC
+                            LIMIT 1)
+                       ) AS situacion_revista,
+                       COALESCE(
+                           (SELECT cd2.id
+                            FROM cargo_docente cd2
+                            WHERE cd2.cargo_id = dh.cargo_id 
+                              AND cd2.estado = 'activo' 
+                              AND cd2.deleted_at IS NULL
+                            ORDER BY cd2.fecha_inicio DESC
+                            LIMIT 1),
+                           (SELECT cd3.id
+                            FROM cargo_docente cd3
+                            WHERE cd3.cargo_id = dh.cargo_id 
+                              AND cd3.estado = 'licencia' 
+                              AND cd3.deleted_at IS NULL
+                            ORDER BY cd3.fecha_inicio DESC
+                            LIMIT 1)
+                       ) AS cargo_docente_id
                 FROM distribucion_horas dh
                 JOIN materias m ON dh.materia_id = m.id
                 JOIN cargos c ON dh.cargo_id = c.id
