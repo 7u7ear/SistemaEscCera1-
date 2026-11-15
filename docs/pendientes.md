@@ -7,6 +7,11 @@
 
 ## 🔴 ALTA PRIORIDAD — Próximos Desarrollos
 
+### Normalización de Nombres y Texto
+- [ ] Normalización a MAYÚSCULAS sin acentos/tildes ni caracteres especiales en nombres de docentes, materias, alumnos y cargos (ej: "Educación Física" → "EDUCACION FISICA"), preservando correos electrónicos intactos en minúsculas:
+  - Función de sanitización/conversión en Services/Backend al crear y actualizar registros.
+  - Script de migración de una sola vez para normalizar datos existentes en la base de datos.
+
 ### Licencias & Puestos
 - [x] Afectación inmediata del puesto al crear licencia (estado `PENDIENTE`) (2026-11-15):
   - Detección inmediata en `cargo.model.js` (`docente_licencia_nombre`, `licencia_activa`, `tramite_estado`) evitando que puestos con titular en licencia figuren como "VACANTE".
