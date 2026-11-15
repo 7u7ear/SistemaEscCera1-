@@ -35,15 +35,20 @@ describe('DocenteService', () => {
       })).rejects.toMatchObject({ status: 400 });
     });
 
-    it('should create a docente if no duplicate exists', async () => {
+    it('should create a docente if no duplicate exists and normalize names to uppercase without accents', async () => {
       DocenteRepository.findDuplicate.mockResolvedValue(null);
       DocenteRepository.create.mockResolvedValue(5);
       const id = await DocenteService.createDocente({
-        rrhh_id: 'X002', apellido: 'López', nombre: 'Ana',
+        rrhh_id: 'X002', apellido: 'López', nombre: 'Ana María',
+        email: 'Ana.Lopez@Escuela.Edu.Ar',
         dni: '87654321', cuil: '27876543219'
       });
       expect(id).toBe(5);
-      expect(DocenteRepository.create).toHaveBeenCalledTimes(1);
+      expect(DocenteRepository.create).toHaveBeenCalledWith(expect.objectContaining({
+        apellido: 'LOPEZ',
+        nombre: 'ANA MARIA',
+        email: 'ana.lopez@escuela.edu.ar'
+      }));
     });
   });
 

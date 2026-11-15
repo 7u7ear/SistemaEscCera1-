@@ -1,6 +1,7 @@
 const CargoRepository = require('../models/cargo.model');
 const AppError = require('../../shared/errors/AppError');
 const AuditoriaService = require('../services/auditoria.service');
+const { normalizeText } = require('../utils/string.util');
 
 class CargoService {
     async getAllCargos() {
@@ -8,24 +9,32 @@ class CargoService {
     }
 
     async createCargo(cargoData, userId) {
-        const { numero_puesto } = cargoData;
+        const sanitized = {
+            ...cargoData,
+            tipo_cargo: normalizeText(cargoData.tipo_cargo)
+        };
+        const { numero_puesto } = sanitized;
         const exists = await CargoRepository.findByNumeroPuesto(numero_puesto);
         if (exists) {
             throw new AppError('Ya existe un cargo con ese número de puesto', 400);
         }
-        const cargoId = await CargoRepository.create(cargoData);
-        await AuditoriaService.registrar(userId, 'CREATE', 'CARGO', cargoId, cargoData);
+        const cargoId = await CargoRepository.create(sanitized);
+        await AuditoriaService.registrar(userId, 'CREATE', 'CARGO', cargoId, sanitized);
         return cargoId;
     }
 
     async updateCargo(id, cargoData, userId) {
-        const { numero_puesto } = cargoData;
+        const sanitized = {
+            ...cargoData,
+            tipo_cargo: normalizeText(cargoData.tipo_cargo)
+        };
+        const { numero_puesto } = sanitized;
         const exists = await CargoRepository.findByNumeroPuesto(numero_puesto, id);
         if (exists) {
             throw new AppError('Otro cargo ya tiene ese número de puesto', 400);
         }
-        await CargoRepository.update(id, cargoData);
-        await AuditoriaService.registrar(userId, 'UPDATE', 'CARGO', id, cargoData);
+        await CargoRepository.update(id, sanitized);
+        await AuditoriaService.registrar(userId, 'UPDATE', 'CARGO', id, sanitized);
     }
 
     async deleteCargo(id, userId) {
@@ -122,8 +131,9 @@ class CargoService {
     }
 
     async createTipoHora(nombre, descripcion, userId) {
-        const id = await CargoRepository.createTipoHora(nombre, descripcion);
-        await AuditoriaService.registrar(userId, 'CREATE', 'TIPO_HORA', id, { nombre, descripcion });
+        const nombreNorm = normalizeText(nombre);
+        const id = await CargoRepository.createTipoHora(nombreNorm, descripcion);
+        await AuditoriaService.registrar(userId, 'CREATE', 'TIPO_HORA', id, { nombre: nombreNorm, descripcion });
         return id;
     }
 

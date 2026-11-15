@@ -1,6 +1,7 @@
 const db = require('../../../config/database');
 const AppError = require('../../shared/errors/AppError');
 const AuditoriaService = require('./auditoria.service');
+const { normalizeText, normalizeEmail } = require('../utils/string.util');
 
 class AlumnoService {
     async getAllAlumnos() {
@@ -73,11 +74,15 @@ class AlumnoService {
                 throw new AppError('Ya existe un alumno con ese DNI', 400);
             }
 
+            const apellido = normalizeText(data.apellido);
+            const nombre = normalizeText(data.nombre);
+            const email = normalizeEmail(data.email);
+
             // Insertar alumno
             const [result] = await connection.query(
                 `INSERT INTO alumnos (apellido, nombre, dni, fecha_nacimiento, direccion, email, created_at, updated_at) 
                  VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-                [data.apellido, data.nombre, data.dni, data.fecha_nacimiento, data.direccion || null, data.email || null]
+                [apellido, nombre, data.dni, data.fecha_nacimiento, data.direccion || null, email || null]
             );
             const alumnoId = result.insertId;
 
@@ -92,12 +97,12 @@ class AlumnoService {
                         `INSERT INTO familiares (nombre, apellido, dni, telefono, email, parentesco, alumno_id, created_at, updated_at)
                          VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
                         [
-                            fam.nombre,
-                            fam.apellido,
+                            normalizeText(fam.nombre),
+                            normalizeText(fam.apellido),
                             fam.dni,
                             fam.telefono || null,
-                            fam.email || null,
-                            fam.parentesco || null,
+                            normalizeEmail(fam.email) || null,
+                            normalizeText(fam.parentesco) || null,
                             alumnoId
                         ]
                     );
@@ -112,7 +117,7 @@ class AlumnoService {
             );
 
             await connection.commit();
-            await AuditoriaService.registrar(userId, 'CREATE', 'ALUMNOS', alumnoId, { dni: data.dni, apellido: data.apellido });
+            await AuditoriaService.registrar(userId, 'CREATE', 'ALUMNOS', alumnoId, { dni: data.dni, apellido });
             return alumnoId;
         } catch (err) {
             await connection.rollback();
@@ -132,11 +137,15 @@ class AlumnoService {
                 throw new AppError('Otro alumno ya posee ese DNI', 400);
             }
 
+            const apellido = normalizeText(data.apellido);
+            const nombre = normalizeText(data.nombre);
+            const email = normalizeEmail(data.email);
+
             await connection.query(
                 `UPDATE alumnos 
                  SET apellido = ?, nombre = ?, dni = ?, fecha_nacimiento = ?, direccion = ?, email = ?, updated_at = NOW() 
                  WHERE id = ?`,
-                [data.apellido, data.nombre, data.dni, data.fecha_nacimiento, data.direccion || null, data.email || null, id]
+                [apellido, nombre, data.dni, data.fecha_nacimiento, data.direccion || null, email || null, id]
             );
 
             // Si se pasa la lista de familiares, sincronizarla
@@ -148,12 +157,12 @@ class AlumnoService {
                             `INSERT INTO familiares (nombre, apellido, dni, telefono, email, parentesco, alumno_id, created_at, updated_at)
                              VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
                             [
-                                fam.nombre,
-                                fam.apellido,
+                                normalizeText(fam.nombre),
+                                normalizeText(fam.apellido),
                                 fam.dni,
                                 fam.telefono || null,
-                                fam.email || null,
-                                fam.parentesco || null,
+                                normalizeEmail(fam.email) || null,
+                                normalizeText(fam.parentesco) || null,
                                 id
                             ]
                         );

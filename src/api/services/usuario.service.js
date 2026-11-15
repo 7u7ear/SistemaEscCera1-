@@ -3,6 +3,7 @@ const UsuarioRepository = require('../models/usuario.model');
 const AppError = require('../../shared/errors/AppError');
 const bcrypt = require('bcrypt');
 const AuditoriaService = require('./auditoria.service');
+const { normalizeText, normalizeEmail } = require('../utils/string.util');
 
 class UsuarioService {
     async getAllUsuarios() {
@@ -46,8 +47,8 @@ class UsuarioService {
         const newUser = {
             username: data.username,
             password: hashedPassword,
-            nombre: data.nombre,
-            email: data.email || null
+            nombre: normalizeText(data.nombre),
+            email: normalizeEmail(data.email) || null
         };
 
         const insertId = await UsuarioRepository.create(newUser);
@@ -67,6 +68,8 @@ class UsuarioService {
             await conn.beginTransaction();
             const newUser = {
                 ...data,
+                nombre: normalizeText(data.nombre),
+                email: normalizeEmail(data.email) || null,
                 password: hashedPassword,
                 estado: 'activo'
             };
