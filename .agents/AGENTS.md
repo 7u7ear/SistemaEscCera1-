@@ -35,6 +35,7 @@ docs/
 - No exponer errores internos al cliente
 - En el frontend: SIEMPRE usar `api.getErrorMessage(err)` para mostrar errores — nunca `[object Object]`
 - No inventar tablas ni campos sin confirmar con el usuario
+- **Aviso obligatorio de cambios de estructura en BD**: Cada vez que un desarrollo implique modificar la base de datos (crear tablas, agregar/modificar columnas, claves o índices), avisar SIEMPRE explícitamente al usuario en la respuesta y proveer el script SQL para que pueda ejecutarlo en la PC de la escuela (WAMP/phpMyAdmin).
 - Naming en inglés, camelCase
 
 ## Estado del Proyecto
