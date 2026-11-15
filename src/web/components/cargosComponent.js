@@ -165,12 +165,8 @@ async function abrirModalGestion(cargoId, defaultTab = 'asignaciones') {
         selectD.innerHTML += `<option value="${d.id}">${d.apellido}, ${d.nombre}</option>`;
     });
 
-    // Poblar Select Materias
-    const selectM = document.getElementById("selectMateria");
-    selectM.innerHTML = '<option value="">-- Materia --</option>';
-    materiasGlobal.forEach(m => {
-        selectM.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
-    });
+    // Poblar Datalist de Materias para búsqueda en tiempo real
+    poblarDatalistMaterias();
 
     // Poblar Select Cursos
     const selectCursos = document.getElementById("selectCurso");
@@ -287,6 +283,8 @@ function mostrarFormMateria() {
 }
 
 function limpiarFormMateria() {
+    const inputBuscar = document.getElementById("inputBuscarMateria");
+    if (inputBuscar) inputBuscar.value = "";
     document.getElementById("inputHoras").value = "";
     document.getElementById("inputHoraIngreso").value = "";
     document.getElementById("inputHoraEgreso").value = "";
@@ -294,6 +292,83 @@ function limpiarFormMateria() {
     document.getElementById("selectCurso").value = "";
     document.getElementById("selectDia").value = "lunes";
     document.getElementById("selectTipoHora").value = "";
+}
+
+function poblarDatalistMaterias() {
+    const datalist = document.getElementById("listaMateriasDatalist");
+    if (!datalist) return;
+    datalist.innerHTML = "";
+    materiasGlobal
+        .slice()
+        .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''))
+        .forEach(m => {
+            const opt = document.createElement("option");
+            opt.value = m.nombre;
+            opt.dataset.id = m.id;
+            datalist.appendChild(opt);
+        });
+}
+
+function seleccionarMateriaDesdeInput() {
+    const input = document.getElementById("inputBuscarMateria");
+    const hidden = document.getElementById("selectMateria");
+    if (!input || !hidden) return;
+    const val = (input.value || '').trim().toUpperCase();
+    const found = materiasGlobal.find(m => (m.nombre || '').toUpperCase() === val);
+    if (found) {
+        hidden.value = found.id;
+    } else {
+        hidden.value = "";
+    }
+}
+
+function abrirModalCrearMateria() {
+    const inputNombre = document.getElementById("inputNuevoNombreMateria");
+    if (inputNombre) inputNombre.value = "";
+    const modalEl = document.getElementById("modalNuevaMateria");
+    if (modalEl && window.bootstrap && bootstrap.Modal) {
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+        setTimeout(() => {
+            if (inputNombre) inputNombre.focus();
+        }, 300);
+    }
+}
+
+async function guardarNuevaMateria() {
+    const input = document.getElementById("inputNuevoNombreMateria");
+    const nombre = (input ? input.value : "").trim();
+    if (!nombre) {
+        return alert("El nombre de la materia o función es requerido");
+    }
+
+    try {
+        const res = await api.post("/api/v1/materias", { nombre });
+        const data = await res.json();
+        if (!res.ok) {
+            return alert(api.getErrorMessage(data));
+        }
+
+        const nuevaMateria = data.data || data;
+
+        await cargarMaterias();
+        poblarDatalistMaterias();
+
+        // Seleccionar automáticamente en el formulario del puesto
+        const hidden = document.getElementById("selectMateria");
+        const inputBuscar = document.getElementById("inputBuscarMateria");
+        if (hidden) hidden.value = nuevaMateria.id;
+        if (inputBuscar) inputBuscar.value = nuevaMateria.nombre;
+
+        // Cerrar modal
+        const modalEl = document.getElementById("modalNuevaMateria");
+        if (modalEl && window.bootstrap && bootstrap.Modal) {
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+        }
+    } catch (err) {
+        alert("Error al crear materia: " + api.getErrorMessage(err));
+    }
 }
 
 async function cargarTiposHora() {
@@ -310,7 +385,10 @@ async function cargarTiposHora() {
 
 async function cargarMaterias() {
     const res = await api.get("/api/v1/materias");
-    if (res.ok) materiasGlobal = await res.json();
+    if (res.ok) {
+        materiasGlobal = await res.json();
+        poblarDatalistMaterias();
+    }
 }
 
 async function cargarCursos() {
@@ -468,7 +546,18 @@ let distribucionActual = [];
 async function agregarMateria() {
     const cargoId = document.getElementById("gestionCargoId").value;
     const editId = document.getElementById("editDistribucionId").value;
-    const materiaId = document.getElementById("selectMateria").value;
+    let materiaId = document.getElementById("selectMateria").value;
+    const inputBuscar = (document.getElementById("inputBuscarMateria") ? document.getElementById("inputBuscarMateria").value : "").trim().toUpperCase();
+
+    // Si no tiene materiaId pero escribió el nombre de una materia existente, resolverla
+    if (!materiaId && inputBuscar) {
+        const found = materiasGlobal.find(m => (m.nombre || '').toUpperCase() === inputBuscar);
+        if (found) {
+            materiaId = found.id;
+            document.getElementById("selectMateria").value = found.id;
+        }
+    }
+
     const cursoId = document.getElementById("selectCurso").value;
     const horas = document.getElementById("inputHoras").value;
     const dia = document.getElementById("selectDia").value;
@@ -476,7 +565,7 @@ async function agregarMateria() {
     const horaEgreso = document.getElementById("inputHoraEgreso").value;
     const tipoHoraId = document.getElementById("selectTipoHora").value;
 
-    if (!materiaId || !horas) return alert("Materia y Horas son obligatorios");
+    if (!materiaId || !horas) return alert("Debe seleccionar una materia válida de la lista (o crearla con el botón '+') y especificar las horas");
 
     const bodyData = {
         materia_id: parseInt(materiaId),
@@ -538,11 +627,14 @@ async function cargarDistribucion(cargoId) {
 }
 
 function editarMateria(id) {
-    const d = distribucionActual.find(x => x.id == id);
+    const d = distribucionActual.find(x => Number(x.id) === Number(id));
     if (!d) return;
 
     document.getElementById("editDistribucionId").value = d.id;
     document.getElementById("selectMateria").value = d.materia_id;
+    const mat = materiasGlobal.find(m => Number(m.id) === Number(d.materia_id));
+    const inputBuscar = document.getElementById("inputBuscarMateria");
+    if (inputBuscar) inputBuscar.value = mat ? mat.nombre : (d.materia_nombre || "");
     document.getElementById("selectCurso").value = d.curso_id;
     document.getElementById("selectDia").value = d.dia;
     document.getElementById("inputHoraIngreso").value = d.hora_ingreso ? d.hora_ingreso.substring(0, 5) : "";

@@ -7,5 +7,6 @@ const router = express.Router();
 router.use(auth);
 
 router.get('/', MateriaController.getAll);
+router.post('/', MateriaController.create);
 
 module.exports = router;

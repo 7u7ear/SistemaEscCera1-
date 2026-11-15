@@ -889,14 +889,21 @@
                         <div class="card p-3 border-0 shadow-sm h-100">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-calendar3"></i> Composición Horaria y Materias</h6>
-                                <button class="btn btn-sm btn-outline-primary" onclick="mostrarFormMateria()">+ Materia</button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="mostrarFormMateria()">+ Asignar Horario / Materia</button>
                             </div>
                             
                             <input type="hidden" id="editDistribucionId">
                             <!-- Formulario rápido de materia (oculto por defecto) -->
                             <div id="formRapidoMateria" class="mb-3 p-3 bg-light rounded" style="display:none;">
                                 <div class="row g-2 mb-2">
-                                    <div class="col-md-7"><select id="selectMateria" class="form-select form-select-sm"></select></div>
+                                    <div class="col-md-7">
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" id="inputBuscarMateria" list="listaMateriasDatalist" class="form-control form-control-sm" placeholder="-- Escribir o buscar materia --" oninput="seleccionarMateriaDesdeInput()" onchange="seleccionarMateriaDesdeInput()" autocomplete="off">
+                                            <datalist id="listaMateriasDatalist"></datalist>
+                                            <input type="hidden" id="selectMateria">
+                                            <button type="button" class="btn btn-outline-primary" onclick="abrirModalCrearMateria()" title="Crear nueva materia o función en el catálogo"><i class="bi bi-plus-lg"></i></button>
+                                        </div>
+                                    </div>
                                     <div class="col-md-5"><select id="selectCurso" class="form-select form-select-sm"></select></div>
                                 </div>
                                 <div class="row g-2 mb-2">
@@ -1276,6 +1283,23 @@
       <div class="modal-footer border-0 p-4 pt-0">
         <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" id="btnGuardarLicencia" class="btn btn-primary px-4 fw-bold shadow-sm" onclick="guardarLicencia(event)">Guardar Licencia</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVA MATERIA / CARGO -->
+<div class="modal fade" id="modalNuevaMateria" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-body p-4 text-center">
+        <h6 class="fw-bold mb-3"><i class="bi bi-book-half text-primary me-2"></i>Nueva Materia / Cargo</h6>
+        <p class="text-muted small mb-2">Ingresá el nombre de la materia o función a incorporar al catálogo.</p>
+        <input type="text" id="inputNuevoNombreMateria" class="form-control mb-3 text-uppercase" placeholder="Ej: TALLER DE ROBOTICA" autocomplete="off" onkeydown="if(event.key==='Enter') guardarNuevaMateria()">
+        <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-sm btn-light px-3" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" onclick="guardarNuevaMateria()">Guardar</button>
+        </div>
       </div>
     </div>
   </div>
