@@ -168,18 +168,8 @@ async function abrirModalGestion(cargoId, defaultTab = 'asignaciones') {
     // Poblar Datalist de Materias para búsqueda en tiempo real
     poblarDatalistMaterias();
 
-    // Poblar Select Cursos
-    const selectCursos = document.getElementById("selectCurso");
-    selectCursos.innerHTML = '<option value="">-- Seleccionar Curso --</option>';
-    selectCursos.innerHTML += '<option value="null">-- No aplica (Extraclase) --</option>';
-    cursosGlobal.forEach(c => {
-        let nombreCurso = `${fmtOrdinal(c.anio)} ${fmtOrdinal(c.division)} ${c.modalidad || ''}`;
-        if (c.especialidad && c.especialidad.trim() !== '') {
-            nombreCurso += ` ${c.especialidad}`;
-        }
-        nombreCurso += ` ${c.turno || ''}`;
-        selectCursos.innerHTML += `<option value="${c.id}">${nombreCurso.trim().replace(/\s+/g, ' ')}</option>`;
-    });
+    // Poblar Select Cursos agrupados por modalidad (B.E.C, T.C.A, AUX)
+    poblarSelectCursos();
 
     // Configurar fechas y limpiar inputs de Alta
     document.getElementById("fechaAsignacion").value = new Date().toISOString().split('T')[0];
@@ -391,9 +381,71 @@ async function cargarMaterias() {
     }
 }
 
+function poblarSelectCursos() {
+    const selectCursos = document.getElementById("selectCurso");
+    if (!selectCursos) return;
+
+    selectCursos.innerHTML = '<option value="">-- Seleccionar Curso --</option>';
+    selectCursos.innerHTML += '<option value="null">-- No aplica (Extraclase) --</option>';
+
+    // Agrupar cursos por modalidad
+    const porModalidad = {};
+    cursosGlobal.forEach(c => {
+        const mod = (c.modalidad || 'General').toUpperCase().trim();
+        if (!porModalidad[mod]) porModalidad[mod] = [];
+        porModalidad[mod].push(c);
+    });
+
+    const ordenPrioridad = ['B.E.C', 'T.C.A', 'AUX'];
+    const modalidadesOrdenadas = Object.entries(porModalidad).sort(([a], [b]) => {
+        let idxA = ordenPrioridad.findIndex(p => a.includes(p));
+        let idxB = ordenPrioridad.findIndex(p => b.includes(p));
+        if (idxA === -1) idxA = 99;
+        if (idxB === -1) idxB = 99;
+        return idxA - idxB;
+    });
+
+    for (const [modName, cursosMod] of modalidadesOrdenadas) {
+        const optgroup = document.createElement("optgroup");
+        let labelGroup = modName;
+        if (modName.includes('B.E.C')) labelGroup = 'B.E.C (Bachillerato)';
+        else if (modName.includes('T.C.A')) labelGroup = 'T.C.A (Técnico Ceramista)';
+        else if (modName.includes('AUX')) labelGroup = 'AUX (Auxiliar de Taller)';
+        optgroup.label = labelGroup;
+
+        // Ordenar por año, división y turno
+        cursosMod.sort((a, b) => {
+            const anioA = parseInt(a.anio, 10) || 0;
+            const anioB = parseInt(b.anio, 10) || 0;
+            if (anioA !== anioB) return anioA - anioB;
+            return (a.division || '').localeCompare(b.division || '');
+        });
+
+        cursosMod.forEach(c => {
+            let desc = `${fmtOrdinal(c.anio)} ${fmtOrdinal(c.division)}`;
+            if (c.especialidad && c.especialidad.trim()) {
+                desc += ` ${c.especialidad.trim()}`;
+            }
+            if (c.turno && c.turno.trim()) {
+                desc += ` (${c.turno.trim().toUpperCase()})`;
+            }
+
+            const opt = document.createElement("option");
+            opt.value = c.id;
+            opt.textContent = desc.trim().replace(/\s+/g, ' ');
+            optgroup.appendChild(opt);
+        });
+
+        selectCursos.appendChild(optgroup);
+    }
+}
+
 async function cargarCursos() {
     const res = await api.get("/api/v1/cursos");
-    if (res.ok) cursosGlobal = await res.json();
+    if (res.ok) {
+        cursosGlobal = await res.json();
+        poblarSelectCursos();
+    }
 }
 
 function toggleReemplazoDrop() {

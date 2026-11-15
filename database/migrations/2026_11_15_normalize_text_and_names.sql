@@ -107,3 +107,8 @@ WHERE `id` > 0;
 UPDATE `usuarios` SET 
     `nombre` = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(`nombre`, 'Á', 'A'), 'É', 'E'), 'Í', 'I'), 'Ó', 'O'), 'Ú', 'U'), 'Ü', 'U')
 WHERE `id` > 0;
+
+-- 7. CURSOS
+UPDATE `cursos` SET `especialidad` = REPLACE(`especialidad`, 'DECORACI?N', 'DECORACION') WHERE `especialidad` LIKE '%DECORACI?N%';
+UPDATE `cursos` SET `especialidad` = TRIM(`especialidad`) WHERE `id` > 0;
+
